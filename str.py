@@ -53,3 +53,27 @@ refran.split('no')              #parte la cadena en las veces que exista esa pal
 ### como podemos extraer la palabra "casa" de la siguiente cadena: "Tengo una casa roja" guardada en la variable frase?
 frase = "Tengo una casa roja"
 print(frase[frase.find('casa'):frase.find('casa')+len('casa')])
+
+# Codigo de caracteres 
+letra = "a"
+print(ord(letra))   #ASCII
+print(chr(43))      #convierte de codigo a caracter
+
+cadena = "El perro de Roque"
+for letra in cadena:
+    print(ord(letra), end=" ") #con "end" manipulamos el print para que lo imprima en la msiam linea con una espacio
+
+## podemos utilizar esta forma de almacenar los caracteres para encriptar un mensaje de forma sencilla con una encriptacion por deplazamiento
+## tambien conocida como cifrado cesar
+cadena="El perro de Roque"
+cadenaCodificada=""
+desplazamiento=7
+for letra in cadena:
+    cadenaCodificada = cadenaCodificada+chr(ord(letra)+desplazamiento)
+cadenaDeCodificada=''
+for letra in cadenaCodificada:
+    cadenaDeCodificada=cadenaDeCodificada+chr(ord(letra)-desplazamiento)
+
+print(cadena)
+print(cadenaCodificada)
+print(cadenaDeCodificada)
