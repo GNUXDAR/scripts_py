@@ -11,7 +11,6 @@ def descifrado():
     cadenaDeCodificada=''
     for letra in cadena:
         cadenaDeCodificada=cadenaDeCodificada+chr(ord(letra)-desplazamiento)
-
     print(cadenaDeCodificada)
 
 descifrado()
