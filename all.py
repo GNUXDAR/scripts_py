@@ -111,3 +111,32 @@ mifuncionParam(5, 5)
 # def suma(num1, num2):
 #     total = num1 + num2
 #     return total
+
+# modulos
+# cada uno de los archivos .py que generamos en python se denominan modulos, y son considerados contenedores para organizar nuestro codigo
+
+#paquetes
+# un pauqete es un modulo que sirve para contener otros modulos y paquetes, en la practica es un directorio que contiene un archivo '__init__.py
+# dentro de dicho directorio podremos tener almacenados otros modulos o paquetes
+# .
+# |-- modulo1.py
+# |-- paquete
+#   |-- __init__.py
+#   |-- modulo1.py
+#   |-- subpaquete
+#       |-- __init__.py
+#       |-- modulo1.py
+#       |-- modulo2.py
+
+
+import math
+help(math) # mostrar la descripcion de la libreria
+print(math.cos(math.pi))  #coseno de pi
+
+# funciones desde objetos
+miTexto = "el perro de san roque no tiene rabo"
+help(str)
+str.title(miTexto)  #poner el principio de cada palabra en mayuscula
+mitexto.title()     # lo mismo que en lo anterior
+mitexto.replace('san','mr')  #replazar palabras
+mitexto.replace('san','mr').title() 
