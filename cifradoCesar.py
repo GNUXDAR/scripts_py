@@ -4,11 +4,13 @@
 # print(chr(43))      #convierte de codigo a caracter
 
 # Cifrado
-cadena=input("$>")
-cadenaCodificada=""
-desplazamiento=7
-for letra in cadena:
-    cadenaCodificada = cadenaCodificada+chr(ord(letra)+desplazamiento)
+def cifrado():
+    cadena=input("$>")
+    cadenaCodificada=""
+    desplazamiento=input("num desplazamiento:")
+    desplazamiento = int(desplazamiento)
+    for letra in cadena:
+        cadenaCodificada = cadenaCodificada+chr(ord(letra)+desplazamiento)
+    print(cadenaCodificada)
 
-print(cadena)
-print(cadenaCodificada)
+cifrado()
