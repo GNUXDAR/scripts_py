@@ -59,18 +59,30 @@ letra = "a"
 print(ord(letra))   #ASCII
 print(chr(43))      #convierte de codigo a caracter
 
+## convertir caracter a ascii y vicebersa
+letra = input(" ")  #caracter
+print(ord(letra))
+print("\nrevertir")
+revertir = input("")        #ASCII
+revertir = int(revertir)
+print(chr(revertir))      #convierte de codigo a caracter
+
+
 cadena = "El perro de Roque"
 for letra in cadena:
     print(ord(letra), end=" ") #con "end" manipulamos el print para que lo imprima en la msiam linea con una espacio
 
 ## podemos utilizar esta forma de almacenar los caracteres para encriptar un mensaje de forma sencilla con una encriptacion por deplazamiento
 ## tambien conocida como cifrado cesar
-cadena="El perro de Roque"
-cadenaCodificada=""
+# cifrado y descifrado
+cadena="Sigueme en mis redes con el usuario gnuxdar"
+cadenaCodificada=''
 desplazamiento=7
+
 for letra in cadena:
     cadenaCodificada = cadenaCodificada+chr(ord(letra)+desplazamiento)
 cadenaDeCodificada=''
+
 for letra in cadenaCodificada:
     cadenaDeCodificada=cadenaDeCodificada+chr(ord(letra)-desplazamiento)
 
