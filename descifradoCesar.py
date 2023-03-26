@@ -5,10 +5,10 @@
 
 # Cifrado
 cadena=input("$>")
-cadenaCodificada=""
-desplazamiento=7
+desplazamiento=input("cant desplazamiento:")
+desplazamiento = int(desplazamiento)
+cadenaDeCodificada=''
 for letra in cadena:
-    cadenaCodificada = cadenaCodificada+chr(ord(letra)+desplazamiento)
+    cadenaDeCodificada=cadenaDeCodificada+chr(ord(letra)-desplazamiento)
 
-print(cadena)
-print(cadenaCodificada)
+print(cadenaDeCodificada)
