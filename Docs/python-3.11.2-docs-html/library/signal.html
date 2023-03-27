@@ -1,0 +1,980 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="signal — Establece gestores para eventos asíncronos" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/signal.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Source code: Lib/signal.py Este módulo proporciona mecanismos para usar gestores de señales en Python. Reglas generales: La función signal.signal() permite definir gestores personalizados que serán..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Source code: Lib/signal.py Este módulo proporciona mecanismos para usar gestores de señales en Python. Reglas generales: La función signal.signal() permite definir gestores personalizados que serán..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>signal — Establece gestores para eventos asíncronos &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="mmap — Soporte de archivos mapeados en memoria" href="mmap.html" />
+    <link rel="prev" title="selectors — Multiplexación de E/S de alto nivel" href="selectors.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/signal.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code> — Establece gestores para eventos asíncronos</a><ul>
+<li><a class="reference internal" href="#general-rules">Reglas generales</a><ul>
+<li><a class="reference internal" href="#execution-of-python-signal-handlers">Ejecución de los gestores de señales de Python</a></li>
+<li><a class="reference internal" href="#signals-and-threads">Señales e hilos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-contents">Contenidos del módulo</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#note-on-sigpipe">Nota sobre SIGPIPE</a></li>
+<li><a class="reference internal" href="#note-on-signal-handlers-and-exceptions">Note on Signal Handlers and Exceptions</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="selectors.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selectors</span></code> — Multiplexación de E/S de alto nivel</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="mmap.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mmap</span></code> — Soporte de archivos mapeados en memoria</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/signal.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="mmap.html" title="mmap — Soporte de archivos mapeados en memoria"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="selectors.html" title="selectors — Multiplexación de E/S de alto nivel"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" accesskey="U">Comunicación en redes y entre procesos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code> — Establece gestores para eventos asíncronos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-signal">
+<span id="signal-set-handlers-for-asynchronous-events"></span><h1><a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code></a> — Establece gestores para eventos asíncronos<a class="headerlink" href="#module-signal" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Source code:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/signal.py">Lib/signal.py</a></p>
+<hr class="docutils" />
+<p>Este módulo proporciona mecanismos para usar gestores de señales en Python.</p>
+<section id="general-rules">
+<h2>Reglas generales<a class="headerlink" href="#general-rules" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La función <a class="reference internal" href="#signal.signal" title="signal.signal"><code class="xref py py-func docutils literal notranslate"><span class="pre">signal.signal()</span></code></a> permite definir gestores personalizados que serán ejecutados cuando una señal es recibida. Un pequeño número de gestores por defecto son instalados: <a class="reference internal" href="#signal.SIGPIPE" title="signal.SIGPIPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGPIPE</span></code></a> es ignorada (por lo que los errores de escritura en tuberías y sockets se pueden informar como excepciones ordinarias de Python) y <a class="reference internal" href="#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGINT</span></code></a> es trasladada en una excepción <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> si el proceso padre no lo ha cambiado.</p>
+<p>El gestor para una señal en particular, una vez establecido, continua instalado hasta que se resetea explícitamente (Python emula el estilo de interfaz BSD independientemente de la implementación subyacente), con la excepción del gestor para <a class="reference internal" href="#signal.SIGCHLD" title="signal.SIGCHLD"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGCHLD</span></code></a>, que sigue la implementación subyacente.</p>
+<p>En las plataformas WebAssembly <code class="docutils literal notranslate"><span class="pre">wasm32-emscripten</span></code> y <code class="docutils literal notranslate"><span class="pre">wasm32-wasi</span></code>, las señales son emuladas y por lo tanto tiene un comportamiento diferente. Muchas de las funciones no están disponible en estas plataformas.</p>
+<section id="execution-of-python-signal-handlers">
+<h3>Ejecución de los gestores de señales de Python<a class="headerlink" href="#execution-of-python-signal-handlers" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Un gestor de señales de Python no se ejecuta dentro del gestor de señales de bajo nivel (C). En vez de eso, el gestor de señales de bajo nivel establece una señal que le dice al <a class="reference internal" href="../glossary.html#term-virtual-machine"><span class="xref std std-term">virtual machine</span></a> que ejecute la correspondiente señal del gestor de Python en una posición posterior (por ejemplo en la próxima instrucción <a class="reference internal" href="../glossary.html#term-bytecode"><span class="xref std std-term">bytecode</span></a>). Esto tiene consecuencias:</p>
+<ul class="simple">
+<li><p>Tiene poco sentido detectar errores sincrónicos como <a class="reference internal" href="#signal.SIGFPE" title="signal.SIGFPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGFPE</span></code></a> o <a class="reference internal" href="#signal.SIGSEGV" title="signal.SIGSEGV"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGSEGV</span></code></a> que son causados por una operación no válida en código C. Python retornará desde el gestor de señales a código C, que es probable que extienda la misma señal otra vez, ocasionando que Python se cuelgue aparentemente. Desde Python 3.3 en adelante, puedes usar el módulo <a class="reference internal" href="faulthandler.html#module-faulthandler" title="faulthandler: Dump the Python traceback."><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code></a> para reportar errores síncronos.</p></li>
+<li><p>Un cálculo de larga duración implementado exclusivamente en C (como una coincidencia de expresiones regulares en un gran cuerpo de texto) puede funcionar interrumpidamente durante una cantidad arbitraria de tiempo, independientemente de las señales recibidas. Los gestores de señales de Python serán llamados cuando el cálculo finalice.</p></li>
+<li><p>Si el gestor genera alguna excepción, será lanzada inesperadamente. Vea la <a class="reference internal" href="#handlers-and-exceptions"><span class="std std-ref">nota abajo</span></a> para discusión.</p></li>
+</ul>
+</section>
+<section id="signals-and-threads">
+<span id="id1"></span><h3>Señales e hilos<a class="headerlink" href="#signals-and-threads" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los gestores de señales de Python se ejecutan siempre en el hilo principal de Python, incluso si la señal fue recibida desde otro hilo. Esto significa que las señales no pueden ser usadas como un medio de comunicación entre hilos. Puedes usar las primitivas de sincronización desde el módulo <a class="reference internal" href="threading.html#module-threading" title="threading: Thread-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code></a> en su lugar.</p>
+<p>Además, solo el hilo principal puede configurar un nuevo gestor de señal.</p>
+</section>
+</section>
+<section id="module-contents">
+<h2>Contenidos del módulo<a class="headerlink" href="#module-contents" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>signal (SIG*), handler (<a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_DFL</span></code></a>, <a class="reference internal" href="#signal.SIG_IGN" title="signal.SIG_IGN"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_IGN</span></code></a>) and sigmask
+(<a class="reference internal" href="#signal.SIG_BLOCK" title="signal.SIG_BLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_BLOCK</span></code></a>, <a class="reference internal" href="#signal.SIG_UNBLOCK" title="signal.SIG_UNBLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_UNBLOCK</span></code></a>, <a class="reference internal" href="#signal.SIG_SETMASK" title="signal.SIG_SETMASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_SETMASK</span></code></a>)
+related constants listed below were turned into
+<a class="reference internal" href="enum.html#enum.IntEnum" title="enum.IntEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">enums</span></code></a> (<a class="reference internal" href="#signal.Signals" title="signal.Signals"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signals</span></code></a>, <a class="reference internal" href="#signal.Handlers" title="signal.Handlers"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handlers</span></code></a> and <a class="reference internal" href="#signal.Sigmasks" title="signal.Sigmasks"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sigmasks</span></code></a> respectively).
+<a class="reference internal" href="#signal.getsignal" title="signal.getsignal"><code class="xref py py-func docutils literal notranslate"><span class="pre">getsignal()</span></code></a>, <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a>, <a class="reference internal" href="#signal.sigpending" title="signal.sigpending"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigpending()</span></code></a> and
+<a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a> functions return human-readable
+<a class="reference internal" href="enum.html#enum.IntEnum" title="enum.IntEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">enums</span></code></a> as <a class="reference internal" href="#signal.Signals" title="signal.Signals"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signals</span></code></a> objects.</p>
+</div>
+<p>The signal module defines three enums:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="signal.Signals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">Signals</span></span><a class="headerlink" href="#signal.Signals" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><a class="reference internal" href="enum.html#enum.IntEnum" title="enum.IntEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a> colección de constantes SIG* y colección de constantes CTRL_*</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="signal.Handlers">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">Handlers</span></span><a class="headerlink" href="#signal.Handlers" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><a class="reference internal" href="enum.html#enum.IntEnum" title="enum.IntEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a> colección de constantes <a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_DFL</span></code></a> y <a class="reference internal" href="#signal.SIG_IGN" title="signal.SIG_IGN"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_IGN</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="signal.Sigmasks">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">Sigmasks</span></span><a class="headerlink" href="#signal.Sigmasks" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><a class="reference internal" href="enum.html#enum.IntEnum" title="enum.IntEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a> colección de constantes <a class="reference internal" href="#signal.SIG_BLOCK" title="signal.SIG_BLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_BLOCK</span></code></a>, <a class="reference internal" href="#signal.SIG_UNBLOCK" title="signal.SIG_UNBLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_UNBLOCK</span></code></a> y <a class="reference internal" href="#signal.SIG_SETMASK" title="signal.SIG_SETMASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_SETMASK</span></code></a>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigprocmask(2)">sigprocmask(2)</a></em> and
+<em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/pthread_sigmask(3)">pthread_sigmask(3)</a></em> for further information.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<p>Las variables definidas en el módulo <a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code></a> son:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIG_DFL">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIG_DFL</span></span><a class="headerlink" href="#signal.SIG_DFL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ésta es una de las dos opciones estándar de manejo de señales; simplemente realizará la función predeterminada para la señal. Por ejemplo, en la mayoría de los sistemas, la acción predeterminada para <code class="xref py py-const docutils literal notranslate"><span class="pre">SIGQUIT</span></code> es volcar el núcleo y salir, mientras que la acción predeterminada para <a class="reference internal" href="#signal.SIGCHLD" title="signal.SIGCHLD"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGCHLD</span></code></a> es simplemente ignorarlo.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIG_IGN">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIG_IGN</span></span><a class="headerlink" href="#signal.SIG_IGN" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este es otro manejador de señales estándar, que simplemente ignorará la señal dada.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGABRT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGABRT</span></span><a class="headerlink" href="#signal.SIGABRT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Abortar señal de <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/abort(3)">abort(3)</a></em>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGALRM">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGALRM</span></span><a class="headerlink" href="#signal.SIGALRM" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal de temporizador de <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/alarm(2)">alarm(2)</a></em>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGBREAK">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGBREAK</span></span><a class="headerlink" href="#signal.SIGBREAK" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Interrumpir desde el teclado (CTRL + BREAK).</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Windows.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGBUS">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGBUS</span></span><a class="headerlink" href="#signal.SIGBUS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Error de bus (mal acceso a la memoria).</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGCHLD">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGCHLD</span></span><a class="headerlink" href="#signal.SIGCHLD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El proceso hijo se detuvo o terminó.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGCLD">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGCLD</span></span><a class="headerlink" href="#signal.SIGCLD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Alias para <a class="reference internal" href="#signal.SIGCHLD" title="signal.SIGCHLD"><code class="xref py py-data docutils literal notranslate"><span class="pre">SIGCHLD</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGCONT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGCONT</span></span><a class="headerlink" href="#signal.SIGCONT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Continuar el proceso si está detenido actualmente</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGFPE">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGFPE</span></span><a class="headerlink" href="#signal.SIGFPE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Excepción de coma flotante. Por ejemplo, división por cero.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference internal" href="exceptions.html#ZeroDivisionError" title="ZeroDivisionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code></a> se genera cuando el segundo argumento de una operación de división o módulo es cero.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGHUP">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGHUP</span></span><a class="headerlink" href="#signal.SIGHUP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se detectó un bloqueo en el terminal de control o muerte del proceso de control.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGILL">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGILL</span></span><a class="headerlink" href="#signal.SIGILL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Instrucción ilegal.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGINT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGINT</span></span><a class="headerlink" href="#signal.SIGINT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Interrumpir desde el teclado (CTRL + C).</p>
+<p>La acción predeterminada es generar <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGKILL">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGKILL</span></span><a class="headerlink" href="#signal.SIGKILL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal de muerte.</p>
+<p>No se puede detectar, bloquear ni ignorar.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGPIPE">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGPIPE</span></span><a class="headerlink" href="#signal.SIGPIPE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Tubería rota: escriba en la tubería sin lectores.</p>
+<p>La acción predeterminada es ignorar la señal.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGSEGV">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGSEGV</span></span><a class="headerlink" href="#signal.SIGSEGV" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Fallo de segmentación: referencia de memoria no válida.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGSTKFLT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGSTKFLT</span></span><a class="headerlink" href="#signal.SIGSTKFLT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><blockquote>
+<div><p>Fallo en el coprocesador del stack. El kernel de Linux no lanza esta señal,esta sólo puede ser lanzada en el espacio de usuario.</p>
+</div></blockquote>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: Linux.</p>
+<p>On architectures where the signal is available. See
+the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/signal(7)">signal(7)</a></em> for further information.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGTERM">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGTERM</span></span><a class="headerlink" href="#signal.SIGTERM" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal de terminación.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGUSR1">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGUSR1</span></span><a class="headerlink" href="#signal.SIGUSR1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal definida por el usuario 1.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGUSR2">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGUSR2</span></span><a class="headerlink" href="#signal.SIGUSR2" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal definida por el usuario 2.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIGWINCH">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIGWINCH</span></span><a class="headerlink" href="#signal.SIGWINCH" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Señal de cambio de tamaño de ventana.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">SIG*</span></span></dt>
+<dd><p>Todos los números de señal se definen simbólicamente. Por ejemplo, la señal de colgar se define como <a class="reference internal" href="#signal.SIGHUP" title="signal.SIGHUP"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGHUP</span></code></a>; los nombres de las variables son idénticos a los nombres utilizados en los programas C, como se encuentran en <code class="docutils literal notranslate"><span class="pre">&lt;signal.h&gt;</span></code>. La página de manual de Unix para “<code class="xref c c-func docutils literal notranslate"><span class="pre">signal()</span></code>” enumera las señales existentes (en algunos sistemas esto es <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/signal(2) `, en otros la lista está en :manpage:`signal(7)">signal(2) `, en otros la lista está en :manpage:`signal(7)</a></em> ). Tenga en cuenta que no todos los sistemas definen el mismo conjunto de nombres de señales; Este módulo solo define los nombres definidos por el sistema.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.CTRL_C_EVENT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">CTRL_C_EVENT</span></span><a class="headerlink" href="#signal.CTRL_C_EVENT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La señal correspondiente al evento de pulsación de tecla <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd> <kbd class="kbd docutils literal notranslate"></kbd>+<kbd class="kbd docutils literal notranslate"></kbd> <kbd class="kbd docutils literal notranslate">C</kbd></kbd>. Esta señal solo se puede utilizar con <a class="reference internal" href="os.html#os.kill" title="os.kill"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.kill()</span></code></a>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Windows.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.CTRL_BREAK_EVENT">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">CTRL_BREAK_EVENT</span></span><a class="headerlink" href="#signal.CTRL_BREAK_EVENT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La señal correspondiente al evento de pulsación de tecla <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd> <kbd class="kbd docutils literal notranslate"></kbd>+<kbd class="kbd docutils literal notranslate"></kbd> <kbd class="kbd docutils literal notranslate">Break</kbd></kbd>. Esta señal solo se puede utilizar con <a class="reference internal" href="os.html#os.kill" title="os.kill"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.kill()</span></code></a>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Windows.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.NSIG">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">NSIG</span></span><a class="headerlink" href="#signal.NSIG" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un número más alto que el número más alto de señal. Use <a class="reference internal" href="#signal.valid_signals" title="signal.valid_signals"><code class="xref py py-func docutils literal notranslate"><span class="pre">valid_signals()</span></code></a> para obtener números válidos de señales.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.ITIMER_REAL">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">ITIMER_REAL</span></span><a class="headerlink" href="#signal.ITIMER_REAL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Reduce el temporizador de intervalo en tiempo real y entrega <a class="reference internal" href="#signal.SIGALRM" title="signal.SIGALRM"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGALRM</span></code></a> al vencimiento.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.ITIMER_VIRTUAL">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">ITIMER_VIRTUAL</span></span><a class="headerlink" href="#signal.ITIMER_VIRTUAL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Disminuye el temporizador de intervalo solo cuando el proceso se está ejecutando y entrega SIGVTALRM al vencimiento.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.ITIMER_PROF">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">ITIMER_PROF</span></span><a class="headerlink" href="#signal.ITIMER_PROF" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Disminuye el temporizador de intervalo tanto cuando se ejecuta el proceso como cuando el sistema se está ejecutando en nombre del proceso. Junto con ITIMER_VIRTUAL, este temporizador generalmente se usa para perfilar el tiempo que pasa la aplicación en el espacio del usuario y del kernel. SIGPROF se entrega al vencimiento.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIG_BLOCK">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIG_BLOCK</span></span><a class="headerlink" href="#signal.SIG_BLOCK" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un valor posible para el parámetro <em>how</em> para <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a> que indica que las señales deben bloquearse.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIG_UNBLOCK">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIG_UNBLOCK</span></span><a class="headerlink" href="#signal.SIG_UNBLOCK" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un valor posible para el parámetro <em>how</em> para <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a> que indica que las señales deben desbloquearse.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="signal.SIG_SETMASK">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">SIG_SETMASK</span></span><a class="headerlink" href="#signal.SIG_SETMASK" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un valor posible para el parámetro <em>how</em> para <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a> que indica que la máscara de señal debe ser reemplazada.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<p>El módulo <a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code></a> define una excepción:</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="signal.ItimerError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">ItimerError</span></span><a class="headerlink" href="#signal.ItimerError" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se genera para señalar un error de la implementación subyacente <a class="reference internal" href="#signal.setitimer" title="signal.setitimer"><code class="xref py py-func docutils literal notranslate"><span class="pre">setitimer()</span></code></a> o <a class="reference internal" href="#signal.getitimer" title="signal.getitimer"><code class="xref py py-func docutils literal notranslate"><span class="pre">getitimer()</span></code></a>. Espere este error si se pasa un temporizador de intervalo no válido o un tiempo negativo a <a class="reference internal" href="#signal.setitimer" title="signal.setitimer"><code class="xref py py-func docutils literal notranslate"><span class="pre">setitimer()</span></code></a>. Este error es un subtipo de <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3: </span>Este error solía ser un subtipo de <a class="reference internal" href="exceptions.html#IOError" title="IOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IOError</span></code></a>, que ahora es un alias de <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<p>El módulo <a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code></a> define las siguientes funciones:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.alarm">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">alarm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.alarm" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si <em>time</em> es distinto de cero, esta función solicita que se envíe una señal <a class="reference internal" href="#signal.SIGALRM" title="signal.SIGALRM"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGALRM</span></code></a> al proceso en <em>time</em> segundos. Se cancela cualquier alarma programada previamente (solo se puede programar una alarma en cualquier momento). El valor retornado es entonces el número de segundos antes de que se entregara cualquier alarma previamente configurada. Si <em>time</em> es cero, no se programa ninguna alarma y se cancela cualquier alarma programada. Si el valor de retorno es cero, no hay ninguna alarma programada actualmente.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/alarm(2)">alarm(2)</a></em> for further information.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.getsignal">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">getsignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signalnum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.getsignal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el manejador de señales actual para la señal <em>signalnum</em>. El valor retornado puede ser un objeto de Python invocable o uno de los valores especiales <a class="reference internal" href="#signal.SIG_IGN" title="signal.SIG_IGN"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_IGN</span></code></a>, <a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_DFL</span></code></a> o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a>. Aquí, <a class="reference internal" href="#signal.SIG_IGN" title="signal.SIG_IGN"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_IGN</span></code></a> significa que la señal fue previamente ignorada, <a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_DFL</span></code></a> significa que la forma predeterminada de manejar la señal estaba en uso anteriormente, y el gestor de señales no se instaló desde Python.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.strsignal">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">strsignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signalnum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.strsignal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Returns the description of signal <em>signalnum</em>, such as «Interrupt»
+for <a class="reference internal" href="#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGINT</span></code></a>. Returns <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> if <em>signalnum</em> has no
+description. Raises <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> if <em>signalnum</em> is invalid.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.valid_signals">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">valid_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#signal.valid_signals" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el conjunto de números de señal válidos en esta plataforma. Esto puede ser menor que <code class="docutils literal notranslate"><span class="pre">rango(1,</span> <span class="pre">NSIG)</span></code> si el sistema reserva algunas señales para uso interno.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.pause">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">pause</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#signal.pause" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Hacer que el proceso duerma hasta que se reciba una señal; entonces se llamará al manejador apropiado. No retorna nada.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/signal(2)">signal(2)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a>, <a class="reference internal" href="#signal.sigwaitinfo" title="signal.sigwaitinfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwaitinfo()</span></code></a>, <a class="reference internal" href="#signal.sigtimedwait" title="signal.sigtimedwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigtimedwait()</span></code></a> y <a class="reference internal" href="#signal.sigpending" title="signal.sigpending"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigpending()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.raise_signal">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">raise_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.raise_signal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía una señal al proceso de llamada. No retorna nada.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.pidfd_send_signal">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">pidfd_send_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pidfd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">siginfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.pidfd_send_signal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía la señal <em>sig</em> al proceso referido por el descriptor de archivo <em>pidfd</em>. Python actualmente no soporta el parámetro <em>siginfo</em>; éste debe ser <code class="docutils literal notranslate"><span class="pre">None</span></code>. El argumento <em>flags</em> está proveído para extensiones futuras; no hay valores actualmente definidos para <em>flags</em>.</p>
+<p>Para más información vea la página de manual <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/pidfd_send_signal(2)">pidfd_send_signal(2)</a></em>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: Linux &gt;= 5.1</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.pthread_kill">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">pthread_kill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signalnum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.pthread_kill" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envíe la señal <em>signalnum</em> al hilo <em>thread_id</em>, otro hilo en el mismo proceso que el llamador. El hilo de destino puede ejecutar cualquier código (Python o no). Sin embargo, si el hilo de destino está ejecutando el intérprete de Python, los manejadores de señales de Python serán <a class="reference internal" href="#signals-and-threads"><span class="std std-ref">ejecutados por el hilo principal</span></a>. Por lo tanto, el único punto de enviar una señal a un hilo de Python en particular sería forzar que una llamada al sistema en ejecución falle con <a class="reference internal" href="exceptions.html#InterruptedError" title="InterruptedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InterruptedError</span></code></a>.</p>
+<p>Utilice <a class="reference internal" href="threading.html#threading.get_ident" title="threading.get_ident"><code class="xref py py-func docutils literal notranslate"><span class="pre">threading.get_ident()</span></code></a> o el atributo <a class="reference internal" href="threading.html#threading.Thread.ident" title="threading.Thread.ident"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ident</span></code></a> de los objetos <a class="reference internal" href="threading.html#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></a> para obtener un valor adecuado para <em>thread_id</em>.</p>
+<p>Si <em>signalnum</em> es 0, no se envía ninguna señal, pero se sigue realizando la comprobación de errores; esto se puede usar para verificar si el hilo de destino aún se está ejecutando.</p>
+<p class="audit-hook">Genera un <a class="reference internal" href="sys.html#auditing"><span class="std std-ref">evento de auditoría</span></a> <code class="docutils literal notranslate"><span class="pre">signal.pthread_kill</span></code> con argumentos <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>, <code class="docutils literal notranslate"><span class="pre">signalnum</span></code>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/pthread_kill(3)">pthread_kill(3)</a></em> for further  information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="os.html#os.kill" title="os.kill"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.kill()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.pthread_sigmask">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">pthread_sigmask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">how</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.pthread_sigmask" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca o cambia la máscara de señal del hilo de llamada. La máscara de señal es el conjunto de señales cuya entrega está actualmente bloqueada para la persona que llama. Retorna la máscara de señal anterior como un conjunto de señales.</p>
+<p>El comportamiento de la llamada depende del valor de <em>how</em>, como sigue.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#signal.SIG_BLOCK" title="signal.SIG_BLOCK"><code class="xref py py-data docutils literal notranslate"><span class="pre">SIG_BLOCK</span></code></a>: El conjunto de señales bloqueadas es la unión del conjunto actual y el argumento <em>mask</em>.</p></li>
+<li><p><a class="reference internal" href="#signal.SIG_UNBLOCK" title="signal.SIG_UNBLOCK"><code class="xref py py-data docutils literal notranslate"><span class="pre">SIG_UNBLOCK</span></code></a>: Las señales en <em>mask</em> se eliminan del conjunto actual de señales bloqueadas. Está permitido intentar desbloquear una señal que no esté bloqueada.</p></li>
+<li><p><a class="reference internal" href="#signal.SIG_SETMASK" title="signal.SIG_SETMASK"><code class="xref py py-data docutils literal notranslate"><span class="pre">SIG_SETMASK</span></code></a>: El conjunto de señales bloqueadas se establece en el argumento <em>mask</em>.</p></li>
+</ul>
+<p><em>mask</em> es un conjunto de números de señales (por ejemplo, {<a class="reference internal" href="#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGINT</span></code></a>, <a class="reference internal" href="#signal.SIGTERM" title="signal.SIGTERM"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGTERM</span></code></a>}). Utilice <a class="reference internal" href="#signal.valid_signals" title="signal.valid_signals"><code class="xref py py-func docutils literal notranslate"><span class="pre">valid_signals()</span></code></a> para una máscara completa que incluya todas las señales.</p>
+<p>Por ejemplo, <code class="docutils literal notranslate"><span class="pre">signal.pthread_sigmask(signal.SIG_BLOCK,</span> <span class="pre">[])</span></code> lee la máscara de señal del hilo de llamada.</p>
+<p><a class="reference internal" href="#signal.SIGKILL" title="signal.SIGKILL"><code class="xref py py-data docutils literal notranslate"><span class="pre">SIGKILL</span></code></a> y <code class="xref py py-data docutils literal notranslate"><span class="pre">SIGSTOP</span></code> no se pueden bloquear.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigprocmask(2)">sigprocmask(2)</a></em> and
+<em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/pthread_sigmask(3)">pthread_sigmask(3)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.pause" title="signal.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a>, <a class="reference internal" href="#signal.sigpending" title="signal.sigpending"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigpending()</span></code></a> y <a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.setitimer">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">setitimer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">which</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.setitimer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el temporizador de intervalo dado (uno de <a class="reference internal" href="#signal.ITIMER_REAL" title="signal.ITIMER_REAL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_REAL</span></code></a>, <a class="reference internal" href="#signal.ITIMER_VIRTUAL" title="signal.ITIMER_VIRTUAL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_VIRTUAL</span></code></a> o <a class="reference internal" href="#signal.ITIMER_PROF" title="signal.ITIMER_PROF"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_PROF</span></code></a>) especificado por <em>which</em> disparar después de <em>seconds</em> (se acepta el números de punto flotante, diferente de <a class="reference internal" href="#signal.alarm" title="signal.alarm"><code class="xref py py-func docutils literal notranslate"><span class="pre">alarm()</span></code></a>) y luego cada <em>interval</em> segundos (si <em>interval</em> es distinto de cero). El temporizador de intervalo especificado por <em>which</em> se puede borrar estableciendo <em>seconds</em> en cero.</p>
+<p>Cuando se dispara un temporizador de intervalos, se envía una señal al proceso. La señal enviada depende del temporizador que se utilice; <a class="reference internal" href="#signal.ITIMER_REAL" title="signal.ITIMER_REAL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_REAL</span></code></a> entregará <a class="reference internal" href="#signal.SIGALRM" title="signal.SIGALRM"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGALRM</span></code></a>, <a class="reference internal" href="#signal.ITIMER_VIRTUAL" title="signal.ITIMER_VIRTUAL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_VIRTUAL</span></code></a> envía <code class="xref py py-const docutils literal notranslate"><span class="pre">SIGVTALRM</span></code>, y <a class="reference internal" href="#signal.ITIMER_PROF" title="signal.ITIMER_PROF"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.ITIMER_PROF</span></code></a> entregará <code class="xref py py-const docutils literal notranslate"><span class="pre">SIGPROF</span></code>.</p>
+<p>Los valores antiguos se retornan como una tupla: (retraso, intervalo).</p>
+<p>Si intenta pasar un temporizador de intervalo no válido, se producirá un <a class="reference internal" href="#signal.ItimerError" title="signal.ItimerError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ItimerError</span></code></a>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.getitimer">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">getitimer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">which</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.getitimer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el valor actual de un temporizador de intervalo dado especificado por <em>which</em>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.set_wakeup_fd">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">set_wakeup_fd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_on_full_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.set_wakeup_fd" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el descriptor del archivo de activación en <em>fd</em>. Cuando se recibe una señal, el número de la señal se escribe como un solo byte en el fd. Esto puede ser utilizado por una biblioteca para despertar una encuesta o seleccionar una llamada, permitiendo que la señal se procese por completo.</p>
+<p>Se retorna el antiguo fd de activación (o -1 si la activación del descriptor de archivo no estaba habilitada). Si <em>fd</em> es -1, la activación del descriptor de archivo está deshabilitada. Si no es -1, <em>fd</em> debe ser sin bloqueo. Depende de la biblioteca eliminar los bytes de <em>fd</em> antes de llamar a poll o seleccionar nuevamente.</p>
+<p>Cuando los hilos están habilitados, esta función solo se puede llamar desde <a class="reference internal" href="#signals-and-threads"><span class="std std-ref">el subproceso principal del intérprete principal</span></a>; intentar llamarlo desde otros hilos hará que se lance una excepción <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<p>Hay dos formas habituales de utilizar esta función. En ambos enfoques, usa el fd para despertarse cuando llega una señal, pero luego difieren en cómo determinan <em>which</em> señal o señales han llegado.</p>
+<p>En el primer enfoque, leemos los datos del búfer de fd, y los valores de bytes le dan los números de señal. Esto es simple, pero en casos raros puede surgir un problema: generalmente el fd tendrá una cantidad limitada de espacio en el búfer, y si llegan demasiadas señales demasiado rápido, entonces el búfer puede llenarse y algunas señales pueden perderse. Si usa este enfoque, entonces debe configurar <code class="docutils literal notranslate"><span class="pre">warn_on_full_buffer</span> <span class="pre">=</span> <span class="pre">True</span></code>, que al menos causará que se imprima una advertencia en stderr cuando se pierdan las señales.</p>
+<p>En el segundo enfoque, usamos el wakeup fd <em>solo</em> para wakeups e ignoramos los valores de bytes reales. En este caso, lo único que nos importa es si el búfer de fd está vacío o no; un búfer lleno no indica ningún problema. Si utiliza este enfoque, debe configurar <code class="docutils literal notranslate"><span class="pre">warn_on_full_buffer</span> <span class="pre">=</span> <span class="pre">False</span></code>, para que sus usuarios no se confundan con mensajes de advertencia falsos.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>En Windows, la función ahora también admite identificadores de socket.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Se agregó el parámetro <code class="docutils literal notranslate"><span class="pre">warn_on_full_buffer</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.siginterrupt">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">siginterrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signalnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.siginterrupt" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cambiar el comportamiento de reinicio de la llamada al sistema: si <em>flag</em> es <a class="reference internal" href="constants.html#False" title="False"><code class="xref py py-const docutils literal notranslate"><span class="pre">False</span></code></a>, las llamadas al sistema se reiniciarán cuando las interrumpa la señal <em>signalnum</em>, de lo contrario, las llamadas al sistema se interrumpirán. No retorna nada.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/siginterrupt(3)">siginterrupt(3)</a></em> for further information.</p>
+</div>
+<p>Tenga en cuenta que la instalación de un gestor de señales con <a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-func docutils literal notranslate"><span class="pre">signal()</span></code></a> restablecerá el comportamiento de reinicio a interrumpible llamando implícitamente a <code class="xref c c-func docutils literal notranslate"><span class="pre">siginterrupt()</span></code> con un valor de <em>flag</em> verdadero para la señal dada.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.signal">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signalnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.signal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el gestor de la señal <em>signalnum</em> en la función <em>handler</em> (manejador). <em>handler</em> puede ser un objeto de Python invocable que toma dos argumentos (ver más abajo), o uno de los valores especiales <a class="reference internal" href="#signal.SIG_IGN" title="signal.SIG_IGN"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_IGN</span></code></a> o <a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIG_DFL</span></code></a>. Se retornará el manejador de señales anterior (vea la descripción de <a class="reference internal" href="#signal.getsignal" title="signal.getsignal"><code class="xref py py-func docutils literal notranslate"><span class="pre">getsignal()</span></code></a> arriba). (Consulte la página del manual de Unix <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/signal(2)">signal(2)</a></em> para obtener más información).</p>
+<p>Cuando los hilos están habilitados, esta función solo se puede llamar desde <a class="reference internal" href="#signals-and-threads"><span class="std std-ref">el subproceso principal del intérprete principal</span></a>; intentar llamarlo desde otros hilos hará que se lance una excepción <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<p>El <em>handler</em> se llama con dos argumentos: el número de señal y el marco de pila actual (<code class="docutils literal notranslate"><span class="pre">None</span></code> o un objeto marco; para obtener una descripción de los objetos marco, consulte la descripción <a class="reference internal" href="../reference/datamodel.html#frame-objects"><span class="std std-ref">en la jerarquía de tipos</span></a> o vea las descripciones de los atributos en el módulo <a class="reference internal" href="inspect.html#module-inspect" title="inspect: Extract information and source code from live objects."><code class="xref py py-mod docutils literal notranslate"><span class="pre">inspect</span></code></a>).</p>
+<p>En Windows, <a class="reference internal" href="#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-func docutils literal notranslate"><span class="pre">signal()</span></code></a> solo se puede llamar con <a class="reference internal" href="#signal.SIGABRT" title="signal.SIGABRT"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGABRT</span></code></a>, <a class="reference internal" href="#signal.SIGFPE" title="signal.SIGFPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGFPE</span></code></a>, <a class="reference internal" href="#signal.SIGILL" title="signal.SIGILL"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGILL</span></code></a>, <a class="reference internal" href="#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGINT</span></code></a>, <a class="reference internal" href="#signal.SIGSEGV" title="signal.SIGSEGV"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGSEGV</span></code></a>, <a class="reference internal" href="#signal.SIGTERM" title="signal.SIGTERM"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGTERM</span></code></a>, o <a class="reference internal" href="#signal.SIGBREAK" title="signal.SIGBREAK"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGBREAK</span></code></a>. Un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> se lanzará en cualquier otro caso. Tenga en cuenta que no todos los sistemas definen el mismo conjunto de nombres de señales; un <a class="reference internal" href="exceptions.html#AttributeError" title="AttributeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a> se lanzará si un nombre de señal no está definido como constante de nivel de módulo <code class="docutils literal notranslate"><span class="pre">SIG*</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.sigpending">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">sigpending</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#signal.sigpending" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Examine el conjunto de señales que están pendientes de entrega al hilo de llamada (es decir, las señales que se han generado mientras estaban bloqueadas). Retorna el conjunto de señales pendientes.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigpending(2)">sigpending(2)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.pause" title="signal.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a>, <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a> y <a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.sigwait">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">sigwait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.sigwait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Suspende la ejecución del hilo de llamada hasta la entrega de una de las señales especificadas en el conjunto de señales <em>sigset</em>. La función acepta la señal (la elimina de la lista pendiente de señales) y retorna el número de señal.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigwait(3)">sigwait(3)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.pause" title="signal.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a>, <a class="reference internal" href="#signal.pthread_sigmask" title="signal.pthread_sigmask"><code class="xref py py-func docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a>, <a class="reference internal" href="#signal.sigpending" title="signal.sigpending"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigpending()</span></code></a>, <a class="reference internal" href="#signal.sigwaitinfo" title="signal.sigwaitinfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwaitinfo()</span></code></a> y <a class="reference internal" href="#signal.sigtimedwait" title="signal.sigtimedwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigtimedwait()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.sigwaitinfo">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">sigwaitinfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.sigwaitinfo" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Suspende la ejecución del hilo de llamada hasta la entrega de una de las señales especificadas en el conjunto de señales <em>sigset</em>. La función acepta la señal y la elimina de la lista de señales pendientes. Si una de las señales en <em>sigset</em> ya está pendiente para el hilo de llamada, la función regresará inmediatamente con información sobre esa señal. No se llama al gestor de señales para la señal enviada. La función genera un <a class="reference internal" href="exceptions.html#InterruptedError" title="InterruptedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InterruptedError</span></code></a> si es interrumpida por una señal que no está en <em>sigset</em>.</p>
+<p>El valor de retorno es un objeto que representa los datos contenidos en la estructura <code class="xref c c-type docutils literal notranslate"><span class="pre">siginfo_t</span></code>, a saber: <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_signo</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_code</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_errno</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_pid</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_uid</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_status</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">si_band</span></code>.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigwaitinfo(2)">sigwaitinfo(2)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.pause" title="signal.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a>, <a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a> y <a class="reference internal" href="#signal.sigtimedwait" title="signal.sigtimedwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigtimedwait()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>La función ahora se vuelve a intentar si es interrumpida por una señal que no está en <em>sigset</em> y el manejador de señales no genera una excepción (ver <span class="target" id="index-4"></span><a class="pep reference external" href="https://peps.python.org/pep-0475/"><strong>PEP 475</strong></a> para la justificación).</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="signal.sigtimedwait">
+<span class="sig-prename descclassname"><span class="pre">signal.</span></span><span class="sig-name descname"><span class="pre">sigtimedwait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signal.sigtimedwait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#signal.sigwaitinfo" title="signal.sigwaitinfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwaitinfo()</span></code></a>, pero toma un argumento <em>timeout</em> adicional que especifica un tiempo de espera. Si <em>timeout</em> se especifica como <code class="xref py py-const docutils literal notranslate"><span class="pre">0</span></code>, se realiza una encuesta. Retorna <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> si se agota el tiempo de espera.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+<p>See the man page <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/sigtimedwait(2)">sigtimedwait(2)</a></em> for further information.</p>
+</div>
+<p>Vea también <a class="reference internal" href="#signal.pause" title="signal.pause"><code class="xref py py-func docutils literal notranslate"><span class="pre">pause()</span></code></a>, <a class="reference internal" href="#signal.sigwait" title="signal.sigwait"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwait()</span></code></a> y <a class="reference internal" href="#signal.sigwaitinfo" title="signal.sigwaitinfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigwaitinfo()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>La función ahora se reintenta con el <em>timeout</em> recalculado si se interrumpe por una señal que no está en <em>sigset</em> y el manejador de señales no genera una excepción (ver <span class="target" id="index-5"></span><a class="pep reference external" href="https://peps.python.org/pep-0475/"><strong>PEP 475</strong></a> para la justificación).</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="examples">
+<span id="signal-example"></span><h2>Examples<a class="headerlink" href="#examples" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Aquí hay un programa de ejemplo mínimo. Utiliza la función <a class="reference internal" href="#signal.alarm" title="signal.alarm"><code class="xref py py-func docutils literal notranslate"><span class="pre">alarm()</span></code></a> para limitar el tiempo de espera para abrir un archivo; esto es útil si el archivo es para un dispositivo serial que puede no estar encendido, lo que normalmente haría que <a class="reference internal" href="os.html#os.open" title="os.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.open()</span></code></a> se cuelgue indefinidamente. La solución es configurar una alarma de 5 segundos antes de abrir el archivo; si la operación lleva demasiado tiempo, se enviará la señal de alarma y el gestor genera una excepción.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">signal</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="n">signame</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">Signals</span><span class="p">(</span><span class="n">signum</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Signal handler called with signal </span><span class="si">{</span><span class="n">signame</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">signum</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t open device!&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set the signal handler and a 5-second alarm</span>
+<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+<span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># This open() may hang indefinitely</span>
+<span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;/dev/ttyS0&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDWR</span><span class="p">)</span>
+
+<span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>          <span class="c1"># Disable the alarm</span>
+</pre></div>
+</div>
+</section>
+<section id="note-on-sigpipe">
+<h2>Nota sobre SIGPIPE<a class="headerlink" href="#note-on-sigpipe" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Canalizar la salida de su programa a herramientas como <em class="manpage"><a class="manpage reference external" href="https://manpages.debian.org/head(1)">head(1)</a></em> hará que se envíe una señal <a class="reference internal" href="#signal.SIGPIPE" title="signal.SIGPIPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGPIPE</span></code></a> a su proceso cuando el receptor de su salida estándar se cierre antes. Esto da como resultado una excepción como <code class="code docutils literal notranslate"><span class="pre">BrokenPipeError:</span> <span class="pre">[Errno</span> <span class="pre">32]</span> <span class="pre">Broken</span> <span class="pre">pipe</span></code>. Para manejar este caso, envuelva su punto de entrada para detectar esta excepción de la siguiente manera:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># simulate large output (your code replaces this loop)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="c1"># flush output here to force SIGPIPE to be triggered</span>
+        <span class="c1"># while inside this try block.</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
+        <span class="c1"># Python flushes standard streams on exit; redirect remaining output</span>
+        <span class="c1"># to devnull to avoid another BrokenPipeError at shutdown</span>
+        <span class="n">devnull</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">dup2</span><span class="p">(</span><span class="n">devnull</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Python exits with error code 1 on EPIPE</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Do not set <a class="reference internal" href="#signal.SIGPIPE" title="signal.SIGPIPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGPIPE</span></code></a>’s disposition to <a class="reference internal" href="#signal.SIG_DFL" title="signal.SIG_DFL"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIG_DFL</span></code></a> in
+order to avoid <a class="reference internal" href="exceptions.html#BrokenPipeError" title="BrokenPipeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BrokenPipeError</span></code></a>.  Doing that would cause
+your program to exit unexpectedly whenever any socket
+connection is interrupted while your program is still writing to
+it.</p>
+</section>
+<section id="note-on-signal-handlers-and-exceptions">
+<span id="handlers-and-exceptions"></span><h2>Note on Signal Handlers and Exceptions<a class="headerlink" href="#note-on-signal-handlers-and-exceptions" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Si un gestor de señal lanza una excepción, ésta excepción será propagada al hilo principal de ejecución y podría ser lanzado luego de cualquier instrucción de <a class="reference internal" href="../glossary.html#term-bytecode"><span class="xref std std-term">bytecode</span></a>. Más notablemente, <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> podría aparecer en cualquier momento de la ejecución. La mayoría del código python, incluida la librería estándar, no puede robustecerse en contra esto, y por esto <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> (o cualquier otra excepción resultante de un gestor de señal) podría poner el programa en un estado inesperado en raras ocasiones.</p>
+<p>Para ilustrar esto, considere el siguiente código:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SpamContext</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># If KeyboardInterrupt occurs here, everything is fine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="c1"># If KeyboardInterrupt occurs here, __exit__ will not be called</span>
+        <span class="o">...</span>
+        <span class="c1"># KeyboardInterrupt could occur just before the function returns</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Para muchos programas, especialmente para los que sólo quieren interrumpir la ejecución ante un <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a>, esto no es un problema, pero las aplicaciones que son complejas o requieren alta confiabilidad deben evitar lanzar excepciones desde los gestores de señales. También deben evitar atrapar <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> como medio de una terminación de ejecución airosa. En su lugar, deben instalar su propio gestor <a class="reference internal" href="#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">SIGINT</span></code></a>. A continuación, un ejemplo de un servidor HTTP que evita el <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">from</span> <span class="nn">selectors</span> <span class="kn">import</span> <span class="n">DefaultSelector</span><span class="p">,</span> <span class="n">EVENT_READ</span>
+<span class="kn">from</span> <span class="nn">http.server</span> <span class="kn">import</span> <span class="n">HTTPServer</span><span class="p">,</span> <span class="n">SimpleHTTPRequestHandler</span>
+
+<span class="n">interrupt_read</span><span class="p">,</span> <span class="n">interrupt_write</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socketpair</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Signal handler called with signal&#39;</span><span class="p">,</span> <span class="n">signum</span><span class="p">)</span>
+    <span class="n">interrupt_write</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">serve_forever</span><span class="p">(</span><span class="n">httpd</span><span class="p">):</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">DefaultSelector</span><span class="p">()</span>
+    <span class="n">sel</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">interrupt_read</span><span class="p">,</span> <span class="n">EVENT_READ</span><span class="p">)</span>
+    <span class="n">sel</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">httpd</span><span class="p">,</span> <span class="n">EVENT_READ</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sel</span><span class="o">.</span><span class="n">select</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">==</span> <span class="n">interrupt_read</span><span class="p">:</span>
+                <span class="n">interrupt_read</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">==</span> <span class="n">httpd</span><span class="p">:</span>
+                <span class="n">httpd</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serving on port 8000&quot;</span><span class="p">)</span>
+<span class="n">httpd</span> <span class="o">=</span> <span class="n">HTTPServer</span><span class="p">((</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">),</span> <span class="n">SimpleHTTPRequestHandler</span><span class="p">)</span>
+<span class="n">serve_forever</span><span class="p">(</span><span class="n">httpd</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shutdown...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code> — Establece gestores para eventos asíncronos</a><ul>
+<li><a class="reference internal" href="#general-rules">Reglas generales</a><ul>
+<li><a class="reference internal" href="#execution-of-python-signal-handlers">Ejecución de los gestores de señales de Python</a></li>
+<li><a class="reference internal" href="#signals-and-threads">Señales e hilos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-contents">Contenidos del módulo</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#note-on-sigpipe">Nota sobre SIGPIPE</a></li>
+<li><a class="reference internal" href="#note-on-signal-handlers-and-exceptions">Note on Signal Handlers and Exceptions</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="selectors.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selectors</span></code> — Multiplexación de E/S de alto nivel</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="mmap.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mmap</span></code> — Soporte de archivos mapeados en memoria</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/signal.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="mmap.html" title="mmap — Soporte de archivos mapeados en memoria"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="selectors.html" title="selectors — Multiplexación de E/S de alto nivel"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code> — Establece gestores para eventos asíncronos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

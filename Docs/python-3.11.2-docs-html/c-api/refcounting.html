@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Conteo de referencias" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/c-api/refcounting.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Los macros de esta sección se utilizan para administrar conteos de referencia de objetos Python. Las siguientes funciones o macros son solo para uso dentro del núcleo del intérprete:_Py_Dealloc(),_..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Los macros de esta sección se utilizan para administrar conteos de referencia de objetos Python. Las siguientes funciones o macros son solo para uso dentro del núcleo del intérprete:_Py_Dealloc(),_..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>Conteo de referencias &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Manejo de excepciones" href="exceptions.html" />
+    <link rel="prev" title="La capa de muy alto nivel" href="veryhigh.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/refcounting.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="veryhigh.html"
+                          title="capítulo anterior">La capa de muy alto nivel</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="exceptions.html"
+                          title="próximo capítulo">Manejo de excepciones</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/c-api/refcounting.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="Manejo de excepciones"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="veryhigh.html" title="La capa de muy alto nivel"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Conteo de referencias</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="reference-counting">
+<span id="countingrefs"></span><h1>Conteo de referencias<a class="headerlink" href="#reference-counting" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Los macros de esta sección se utilizan para administrar conteos de referencia de objetos Python.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_INCREF">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_INCREF</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_INCREF" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Incrementar el recuento de referencia para el objeto <em>o</em>.</p>
+<p>Esta función se usa generalmente para convertir un <a class="reference internal" href="../glossary.html#term-borrowed-reference"><span class="xref std std-term">borrowed reference</span></a> en un <a class="reference internal" href="../glossary.html#term-strong-reference"><span class="xref std std-term">strong reference</span></a> en su lugar. La función <a class="reference internal" href="#c.Py_NewRef" title="Py_NewRef"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_NewRef()</span></code></a> se puede utilizar para crear un nuevo <a class="reference internal" href="../glossary.html#term-strong-reference"><span class="xref std std-term">strong reference</span></a>.</p>
+<p>El objeto no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>; si no está seguro de que no sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, use <a class="reference internal" href="#c.Py_XINCREF" title="Py_XINCREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XINCREF()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_XINCREF">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_XINCREF</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_XINCREF" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Incrementa el conteo de referencia para el objeto <em>o</em>. El objeto puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, en cuyo caso el macro no tiene efecto.</p>
+<p>Ver también <a class="reference internal" href="#c.Py_XNewRef" title="Py_XNewRef"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XNewRef()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_NewRef">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Py_NewRef</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_NewRef" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a> since version 3.10.</em><p>Crea un nuevo <a class="reference internal" href="../glossary.html#term-strong-reference"><span class="xref std std-term">strong reference</span></a> a un objeto: incrementa el recuento de referencias del objeto <em>o</em> y retorna el objeto <em>o</em>.</p>
+<p>Cuando el <a class="reference internal" href="../glossary.html#term-strong-reference"><span class="xref std std-term">strong reference</span></a> ya no sea necesario <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a> debe ser llamado para disminuir el recuento de referencias del objeto.</p>
+<p>El objeto <em>o</em> no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>; use <a class="reference internal" href="#c.Py_XNewRef" title="Py_XNewRef"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XNewRef()</span></code></a> si <em>o</em> puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Por ejemplo:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Py_INCREF</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+<span class="n">self</span><span class="o">-&gt;</span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>puede ser escrito como:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">self</span><span class="o">-&gt;</span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_NewRef</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Ver también <a class="reference internal" href="#c.Py_INCREF" title="Py_INCREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_INCREF()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_XNewRef">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Py_XNewRef</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_XNewRef" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a> since version 3.10.</em><p>Similar a <a class="reference internal" href="#c.Py_NewRef" title="Py_NewRef"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_NewRef()</span></code></a>, pero el objeto <em>o</em> puede ser NULL.</p>
+<p>Si el objeto <em>o</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la función solo retorna <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_DECREF">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_DECREF</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_DECREF" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Decrementa el conteo de referencia para el objeto <em>o</em>.</p>
+<p>Si el recuento de referencias llega a cero, se invoca la función de desasignación del tipo de objeto (que no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>).</p>
+<p>Esta función se usa generalmente para eliminar un <a class="reference internal" href="../glossary.html#term-strong-reference"><span class="xref std std-term">strong reference</span></a> antes de salir de su alcance.</p>
+<p>El objeto no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>; si no está seguro de que no sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, use <a class="reference internal" href="#c.Py_XINCREF" title="Py_XINCREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XINCREF()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>La función de desasignación puede hacer que se invoque un código arbitrario de Python (por ejemplo, cuando se desasigna una instancia de clase con un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">__del__()</span></code>). Si bien las excepciones en dicho código no se propagan, el código ejecutado tiene acceso libre a todas las variables globales de Python. Esto significa que cualquier objeto al que se pueda acceder desde una variable global debe estar en un estado coherente antes de invocar <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a>. Por ejemplo, el código para eliminar un objeto de una lista debe copiar una referencia al objeto eliminado en una variable temporal, actualizar la estructura de datos de la lista y luego llamar a <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a> para la variable temporal.</p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_XDECREF">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_XDECREF</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_XDECREF" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Disminuye el conteo de referencia para el objeto <em>o</em>. El objeto puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, en cuyo caso el macro no tiene efecto; de lo contrario, el efecto es el mismo que para <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a>, y se aplica la misma advertencia.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_CLEAR">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_CLEAR</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_CLEAR" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Disminuye el conteo de referencia para el objeto <em>o</em>. El objeto puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, en cuyo caso el macro no tiene efecto; de lo contrario, el efecto es el mismo que para <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a>, excepto que el argumento también se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. La advertencia para <a class="reference internal" href="#c.Py_DECREF" title="Py_DECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DECREF()</span></code></a> no se aplica con respecto al objeto pasado porque el macro usa cuidadosamente una variable temporal y establece el argumento en <code class="docutils literal notranslate"><span class="pre">NULL</span></code> antes de disminuir su conteo de referencia.</p>
+<p>Es una buena idea usar este macro siempre que disminuya el conteo de referencia de un objeto que pueda atravesarse durante la recolección de basura.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_IncRef">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_IncRef</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_IncRef" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Incrementa el conteo de referencias para objeto <em>o</em>. Una versión de la función <a class="reference internal" href="#c.Py_XINCREF" title="Py_XINCREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XINCREF()</span></code></a>. Puede utilizarse para la integración dinámica en tiempo de ejecución de Python.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.Py_DecRef">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Py_DecRef</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">o</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_DecRef" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Disminuye el conteo de referencias del objeto <em>o</em>. Una versión de la función <a class="reference internal" href="#c.Py_XDECREF" title="Py_XDECREF"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_XDECREF()</span></code></a>. Puede utilizarse para la integración dinámica en tiempo de ejecución de Python.</p>
+</dd></dl>
+
+<p>Las siguientes funciones o macros son solo para uso dentro del núcleo del intérprete: <code class="xref c c-func docutils literal notranslate"><span class="pre">_Py_Dealloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">_Py_ForgetReference()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">_Py_NewReference()</span></code>, así como la variable global <code class="xref c c-data docutils literal notranslate"><span class="pre">_Py_RefTotal</span></code>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="veryhigh.html"
+                          title="capítulo anterior">La capa de muy alto nivel</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="exceptions.html"
+                          title="próximo capítulo">Manejo de excepciones</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/c-api/refcounting.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="Manejo de excepciones"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="veryhigh.html" title="La capa de muy alto nivel"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Conteo de referencias</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

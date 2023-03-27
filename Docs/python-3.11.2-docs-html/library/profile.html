@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Los perfiladores de Python" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/profile.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/profile.py y Lib/pstats.py Introducción a los perfiladores: cProfile y profile proporcionan deterministic profiling de los programas de Python. profile es un conjunto de estadíst..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/profile.py y Lib/pstats.py Introducción a los perfiladores: cProfile y profile proporcionan deterministic profiling de los programas de Python. profile es un conjunto de estadíst..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>Los perfiladores de Python &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="timeit — Mide el tiempo de ejecución de pequeños fragmentos de código" href="timeit.html" />
+    <link rel="prev" title="pdb — El Depurador de Python" href="pdb.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/profile.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Los perfiladores de Python</a><ul>
+<li><a class="reference internal" href="#introduction-to-the-profilers">Introducción a los perfiladores</a></li>
+<li><a class="reference internal" href="#instant-user-s-manual">Manual instantáneo de usuario</a></li>
+<li><a class="reference internal" href="#module-cProfile">Referencia del módulo <code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code> y <code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a></li>
+<li><a class="reference internal" href="#the-stats-class">La clase <code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a></li>
+<li><a class="reference internal" href="#what-is-deterministic-profiling">¿Qué es el perfil determinista?</a></li>
+<li><a class="reference internal" href="#limitations">Limitaciones</a></li>
+<li><a class="reference internal" href="#calibration">Calibración</a></li>
+<li><a class="reference internal" href="#using-a-custom-timer">Usando un temporizador personalizado</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="pdb.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="timeit.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">timeit</span></code> — Mide el tiempo de ejecución de pequeños fragmentos de código</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/profile.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="timeit.html" title="timeit — Mide el tiempo de ejecución de pequeños fragmentos de código"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="pdb.html" title="pdb — El Depurador de Python"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="debug.html" accesskey="U">Depuración y perfilado</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Los perfiladores de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="the-python-profilers">
+<span id="profile"></span><h1>Los perfiladores de Python<a class="headerlink" href="#the-python-profilers" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/profile.py">Lib/profile.py</a> y <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/pstats.py">Lib/pstats.py</a></p>
+<hr class="docutils" />
+<section id="introduction-to-the-profilers">
+<span id="profiler-introduction"></span><h2>Introducción a los perfiladores<a class="headerlink" href="#introduction-to-the-profilers" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="index-0"><a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a> y <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> proporcionan <em class="dfn">deterministic profiling</em> de los programas de Python. <em class="dfn">profile</em> es un conjunto de estadísticas que describe con qué frecuencia y durante cuánto tiempo se ejecutaron varias partes del programa. Estas estadísticas pueden formatearse en informes a través del módulo <a class="reference internal" href="#module-pstats" title="pstats: Statistics object for use with the profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pstats</span></code></a>.</p>
+<p>La biblioteca estándar de Python proporciona dos implementaciones diferentes de la misma interfaz de creación de perfiles:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a> se recomienda para la mayoría de los usuarios; Es una extensión C con una sobrecarga razonable que la hace adecuada para perfilar programas de larga duración. Basado en <code class="xref py py-mod docutils literal notranslate"><span class="pre">lsprof</span></code>, aportado por Brett Rosen y Ted Czotter.</p></li>
+<li><p><a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a>, un módulo Python puro cuya interfaz es imitada por <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>, pero que agrega una sobrecarga significativa a los programas perfilados. Si está intentando extender el generador de perfiles de alguna manera, la tarea podría ser más fácil con este módulo. Originalmente diseñado y escrito por Jim Roskind.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Los módulos del generador de perfiles están diseñados para proporcionar un perfil de ejecución para un programa determinado, no para fines de evaluación comparativa (para eso, está <a class="reference internal" href="timeit.html#module-timeit" title="timeit: Measure the execution time of small code snippets."><code class="xref py py-mod docutils literal notranslate"><span class="pre">timeit</span></code></a> que permite obtener resultados razonablemente precisos). Esto se aplica particularmente a la evaluación comparativa del código Python contra el código C: los perfiladores introducen gastos generales para el código Python, pero no para las funciones de nivel C, por lo que el código C parecería más rápido que cualquier Python.</p>
+</div>
+</section>
+<section id="instant-user-s-manual">
+<span id="profile-instant"></span><h2>Manual instantáneo de usuario<a class="headerlink" href="#instant-user-s-manual" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Esta sección se proporciona a los usuarios que «no quieren leer el manual». Proporciona una visión general muy breve y permite a un usuario realizar perfiles rápidamente en una aplicación existente.</p>
+<p>Para perfilar una función que toma un solo argumento, puede hacer:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="n">cProfile</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;re.compile(&quot;foo|bar&quot;)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(Use <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> en lugar de <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a> si este último no está disponible en su sistema.)</p>
+<p>La acción anterior ejecutaría <a class="reference internal" href="re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.compile()</span></code></a> e imprime resultados de perfil como los siguientes:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>      <span class="mi">214</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">207</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">0.002</span> <span class="n">seconds</span>
+
+<span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">cumulative</span> <span class="n">time</span>
+
+<span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.002</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">exec</span><span class="p">}</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.001</span>    <span class="mf">0.001</span> <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">1</span><span class="p">(</span><span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.001</span>    <span class="mf">0.001</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">250</span><span class="p">(</span><span class="nb">compile</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.001</span>    <span class="mf">0.001</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">289</span><span class="p">(</span><span class="n">_compile</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="n">_compiler</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">759</span><span class="p">(</span><span class="nb">compile</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="n">_parser</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">937</span><span class="p">(</span><span class="n">parse</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="n">_compiler</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">598</span><span class="p">(</span><span class="n">_code</span><span class="p">)</span>
+     <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="n">_parser</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">435</span><span class="p">(</span><span class="n">_parse_sub</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>La primera línea indica que 214 llamadas fueron monitoreadas. De esas llamadas, 207 fueron <em class="dfn">primitive</em>, lo cual significa que la llamada no fue inducida vía recursión. La siguiente línea: <code class="docutils literal notranslate"><span class="pre">Ordered</span> <span class="pre">by:</span> <span class="pre">cumulative</span> <span class="pre">name</span></code>, indica que la cadena de texto en la columna más a la derecha fue utilizada para ordenar la salida. Las cabeceras de la columna incluyen:</p>
+<dl class="simple">
+<dt>ncalls</dt><dd><p>por el número de llamadas.</p>
+</dd>
+<dt>tottime</dt><dd><p>para el tiempo total empleado en la función dada (y excluyendo el tiempo realizado en llamadas a subfunciones)</p>
+</dd>
+<dt>percall</dt><dd><p>es el cociente de <code class="docutils literal notranslate"><span class="pre">tottime</span></code> dividido por <code class="docutils literal notranslate"><span class="pre">ncalls</span></code></p>
+</dd>
+<dt>cumtime</dt><dd><p>es el tiempo acumulado empleado en esta y todas las subfunciones (desde la invocación hasta la salida). Esta cifra es precisa <em>incluso</em> para funciones recursivas.</p>
+</dd>
+<dt>percall</dt><dd><p>es el cociente de <code class="docutils literal notranslate"><span class="pre">cumtime</span></code> dividido por llamadas primitivas</p>
+</dd>
+<dt>filename:lineno(function)</dt><dd><p>proporciona los datos respectivos de cada función</p>
+</dd>
+</dl>
+<p>Cuando hay dos números en la primera columna (por ejemplo, <code class="docutils literal notranslate"><span class="pre">3/1</span></code>), significa que la función se repite. El segundo valor es el número de llamadas primitivas y el primero es el número total de llamadas. Tenga en cuenta que cuando la función no se repite, estos dos valores son iguales y solo se imprime la figura.</p>
+<p>En lugar de imprimir la salida al final de la ejecución del perfil, puede guardar los resultados en un archivo especificando un nombre de archivo en la función <code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="n">cProfile</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;re.compile(&quot;foo|bar&quot;)&#39;</span><span class="p">,</span> <span class="s1">&#39;restats&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>La clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">pstats.Stats</span></code></a> lee los resultados del perfil desde un archivo y los formatea de varias maneras.</p>
+<p>Los archivos <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a> y <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> también se pueden invocar como un script para perfilar otro script. Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cProfile</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">output_file</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">sort_order</span><span class="p">]</span> <span class="p">(</span><span class="o">-</span><span class="n">m</span> <span class="n">module</span> <span class="o">|</span> <span class="n">myscript</span><span class="o">.</span><span class="n">py</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">-o</span></code> escribe los resultados del perfil en un archivo en lugar de stdout</p>
+<p><code class="docutils literal notranslate"><span class="pre">-s</span></code> especifica uno de los valores de clasificación <a class="reference internal" href="#pstats.Stats.sort_stats" title="pstats.Stats.sort_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">sort_stats()</span></code></a> para ordenar la salida. Esto solo se aplica cuando <code class="docutils literal notranslate"><span class="pre">-o</span></code> no se suministra.</p>
+<p><code class="docutils literal notranslate"><span class="pre">-m</span></code> especifica que se está perfilando un módulo en lugar de un script.</p>
+<blockquote>
+<div><div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7: </span>Se agregó la opción <code class="docutils literal notranslate"><span class="pre">-m</span></code> a <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8: </span>Se agregó la opción <code class="docutils literal notranslate"><span class="pre">-m</span></code> a <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a>.</p>
+</div>
+</div></blockquote>
+<p>Los módulos <a class="reference internal" href="#module-pstats" title="pstats: Statistics object for use with the profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pstats</span></code></a> clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> tienen una variedad de métodos para manipular e imprimir los datos guardados en un archivo de resultados de perfil:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pstats</span>
+<span class="kn">from</span> <span class="nn">pstats</span> <span class="kn">import</span> <span class="n">SortKey</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="s1">&#39;restats&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">strip_dirs</span><span class="p">()</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El método <a class="reference internal" href="#pstats.Stats.strip_dirs" title="pstats.Stats.strip_dirs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">strip_dirs()</span></code></a> eliminó la ruta extraña de todos los nombres de módulos. El método <a class="reference internal" href="#pstats.Stats.sort_stats" title="pstats.Stats.sort_stats"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sort_stats()</span></code></a> clasificó todas las entradas de acuerdo con el módulo/línea/nombre de cadena de caracteres estándar que se imprime. El método <a class="reference internal" href="#pstats.Stats.print_stats" title="pstats.Stats.print_stats"><code class="xref py py-meth docutils literal notranslate"><span class="pre">print_stats()</span></code></a> imprimió todas las estadísticas. Puede intentar las siguientes llamadas de clasificación:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">SortKey</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>La primera llamada realmente ordenará la lista por nombre de función, y la segunda llamada imprimirá las estadísticas. Las siguientes son algunas llamadas interesantes para experimentar:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">SortKey</span><span class="o">.</span><span class="n">CUMULATIVE</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esto ordena el perfil por tiempo acumulado en una función y luego solo imprime las diez líneas más significativas. Si desea comprender qué algoritmos están tomando tiempo, la línea anterior es lo que usaría.</p>
+<p>Si estuviera buscando ver qué funciones se repetían mucho y toman mucho tiempo, usted haría:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">SortKey</span><span class="o">.</span><span class="n">TIME</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>para ordenar según el tiempo dedicado a cada función y luego imprimir las estadísticas de las diez funciones principales.</p>
+<p>También puedes probar:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">SortKey</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="s1">&#39;__init__&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esto ordenará todas las estadísticas por nombre de archivo y luego imprimirá estadísticas solo para los métodos de inicio de clase (ya que están escritos con <code class="docutils literal notranslate"><span class="pre">__init__</span></code> en ellos). Como último ejemplo, puedes probar:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">SortKey</span><span class="o">.</span><span class="n">TIME</span><span class="p">,</span> <span class="n">SortKey</span><span class="o">.</span><span class="n">CUMULATIVE</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esta línea clasifica las estadísticas con una clave primaria de tiempo y una clave secundaria de tiempo acumulado, y luego imprime algunas de las estadísticas. Para ser específicos, la lista primero se reduce al 50% (re: <code class="docutils literal notranslate"><span class="pre">.5</span></code>) de su tamaño original, luego solo se mantienen las líneas que contienen <code class="docutils literal notranslate"><span class="pre">`init</span></code> y se imprime esa sub-sublista.</p>
+<p>Si se preguntó qué funciones denominaban las funciones anteriores, ahora podría (<code class="docutils literal notranslate"><span class="pre">p</span></code> todavía está ordenada según el último criterio) hacer:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">print_callers</span><span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>y obtendría una lista de llamadas para cada una de las funciones enumeradas.</p>
+<p>Si desea más funcionalidad, tendrá que leer el manual o adivinar lo que hacen las siguientes funciones:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">print_callees</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;restats&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Invocado como un script, el módulo <a class="reference internal" href="#module-pstats" title="pstats: Statistics object for use with the profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pstats</span></code></a> es un navegador de estadísticas para leer y examinar volcados de perfil. Tiene una interfaz simple orientada a la línea de comandos (implementada usando <a class="reference internal" href="cmd.html#module-cmd" title="cmd: Build line-oriented command interpreters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">cmd</span></code></a>) y ayuda interactiva.</p>
+</section>
+<section id="module-cProfile">
+<span id="profile-and-cprofile-module-reference"></span><h2>Referencia del módulo <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> y <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a><a class="headerlink" href="#module-cProfile" title="Enlazar permanentemente con este título">¶</a></h2>
+<span class="target" id="module-profile"></span><p>Los módulos <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> y <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a> proporcionan las siguientes funciones:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="profile.run">
+<span class="sig-prename descclassname"><span class="pre">profile.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función toma un único argumento que se puede pasar a la función <a class="reference internal" href="functions.html#exec" title="exec"><code class="xref py py-func docutils literal notranslate"><span class="pre">exec()</span></code></a> y un nombre de archivo opcional. En todos los casos esta rutina ejecuta:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">__main__</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">__main__</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>y recopila estadísticas de perfiles de la ejecución. Si no hay ningún nombre de archivo, esta función crea automáticamente una instancia de <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> e imprime un informe de perfil simple. Si se especifica el valor de clasificación, se pasa a esta instancia <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> para controlar cómo se ordenan los resultados.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="profile.runctx">
+<span class="sig-prename descclassname"><span class="pre">profile.</span></span><span class="sig-name descname"><span class="pre">runctx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.runctx" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función es similar a <a class="reference internal" href="#profile.run" title="profile.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a>, con argumentos agregados para proporcionar los diccionarios globales y locales para la cadena de caracteres <em>command</em>. Esta rutina ejecuta:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">globals</span><span class="p">,</span> <span class="nb">locals</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>y recopila estadísticas de perfiles como en la función <a class="reference internal" href="#profile.run" title="profile.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a> anterior.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="profile.Profile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">profile.</span></span><span class="sig-name descname"><span class="pre">Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeunit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcalls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta clase normalmente solo es usada si se necesita un control más preciso sobre la creación de perfiles que el que proporciona la función <code class="xref py py-func docutils literal notranslate"><span class="pre">cProfile.run()</span></code>.</p>
+<p>Se puede suministrar un temporizador personalizado para medir cuánto tiempo tarda el código en ejecutarse mediante el argumento <em>timer</em>. Esta debe ser una función que retorna un solo número que representa la hora actual. Si el número es un entero, la <em>timeunit</em> especifica un multiplicador que especifica la duración de cada unidad de tiempo. Por ejemplo, si el temporizador retorna tiempos medidos en miles de segundos, la unidad de tiempo sería <code class="docutils literal notranslate"><span class="pre">.001</span></code>.</p>
+<p>El uso directo de la clase <a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code></a> permite formatear los resultados del perfil sin escribir los datos del perfil en un archivo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span><span class="o">,</span> <span class="nn">pstats</span><span class="o">,</span> <span class="nn">io</span>
+<span class="kn">from</span> <span class="nn">pstats</span> <span class="kn">import</span> <span class="n">SortKey</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+<span class="c1"># ... do something ...</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+<span class="n">sortby</span> <span class="o">=</span> <span class="n">SortKey</span><span class="o">.</span><span class="n">CUMULATIVE</span>
+<span class="n">ps</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="n">pr</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="n">sortby</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>La clase <a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code></a> también se puede usar como administrador de contexto (solo se admite en el módulo <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>. Ver <a class="reference internal" href="stdtypes.html#typecontextmanager"><span class="std std-ref">Tipos gestores de contexto</span></a>):</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>
+
+<span class="k">with</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span> <span class="k">as</span> <span class="n">pr</span><span class="p">:</span>
+    <span class="c1"># ... do something ...</span>
+
+    <span class="n">pr</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Se agregó soporte de administrador de contexto.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.enable">
+<span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.enable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Comienza a recopilar datos de perfiles. Solo en <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.disable">
+<span class="sig-name descname"><span class="pre">disable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.disable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Deja de recopilar datos de perfiles. Solo en <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.create_stats">
+<span class="sig-name descname"><span class="pre">create_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.create_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Deja de recopilar datos de perfiles y registre los resultados internamente como el perfil actual.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.print_stats">
+<span class="sig-name descname"><span class="pre">print_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.print_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea un objeto <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> en función del perfil actual e imprima los resultados en <em>stdout</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.dump_stats">
+<span class="sig-name descname"><span class="pre">dump_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.dump_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe los resultados del perfil actual en <em>filename</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Perfila el cmd a través de <a class="reference internal" href="functions.html#exec" title="exec"><code class="xref py py-func docutils literal notranslate"><span class="pre">exec()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.runctx">
+<span class="sig-name descname"><span class="pre">runctx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.runctx" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Perfila el cmd a través de <a class="reference internal" href="functions.html#exec" title="exec"><code class="xref py py-func docutils literal notranslate"><span class="pre">exec()</span></code></a> con el entorno global y local especificado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="profile.Profile.runcall">
+<span class="sig-name descname"><span class="pre">runcall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#profile.Profile.runcall" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Perfila <code class="docutils literal notranslate"><span class="pre">func(*args,</span> <span class="pre">**kwargs)</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Tenga en cuenta que la creación de perfiles solo funcionará si el comando/función llamado realmente regresa. Si el intérprete se termina (por ejemplo, a través de una llamada a <a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.exit()</span></code></a> durante la ejecución del comando/función llamado) no se imprimirán resultados de generación de perfiles.</p>
+</section>
+<section id="the-stats-class">
+<span id="profile-stats"></span><h2>La clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a><a class="headerlink" href="#the-stats-class" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El análisis de los datos del generador de perfiles es realizado utilizando la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a>.</p>
+<span class="target" id="module-pstats"></span><dl class="py class">
+<dt class="sig sig-object py" id="pstats.Stats">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pstats.</span></span><span class="sig-name descname"><span class="pre">Stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*filenames</span> <span class="pre">or</span> <span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream=sys.stdout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este constructor de clase crea una instancia de un «objeto de estadísticas» a partir de un <em>filename</em> (o una lista de nombres de archivo) o de una instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code>. La salida se imprimirá en la secuencia especificada por <em>stream</em>.</p>
+<p>El archivo seleccionado por el constructor anterior debe haber sido creado por la versión correspondiente de <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> o <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>. Para ser específicos, <em>no</em> hay compatibilidad de archivos garantizada con futuras versiones de este generador de perfiles, y no hay compatibilidad con archivos producidos por otros perfiladores, o el mismo generador de perfiles ejecutado en un sistema operativo diferente. Si se proporcionan varios archivos, se combinarán todas las estadísticas para funciones idénticas, de modo que se pueda considerar una vista general de varios procesos en un solo informe. Si es necesario combinar archivos adicionales con datos en un objeto existente <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a>, se puede usar el método <a class="reference internal" href="#pstats.Stats.add" title="pstats.Stats.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a>.</p>
+<p>En lugar de leer los datos del perfil de un archivo, se puede usar un objeto <code class="xref py py-class docutils literal notranslate"><span class="pre">cProfile.Profile</span></code> o <a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">profile.Profile</span></code></a> como fuente de datos del perfil.</p>
+<p>los objetos <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> tienen los siguientes métodos:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.strip_dirs">
+<span class="sig-name descname"><span class="pre">strip_dirs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.strip_dirs" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método para la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> elimina toda la información de ruta principal de los nombres de archivo. Es muy útil para reducir el tamaño de la impresión para que quepa en (cerca de) 80 columnas. Este método modifica el objeto y se pierde la información eliminada. Después de realizar una operación de tira, se considera que el objeto tiene sus entradas en un orden «aleatorio», como lo fue justo después de la inicialización y carga del objeto. Si <a class="reference internal" href="#pstats.Stats.strip_dirs" title="pstats.Stats.strip_dirs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">strip_dirs()</span></code></a> hace que dos nombres de funciones no se puedan distinguir (están en la misma línea del mismo nombre de archivo y tienen el mismo nombre de función), entonces las estadísticas para estas dos entradas se acumulan en un sola entrada.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">filenames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.add" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método de la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> acumula información de perfil adicional en el objeto de perfil actual. Sus argumentos deben referirse a los nombres de archivo creados por la versión correspondiente de <a class="reference internal" href="#profile.run" title="profile.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">profile.run()</span></code></a> or <code class="xref py py-func docutils literal notranslate"><span class="pre">cProfile.run()</span></code>. Las estadísticas para funciones con nombre idéntico (re: archivo, línea, nombre) se acumulan automáticamente en estadísticas de función única.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.dump_stats">
+<span class="sig-name descname"><span class="pre">dump_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.dump_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Guarda los datos cargados en el objeto <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> en un archivo llamado <em>filename</em>. El archivo se crea si no existe y se sobrescribe si ya existe. Esto es equivalente al método del mismo nombre en las clases: class <a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">profile.Profile</span></code></a> y <code class="xref py py-class docutils literal notranslate"><span class="pre">cProfile.Profile</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.sort_stats">
+<span class="sig-name descname"><span class="pre">sort_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.sort_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método modifica el objeto <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> ordenándolo de acuerdo con los criterios proporcionados. El argumento puede ser una cadena de caracteres o una enumeración SortKey que identifica la base de una clasificación (ejemplo: <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, <code class="docutils literal notranslate"><span class="pre">SortKey.TIME</span></code> o <code class="docutils literal notranslate"><span class="pre">SortKey.NAME</span></code>). El argumento enumeraciones SortKey tiene ventaja sobre el argumento de cadena de caracteres en que es más robusto y menos propenso a errores.</p>
+<p>Cuando se proporciona más de una llave, se utilizan llaves adicionales como criterios secundarios cuando hay igualdad en todas las llaves seleccionadas antes que ellas. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">sort_stats(SortKey.NAME,</span> <span class="pre">SortKey.FILE)</span></code> ordenará todas las entradas de acuerdo con el nombre de su función y resolverá todos los vínculos (nombres de función idénticos) clasificándolos por nombre de archivo.</p>
+<p>Para el argumento de cadena de caracteres, se pueden usar abreviaturas para cualquier nombre de llaves, siempre que la abreviatura no sea ambigua.</p>
+<p>Los siguientes son la cadena de caracteres válida y SortKey:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 34%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Arg de cadena de caracteres válido</p></th>
+<th class="head"><p>Arg de enumeración válido</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'calls'</span></code></p></td>
+<td><p>SortKey.CALLS</p></td>
+<td><p>recuento de llamadas</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'cumulative'</span></code></p></td>
+<td><p>SortKey.CUMULATIVE</p></td>
+<td><p>tiempo acumulado</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'cumtime'</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p>tiempo acumulado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'file'</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p>nombre de archivo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'filename'</span></code></p></td>
+<td><p>SortKey.FILENAME</p></td>
+<td><p>nombre de archivo</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'module'</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p>nombre de archivo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'ncalls'</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p>recuento de llamadas</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'pcalls'</span></code></p></td>
+<td><p>SortKey.PCALLS</p></td>
+<td><p>recuento de llamadas primitivas</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'line'</span></code></p></td>
+<td><p>SortKey.LINE</p></td>
+<td><p>número de línea</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'name'</span></code></p></td>
+<td><p>SortKey.NAME</p></td>
+<td><p>nombre de la función</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'nfl'</span></code></p></td>
+<td><p>SortKey.NFL</p></td>
+<td><p>nombre/archivo/línea</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'stdname'</span></code></p></td>
+<td><p>SortKey.STDNAME</p></td>
+<td><p>nombre estándar</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'time'</span></code></p></td>
+<td><p>SortKey.TIME</p></td>
+<td><p>tiempo interno</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'tottime'</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p>tiempo interno</p></td>
+</tr>
+</tbody>
+</table>
+<p>Tenga en cuenta que todos los tipos de estadísticas están en orden descendente (colocando primero los elementos que requieren más tiempo), donde las búsquedas de nombre, archivo y número de línea están en orden ascendente (alfabético). La sutil distinción entre <code class="docutils literal notranslate"><span class="pre">SortKey.NFL</span></code> y <code class="docutils literal notranslate"><span class="pre">SortKey.STDNAME</span></code> es que el nombre estándar es una especie de nombre tal como está impreso, lo que significa que los números de línea incrustados se comparan de manera extraña. Por ejemplo, las líneas 3, 20 y 40 aparecerían (si los nombres de los archivos fueran los mismos) en el orden de las cadenas 20, 3 y 40. En contraste, <code class="docutils literal notranslate"><span class="pre">SortKey.NFL</span></code> hace una comparación numérica de los números de línea. De hecho, <code class="docutils literal notranslate"><span class="pre">sort_stats(SortKey.NFL)</span></code> es lo mismo que <code class="docutils literal notranslate"><span class="pre">sort_stats(SortKey.NAME,</span> <span class="pre">SortKey.FILENAME,</span> <span class="pre">SortKey.LINE)</span></code>.</p>
+<p>Por razones de compatibilidad con versiones anteriores, se permiten los argumentos numéricos <code class="docutils literal notranslate"><span class="pre">-1</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, y <code class="docutils literal notranslate"><span class="pre">2</span></code>. Se interpretan como <code class="docutils literal notranslate"><span class="pre">'stdname'</span></code>, <code class="docutils literal notranslate"><span class="pre">'calls'</span></code>, <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, y <code class="docutils literal notranslate"><span class="pre">'cumulative'</span></code> respectivamente. Si se usa este formato de estilo antiguo (numérico), solo se usará una clave de clasificación (la tecla numérica) y los argumentos adicionales se ignorarán en silencio.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7: </span>Enumeración SortKey añadida.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.reverse_order">
+<span class="sig-name descname"><span class="pre">reverse_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.reverse_order" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método para la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> invierte el orden de la lista básica dentro del objeto. Tenga en cuenta que, de forma predeterminada, el orden ascendente vs descendente se selecciona correctamente en función de la llave de clasificación elegida.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.print_stats">
+<span class="sig-name descname"><span class="pre">print_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">restrictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.print_stats" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método para la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> imprime un informe como se describe en la definición <a class="reference internal" href="#profile.run" title="profile.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">profile.run()</span></code></a>.</p>
+<p>El orden de la impresión se basa en la última operación <a class="reference internal" href="#pstats.Stats.sort_stats" title="pstats.Stats.sort_stats"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sort_stats()</span></code></a> realizada en el objeto (sujeto a advertencias en <a class="reference internal" href="#pstats.Stats.add" title="pstats.Stats.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> y <a class="reference internal" href="#pstats.Stats.strip_dirs" title="pstats.Stats.strip_dirs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">strip_dirs()</span></code></a>).</p>
+<p>Los argumentos proporcionados (si los hay) se pueden usar para limitar la lista a las entradas significativas. Inicialmente, se considera que la lista es el conjunto completo de funciones perfiladas. Cada restricción es un número entero (para seleccionar un recuento de líneas), o una fracción decimal entre 0.0 y 1.0 inclusive (para seleccionar un porcentaje de líneas), o una cadena que se interpretará como una expresión regular (para que el patrón coincida con el nombre estándar eso está impreso). Si se proporcionan varias restricciones, se aplican secuencialmente. Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_stats</span><span class="p">(</span><span class="mf">.1</span><span class="p">,</span> <span class="s1">&#39;foo:&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>primero limitaría la impresión al primer 10% de la lista, y luego solo imprimiría las funciones que formaban parte del nombre del archivo <code class="file docutils literal notranslate"><span class="pre">.*foo:</span></code>. En contraste, el comando:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_stats</span><span class="p">(</span><span class="s1">&#39;foo:&#39;</span><span class="p">,</span> <span class="mf">.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>limitaría la lista a todas las funciones que tengan nombres de archivo: archivo <code class="file docutils literal notranslate"><span class="pre">.*foo:</span></code>, y luego procedería a imprimir solo el primer 10% de ellas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.print_callers">
+<span class="sig-name descname"><span class="pre">print_callers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">restrictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.print_callers" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método para la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> imprime una lista de todas las funciones que llamaron a cada función en la base de datos perfilada. El orden es idéntico al proporcionado por <a class="reference internal" href="#pstats.Stats.print_stats" title="pstats.Stats.print_stats"><code class="xref py py-meth docutils literal notranslate"><span class="pre">print_stats()</span></code></a>, y la definición del argumento de restricción también es idéntica. Cada persona que llama se informa en su propia línea. El formato difiere ligeramente según el generador de perfiles que produjo las estadísticas:</p>
+<ul class="simple">
+<li><p>Con <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a>, se muestra un número entre paréntesis después de cada llamada para mostrar cuántas veces se realizó esta llamada específica. Por conveniencia, un segundo número sin paréntesis repite el tiempo acumulado empleado en la función de la derecha.</p></li>
+<li><p>Con <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>, cada persona que llama está precedida por tres números: la cantidad de veces que se realizó esta llamada específica y los tiempos totales y acumulativos gastados en la función actual mientras fue invocada por esta persona que llama.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.print_callees">
+<span class="sig-name descname"><span class="pre">print_callees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">restrictions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.print_callees" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método para la clase <a class="reference internal" href="#pstats.Stats" title="pstats.Stats"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a> imprime una lista de todas las funciones que fueron llamadas por la función indicada. Aparte de esta inversión de la dirección de las llamadas (re: llamado vs fue llamado por), los argumentos y el orden son idénticos al método <a class="reference internal" href="#pstats.Stats.print_callers" title="pstats.Stats.print_callers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">print_callers()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pstats.Stats.get_stats_profile">
+<span class="sig-name descname"><span class="pre">get_stats_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pstats.Stats.get_stats_profile" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método retorna una instancia de StatsProfile, la cual contiene un mapeo de nombres de función a instancias de FunctionProfile. Cada instancia de FunctionProfile mantiene información relacionada al perfil de la función, como cuánto demoró la función en ejecutarse, cuantas veces fue llamada, etc…</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9: </span>Añadidas las siguientes clases de datos: StatsProfile, FunctionProfile. Añadida la siguiente función: get_stats_profile.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="what-is-deterministic-profiling">
+<span id="deterministic-profiling"></span><h2>¿Qué es el perfil determinista?<a class="headerlink" href="#what-is-deterministic-profiling" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><em class="dfn">Deterministic profiling</em> está destinada a reflejar el hecho de que se supervisan todos los eventos <em>function call</em>, <em>function return</em>, y <em>exception</em>, y se realizan temporizaciones precisas para los intervalos entre estos eventos (durante los cuales el código del usuario se está ejecutando). Por el contrario, <em class="dfn">statistical profiling</em> (que no se realiza en este módulo) muestrea aleatoriamente el puntero de instrucción efectivo y deduce dónde se está gastando el tiempo. La última técnica tradicionalmente implica menos sobrecarga (ya que el código no necesita ser instrumentado), pero proporciona solo indicaciones relativas de dónde se está gastando el tiempo.</p>
+<p>En Python, dado que hay un intérprete activo durante la ejecución, no se requiere la presencia de código instrumentado para realizar un perfil determinista. Python proporciona automáticamente un <em class="dfn">hook</em> (retrollamada  opcional) para cada evento. Además, la naturaleza interpretada de Python tiende a agregar tanta sobrecarga a la ejecución, que los perfiles deterministas tienden a agregar solo una pequeña sobrecarga de procesamiento en aplicaciones típicas. El resultado es que el perfil determinista no es tan costoso, pero proporciona estadísticas extensas de tiempo de ejecución sobre la ejecución de un programa Python.</p>
+<p>Las estadísticas de recuento de llamadas se pueden usar para identificar errores en el código (recuentos sorprendentes) e identificar posibles puntos de expansión en línea (recuentos altos de llamadas). Las estadísticas de tiempo interno se pueden utilizar para identificar «bucles activos» que deben optimizarse cuidadosamente. Las estadísticas de tiempo acumulativo deben usarse para identificar errores de alto nivel en la selección de algoritmos. Tenga en cuenta que el manejo inusual de los tiempos acumulativos en este generador de perfiles permite que las estadísticas de implementaciones recursivas de algoritmos se comparen directamente con implementaciones iterativas.</p>
+</section>
+<section id="limitations">
+<span id="profile-limitations"></span><h2>Limitaciones<a class="headerlink" href="#limitations" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una limitación tiene que ver con la precisión de la información de sincronización. Hay un problema fundamental con los perfiladores deterministas que implican precisión. La restricción más obvia es que el «reloj» subyacente solo funciona a una velocidad (típicamente) de aproximadamente 0,001 segundos. Por lo tanto, ninguna medición será más precisa que el reloj subyacente. Si se toman suficientes medidas, entonces el «error» tenderá a promediar. Desafortunadamente, eliminar este primer error induce una segunda fuente de error.</p>
+<p>El segundo problema es que «lleva un tiempo» desde que se distribuye un evento hasta que la llamada del generador de perfiles para obtener la hora en realidad <em>obtiene</em> el estado del reloj. Del mismo modo, hay un cierto retraso al salir del controlador de eventos del generador de perfiles desde el momento en que se obtuvo el valor del reloj (y luego se retiró), hasta que el código del usuario se está ejecutando nuevamente. Como resultado, las funciones que se llaman muchas veces, o llaman a muchas funciones, generalmente acumularán este error. El error que se acumula de esta manera es típicamente menor que la precisión del reloj (menos de un tic de reloj), pero <em>puede</em> acumularse y volverse muy significativo.</p>
+<p>El problema es más importante con <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> que con la sobrecarga inferior <a class="reference internal" href="#module-cProfile" title="cProfile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a>. Por esta razón, <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> proporciona un medio para calibrarse a sí mismo para una plataforma dada para que este error pueda ser eliminado probabilísticamente (en promedio). Después de calibrar el generador de perfiles, será más preciso (en un sentido al menos cuadrado), pero a veces producirá números negativos (cuando el recuento de llamadas es excepcionalmente bajo y los dioses de la probabilidad trabajan en su contra :-) ) <em>No</em> se alarme por los números negativos en el perfil. Deberían aparecer <em>solo</em> si ha calibrado su generador de perfiles, y los resultados son realmente mejores que sin calibración.</p>
+</section>
+<section id="calibration">
+<span id="profile-calibration"></span><h2>Calibración<a class="headerlink" href="#calibration" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El generador de perfiles del módulo <a class="reference internal" href="#module-profile" title="profile: Python source profiler."><code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code></a> resta una constante de cada tiempo de manejo de eventos para compensar la sobrecarga de llamar a la función de tiempo y eliminar los resultados. Por defecto, la constante es 0. El siguiente procedimiento se puede usar para obtener una mejor constante para una plataforma dada (ver <a class="reference internal" href="#profile-limitations"><span class="std std-ref">Limitaciones</span></a>).</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">profile</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="mi">10000</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>El método ejecuta la cantidad de llamadas de Python dadas por el argumento, directamente y nuevamente bajo el generador de perfiles, midiendo el tiempo para ambos. Luego, calcula la sobrecarga oculta por evento del generador de perfiles y la retorna como un valor flotante. Por ejemplo, en un Intel Core i5 de 1.8Ghz que ejecuta macOS y usa el time.process_time () de Python como temporizador, el número mágico es aproximadamente 4.04e-6.</p>
+<p>El objetivo de este ejercicio es obtener un resultado bastante consistente. Si su computadora es <em>muy</em> rápida, o su función de temporizador tiene una resolución pobre, es posible que tenga que pasar 100000, o incluso 1000000, para obtener resultados consistentes.</p>
+<p>Cuando tiene una respuesta consistente, hay tres formas de usarla:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">profile</span>
+
+<span class="c1"># 1. Apply computed bias to all Profile instances created hereafter.</span>
+<span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">your_computed_bias</span>
+
+<span class="c1"># 2. Apply computed bias to a specific Profile instance.</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">your_computed_bias</span>
+
+<span class="c1"># 3. Specify computed bias in instance constructor.</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">bias</span><span class="o">=</span><span class="n">your_computed_bias</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Si tiene una opción, es mejor que elija una constante más pequeña, y luego sus resultados «con menos frecuencia» se mostrarán como negativos en las estadísticas del perfil.</p>
+</section>
+<section id="using-a-custom-timer">
+<span id="profile-timers"></span><h2>Usando un temporizador personalizado<a class="headerlink" href="#using-a-custom-timer" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Si desea cambiar la forma en que se determina el tiempo actual (por ejemplo, para forzar el uso del tiempo del reloj de pared o el tiempo transcurrido del proceso), pase la función de temporización que desee a la clase constructora <code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pr</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">your_time_func</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El generador de perfiles resultante llamará a <code class="docutils literal notranslate"><span class="pre">your_time_func</span></code>. Dependiendo de si está utilizando <a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">profile.Profile</span></code></a> o <code class="xref py py-class docutils literal notranslate"><span class="pre">cProfile.Profile</span></code>, el valor de retorno de <code class="docutils literal notranslate"><span class="pre">your_time_func</span></code> se interpretará de manera diferente:</p>
+<dl>
+<dt><a class="reference internal" href="#profile.Profile" title="profile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">profile.Profile</span></code></a></dt><dd><p><code class="docutils literal notranslate"><span class="pre">your_time_func</span></code> debería retornar un solo número o una lista de números cuya suma es la hora actual (como lo que <a class="reference internal" href="os.html#os.times" title="os.times"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.times()</span></code></a> retorna). Si la función retorna un número de tiempo único o la lista de números retornados tiene una longitud de 2, obtendrá una versión especialmente rápida de la rutina de envío.</p>
+<p>Tenga en cuenta que debe calibrar la clase de generador de perfiles para la función de temporizador que elija (consulte <a class="reference internal" href="#profile-calibration"><span class="std std-ref">Calibración</span></a>). Para la mayoría de las máquinas, un temporizador que retorna un valor entero solitario proporcionará los mejores resultados en términos de baja sobrecarga durante la creación de perfiles. (<a class="reference internal" href="os.html#os.times" title="os.times"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.times()</span></code></a> es <em>bastante</em> malo, ya que retorna una tupla de valores de coma flotante). Si desea sustituir un temporizador mejor de la manera más limpia, obtenga una clase y conecte un método de envío de reemplazo que maneje mejor su llamada de temporizador, junto con la constante de calibración adecuada.</p>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">cProfile.Profile</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">your_time_func</span></code> debería retornar un solo número. Si retorna enteros, también puede invocar al constructor de la clase con un segundo argumento que especifique la duración real de una unidad de tiempo. Por ejemplo, si <code class="docutils literal notranslate"><span class="pre">your_integer_time_func</span></code> retorna tiempos medidos en miles de segundos, construiría la instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code> de la siguiente manera:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pr</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">your_integer_time_func</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Como la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">cProfile.Profile</span></code> no se puede calibrar, las funciones de temporizador personalizadas deben usarse con cuidado y deben ser lo más rápidas posible. Para obtener los mejores resultados con un temporizador personalizado, puede ser necesario codificarlo en la fuente C del módulo interno <code class="xref py py-mod docutils literal notranslate"><span class="pre">_lsprof</span></code>.</p>
+</dd>
+</dl>
+<p>Python 3.3 agrega varias funciones nuevas en <a class="reference internal" href="time.html#module-time" title="time: Time access and conversions."><code class="xref py py-mod docutils literal notranslate"><span class="pre">time</span></code></a> que se puede usar para realizar mediciones precisas del proceso o el tiempo del reloj de pared (<em>wall-clock time</em>). Por ejemplo, vea <a class="reference internal" href="time.html#time.perf_counter" title="time.perf_counter"><code class="xref py py-func docutils literal notranslate"><span class="pre">time.perf_counter()</span></code></a>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Los perfiladores de Python</a><ul>
+<li><a class="reference internal" href="#introduction-to-the-profilers">Introducción a los perfiladores</a></li>
+<li><a class="reference internal" href="#instant-user-s-manual">Manual instantáneo de usuario</a></li>
+<li><a class="reference internal" href="#module-cProfile">Referencia del módulo <code class="xref py py-mod docutils literal notranslate"><span class="pre">profile</span></code> y <code class="xref py py-mod docutils literal notranslate"><span class="pre">cProfile</span></code></a></li>
+<li><a class="reference internal" href="#the-stats-class">La clase <code class="xref py py-class docutils literal notranslate"><span class="pre">Stats</span></code></a></li>
+<li><a class="reference internal" href="#what-is-deterministic-profiling">¿Qué es el perfil determinista?</a></li>
+<li><a class="reference internal" href="#limitations">Limitaciones</a></li>
+<li><a class="reference internal" href="#calibration">Calibración</a></li>
+<li><a class="reference internal" href="#using-a-custom-timer">Usando un temporizador personalizado</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="pdb.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="timeit.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">timeit</span></code> — Mide el tiempo de ejecución de pequeños fragmentos de código</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/profile.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="timeit.html" title="timeit — Mide el tiempo de ejecución de pequeños fragmentos de código"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="pdb.html" title="pdb — El Depurador de Python"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="debug.html" >Depuración y perfilado</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Los perfiladores de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="xmlrpc.server — Servidores básicos XML-RPC" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/xmlrpc.server.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/xmlrpc/server.py El módulo xmlrpc.server proporciona un marco de servidor básico para servidores XML-RPC escritos en Python. Los servidores pueden ser independientes, utilizando ..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/xmlrpc/server.py El módulo xmlrpc.server proporciona un marco de servidor básico para servidores XML-RPC escritos en Python. Los servidores pueden ser independientes, utilizando ..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>xmlrpc.server — Servidores básicos XML-RPC &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="ipaddress — Biblioteca de manipulación IPv4 / IPv6" href="ipaddress.html" />
+    <link rel="prev" title="xmlrpc.client — acceso cliente XML-RPC" href="xmlrpc.client.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/xmlrpc.server.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code> — Servidores básicos XML-RPC</a><ul>
+<li><a class="reference internal" href="#simplexmlrpcserver-objects">Objetos SimpleXMLRPCServer</a><ul>
+<li><a class="reference internal" href="#simplexmlrpcserver-example">Ejemplo de SimpleXMLRPCServer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cgixmlrpcrequesthandler">CGIXMLRPCRequestHandler</a></li>
+<li><a class="reference internal" href="#documenting-xmlrpc-server">Documentando el servidor XMLRPC</a></li>
+<li><a class="reference internal" href="#docxmlrpcserver-objects">Objetos DocXMLRPCServer</a></li>
+<li><a class="reference internal" href="#doccgixmlrpcrequesthandler">DocCGIXMLRPCRequestHandler</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="xmlrpc.client.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.client</span></code> — acceso cliente XML-RPC</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="ipaddress.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ipaddress</span></code> — Biblioteca de manipulación IPv4 / IPv6</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/xmlrpc.server.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="ipaddress.html" title="ipaddress — Biblioteca de manipulación IPv4 / IPv6"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="xmlrpc.client.html" title="xmlrpc.client — acceso cliente XML-RPC"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="internet.html" accesskey="U">Protocolos y soporte de Internet</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code> — Servidores básicos XML-RPC</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-xmlrpc.server">
+<span id="xmlrpc-server-basic-xml-rpc-servers"></span><h1><a class="reference internal" href="#module-xmlrpc.server" title="xmlrpc.server: Basic XML-RPC server implementations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code></a> — Servidores básicos XML-RPC<a class="headerlink" href="#module-xmlrpc.server" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/xmlrpc/server.py">Lib/xmlrpc/server.py</a></p>
+<hr class="docutils" />
+<p>El módulo <a class="reference internal" href="#module-xmlrpc.server" title="xmlrpc.server: Basic XML-RPC server implementations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code></a> proporciona un marco de servidor básico para servidores XML-RPC escritos en Python. Los servidores pueden ser independientes, utilizando <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer" title="xmlrpc.server.SimpleXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCServer</span></code></a>, o integrados en un entorno CGI, utilizando <a class="reference internal" href="#xmlrpc.server.CGIXMLRPCRequestHandler" title="xmlrpc.server.CGIXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">CGIXMLRPCRequestHandler</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>El módulo <a class="reference internal" href="#module-xmlrpc.server" title="xmlrpc.server: Basic XML-RPC server implementations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code></a> no es seguro contra datos construidos maliciosamente. Si necesita analizar sintácticamente datos no confiables o no autentificados, consulte <a class="reference internal" href="xml.html#xml-vulnerabilities"><span class="std std-ref">Vulnerabilidades XML</span></a>.</p>
+</div>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: not Emscripten, not WASI.</p>
+<p>Este módulo no funciona o no está disponible en plataformas WebAssembly <code class="docutils literal notranslate"><span class="pre">wasm32-emscripten</span></code> y <code class="docutils literal notranslate"><span class="pre">wasm32-wasi</span></code>. Ver <a class="reference internal" href="intro.html#wasm-availability"><span class="std std-ref">Plataformas WebAssembly</span></a> para más información.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCServer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">SimpleXMLRPCServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requestHandler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SimpleXMLRPCRequestHandler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logRequests</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_none</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bind_and_activate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_builtin_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCServer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia de servidor. Esta clase proporciona métodos para el registro de funciones que pueden ser llamados por el protocolo XML-RPC. El parámetro <em>requestHandler</em> debe ser un generador para las instancias del controlador de solicitudes; el valor predeterminado es <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCRequestHandler" title="xmlrpc.server.SimpleXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCRequestHandler</span></code></a>. Los parámetros <em>addr</em> y <em>requestHandler</em> se pasan al constructor <code class="xref py py-class docutils literal notranslate"><span class="pre">socketserver.</span> <span class="pre">TCPServer</span></code>. Si <em>logRequests</em> es verdadero (valor predeterminado), se registrarán las solicitudes; establecer este parámetro como falso desactivará el registro. Los parámetros <em>allow_none</em> y <em>encoding</em> se pasan a <a class="reference internal" href="xmlrpc.client.html#module-xmlrpc.client" title="xmlrpc.client: XML-RPC client access."><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.client</span></code></a> y controlan las respuestas XML-RPC que se devolverán desde el servidor. El parámetro <em>bind_and_activate</em> controla si <code class="xref py py-meth docutils literal notranslate"><span class="pre">server_bind()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">server_activate()</span></code> son llamados inmediatamente por el constructor; por defecto es verdadero. Establecerlo como false permite que el código manipule la variable de clase <em>allow_reuse_address</em> antes de enlazar la dirección. El parámetro <em>use_builtin_types</em> se pasa a la función <a class="reference internal" href="xmlrpc.client.html#xmlrpc.client.loads" title="xmlrpc.client.loads"><code class="xref py py-func docutils literal notranslate"><span class="pre">loads()</span></code></a> y controla qué tipos se procesan cuando se reciben valores de fecha y hora o datos binarios; el valor predeterminado es false.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Se ha añadido el indicador <em>use_builtin_types</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">CGIXMLRPCRequestHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_none</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_builtin_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia para gestionar solicitudes XML-RPC en un entorno CGI.  Los parámetros <em>allow_none</em> y <em>encoding</em> se pasan a <a class="reference internal" href="xmlrpc.client.html#module-xmlrpc.client" title="xmlrpc.client: XML-RPC client access."><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.client</span></code></a> y controlan las respuestas XML-RPC que se devolverán desde el servidor. El parámetro <em>use_builtin_types</em> se pasa a la función <a class="reference internal" href="xmlrpc.client.html#xmlrpc.client.loads" title="xmlrpc.client.loads"><code class="xref py py-func docutils literal notranslate"><span class="pre">loads()</span></code></a> y controla qué tipos se procesan cuando se reciben valores de fecha y hora o datos binarios; el valor predeterminado es falso.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Se ha añadido el indicador <em>use_builtin_types</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCRequestHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">SimpleXMLRPCRequestHandler</span></span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCRequestHandler" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia del controlador de solicitudes.  Este controlador de solicitudes admite solicitudes <code class="docutils literal notranslate"><span class="pre">POST</span></code> y modifica el registro para que se respete el parámetro <em>logRequests</em> del parámetro constructor <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer" title="xmlrpc.server.SimpleXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCServer</span></code></a>.</p>
+</dd></dl>
+
+<section id="simplexmlrpcserver-objects">
+<span id="simple-xmlrpc-servers"></span><h2>Objetos SimpleXMLRPCServer<a class="headerlink" href="#simplexmlrpcserver-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La clase <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer" title="xmlrpc.server.SimpleXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCServer</span></code></a> se basa en <a class="reference internal" href="socketserver.html#socketserver.TCPServer" title="socketserver.TCPServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">socketserver.TCPServer</span></code></a> y proporciona un medio para crear servidores XML-RPC simples e independientes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCServer.register_function">
+<span class="sig-prename descclassname"><span class="pre">SimpleXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">register_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCServer.register_function" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra una función que pueda responder a solicitudes XML-RPC. Si se proporciona <em>name</em>, este será el nombre del método asociado con <em>function</em>, en otro caso se utilizará <code class="docutils literal notranslate"><span class="pre">function.__name__</span></code>. <em>name</em> es una cadena de texto, y puede contener caracteres no permitidos en los identificadores de Python, incluido el caracter de punto.</p>
+<p>Este método también se puede utilizar como decorador. Cuando se usa como decorador, <em>name</em> solo se puede dar como un argumento de palabra clave para registrar <em>function</em> bajo <em>nombre</em>. Si no se proporciona <em>name</em>, se usará <code class="docutils literal notranslate"><span class="pre">function.__name__</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span><a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer.register_function" title="xmlrpc.server.SimpleXMLRPCServer.register_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_function()</span></code></a> puede ser usado como decorador.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCServer.register_instance">
+<span class="sig-prename descclassname"><span class="pre">SimpleXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">register_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_dotted_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCServer.register_instance" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registre un objeto que se usa para exponer nombre de métodos que no se han registrado usando <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer.register_function" title="xmlrpc.server.SimpleXMLRPCServer.register_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_function()</span></code></a>. Si <em>instance</em> contiene un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code>, este será llamado con el nombre del método solicitado y los parámetros de la solicitud. Su API es <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">_dispatch(self,</span> <span class="pre">method,</span> <span class="pre">params)</span></code> (tenga en cuenta que <em>params</em> no representa una lista de argumentos variables). Si se invoca a una función subyacente para realizar su tarea, esa función es llamada como <code class="docutils literal notranslate"><span class="pre">func(*params)</span></code>, expandiendo la lista de parámetros. El valor de retorno de <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code> se retorna al cliente como resultado. Si <em>instance</em> no tiene un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code>, se busca un atributo que coincida con el nombre del método solicitado.</p>
+<p>Si el argumento opcional <em>allow_dotted_names</em> es verdadero y la instancia no tiene un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code>, entonces si el nombre solicitado contiene puntos, cada componente del nombre del método se busca individualmente, con el efecto con el efecto que produce una búsqueda jerárquica simple. El valor encontrado en esta búsqueda es entonces llamado con los parámetros de la solicitud y el valor de retorno se devuelve al cliente.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Habilitando la opción <em>allow_dotted_names</em> permite a los intrusos acceder a las variables globales de su módulo y puede permitir que los intrusos ejecuten código arbitrario en su máquina. Utilice esta opción únicamente en una red cerrada y segura.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCServer.register_introspection_functions">
+<span class="sig-prename descclassname"><span class="pre">SimpleXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">register_introspection_functions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCServer.register_introspection_functions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registre las funciones de introspección XML-RPC <code class="docutils literal notranslate"><span class="pre">system.listMethods</span></code>, <code class="docutils literal notranslate"><span class="pre">system.methodHelp</span></code> y <code class="docutils literal notranslate"><span class="pre">system.methodSignature</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCServer.register_multicall_functions">
+<span class="sig-prename descclassname"><span class="pre">SimpleXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">register_multicall_functions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCServer.register_multicall_functions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registre la función de llamada múltiple XML-RPC system.multicall.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths">
+<span class="sig-prename descclassname"><span class="pre">SimpleXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">rpc_paths</span></span><a class="headerlink" href="#xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un valor de atributo que debe ser una tupla que enumere porciones de rota válidas de la URL para recibir solicitudes XML-RPC. Las solicitudes publicadas en otras rutas darán como resultado un error HTTP 404 «no existe tal página». Si esta tupla está vacía, todas las rutas se considerarán válidas. El valor predeterminado es <code class="docutils literal notranslate"><span class="pre">('/',</span> <span class="pre">'/RPC2')</span></code>.</p>
+</dd></dl>
+
+<section id="simplexmlrpcserver-example">
+<span id="id1"></span><h3>Ejemplo de SimpleXMLRPCServer<a class="headerlink" href="#simplexmlrpcserver-example" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Código del servidor:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">xmlrpc.server</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+<span class="kn">from</span> <span class="nn">xmlrpc.server</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCRequestHandler</span>
+
+<span class="c1"># Restrict to a particular path.</span>
+<span class="k">class</span> <span class="nc">RequestHandler</span><span class="p">(</span><span class="n">SimpleXMLRPCRequestHandler</span><span class="p">):</span>
+    <span class="n">rpc_paths</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;/RPC2&#39;</span><span class="p">,)</span>
+
+<span class="c1"># Create server</span>
+<span class="k">with</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">),</span>
+                        <span class="n">requestHandler</span><span class="o">=</span><span class="n">RequestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_introspection_functions</span><span class="p">()</span>
+
+    <span class="c1"># Register pow() function; this will use the value of</span>
+    <span class="c1"># pow.__name__ as the name, which is just &#39;pow&#39;.</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="nb">pow</span><span class="p">)</span>
+
+    <span class="c1"># Register a function under a different name</span>
+    <span class="k">def</span> <span class="nf">adder_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">adder_function</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Register an instance; all the methods of the instance are</span>
+    <span class="c1"># published as XML-RPC methods (in this case, just &#39;mul&#39;).</span>
+    <span class="k">class</span> <span class="nc">MyFuncs</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="n">server</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="n">MyFuncs</span><span class="p">())</span>
+
+    <span class="c1"># Run the server&#39;s main loop</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El siguiente código de cliente llamará a los métodos disponibles por el servidor anterior:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xmlrpc.client</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s1">&#39;http://localhost:8000&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>  <span class="c1"># Returns 2**3 = 8</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>  <span class="c1"># Returns 5</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># Returns 5*2 = 10</span>
+
+<span class="c1"># Print list of available methods</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">listMethods</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_function()</span></code> también se puede utilizar como decorador. El ejemplo de servidor anterior puede registrar funciones a modo de decorador:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">xmlrpc.server</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+<span class="kn">from</span> <span class="nn">xmlrpc.server</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCRequestHandler</span>
+
+<span class="k">class</span> <span class="nc">RequestHandler</span><span class="p">(</span><span class="n">SimpleXMLRPCRequestHandler</span><span class="p">):</span>
+    <span class="n">rpc_paths</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;/RPC2&#39;</span><span class="p">,)</span>
+
+<span class="k">with</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">),</span>
+                        <span class="n">requestHandler</span><span class="o">=</span><span class="n">RequestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_introspection_functions</span><span class="p">()</span>
+
+    <span class="c1"># Register pow() function; this will use the value of</span>
+    <span class="c1"># pow.__name__ as the name, which is just &#39;pow&#39;.</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="nb">pow</span><span class="p">)</span>
+
+    <span class="c1"># Register a function under a different name, using</span>
+    <span class="c1"># register_function as a decorator. *name* can only be given</span>
+    <span class="c1"># as a keyword argument.</span>
+    <span class="nd">@server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;add&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">adder_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+    <span class="c1"># Register a function under function.__name__.</span>
+    <span class="nd">@server</span><span class="o">.</span><span class="n">register_function</span>
+    <span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El siguiente ejemplo incluido en el módulo <code class="file docutils literal notranslate"><span class="pre">Lib/xmlrpc/server.py</span></code> muestra un servidor que permite nombres con puntos y registra una función de llamada múltiple.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Habilitar la opción <em>allow_dotted_names</em> permite a los intrusos acceder a las variables globales de su módulo y puede permitir que los intrusos ejecuten código arbitrario en su máquina. Utilice este ejemplo únicamente dentro de una red cerrada y segura.</p>
+</div>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">class</span> <span class="nc">ExampleService</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;42&#39;</span>
+
+    <span class="k">class</span> <span class="nc">currentTime</span><span class="p">:</span>
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">getCurrentTime</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">))</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="nb">pow</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="n">ExampleService</span><span class="p">(),</span> <span class="n">allow_dotted_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">register_multicall_functions</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Serving XML-RPC on localhost port 8000&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Keyboard interrupt received, exiting.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esta demostración de ExampleService se puede invocar desde la línea de comando:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">server</span>
+</pre></div>
+</div>
+<p>El cliente que interactúa con el servidor anterior está incluido en <cite>Lib/xmlrpc/client.py</cite>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">server</span> <span class="o">=</span> <span class="n">ServerProxy</span><span class="p">(</span><span class="s2">&quot;http://localhost:8000&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">currentTime</span><span class="o">.</span><span class="n">getCurrentTime</span><span class="p">())</span>
+<span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">v</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+<span class="n">multi</span> <span class="o">=</span> <span class="n">MultiCall</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+<span class="n">multi</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+<span class="n">multi</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">multi</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">multi</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">Error</span> <span class="k">as</span> <span class="n">v</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Este cliente que interactúa con el servidor XMLRPC de demostración se puede invocar como:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">client</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cgixmlrpcrequesthandler">
+<h2>CGIXMLRPCRequestHandler<a class="headerlink" href="#cgixmlrpcrequesthandler" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La clase <a class="reference internal" href="#xmlrpc.server.CGIXMLRPCRequestHandler" title="xmlrpc.server.CGIXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">CGIXMLRPCRequestHandler</span></code></a> se puede usar para manejar solicitudes XML-RPC enviadas a scripts Python CGI.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler.register_function">
+<span class="sig-prename descclassname"><span class="pre">CGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">register_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_function" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra una función que pueda responder a solicitudes XML-RPC. Si se proporciona <em>name</em>, este será el nombre del método asociado con <em>function</em>, en otro caso se utilizará <code class="docutils literal notranslate"><span class="pre">function.__name__</span></code>. <em>name</em> es una cadena de texto, y puede contener caracteres no permitidos en los identificadores de Python, incluido el caracter de punto.</p>
+<p>Este método también se puede utilizar como decorador. Cuando se usa como decorador, <em>name</em> solo se puede dar como un argumento de palabra clave para registrar <em>function</em> bajo <em>nombre</em>. Si no se proporciona <em>name</em>, se usará <code class="docutils literal notranslate"><span class="pre">function.__name__</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span><a class="reference internal" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_function" title="xmlrpc.server.CGIXMLRPCRequestHandler.register_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_function()</span></code></a> puede ser usado como decorador.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler.register_instance">
+<span class="sig-prename descclassname"><span class="pre">CGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">register_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_instance" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra un objeto que se usa para exponer nombres de métodos que no se han registrado usando <a class="reference internal" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_function" title="xmlrpc.server.CGIXMLRPCRequestHandler.register_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_function()</span></code></a>. Si la instancia contiene un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code>, se llama con el nombre del método solicitado y los parámetros de la solicitud; el valor de retorno se devuelve al cliente como resultado. Si la instancia no tiene un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">_dispatch()</span></code>, se busca un atributo que coincida con el nombre del método solicitado; si el nombre del método contiene puntos, cada componente del nombre del método se busca individualmente, con el efecto con el efecto que produce una búsqueda jerárquica simple. El valor encontrado en esta búsqueda es entonces llamado con los parámetros de la solicitud y el valor de retorno se devuelve al cliente.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler.register_introspection_functions">
+<span class="sig-prename descclassname"><span class="pre">CGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">register_introspection_functions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_introspection_functions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra las funciones de introspección <code class="docutils literal notranslate"><span class="pre">system.listMethods</span></code>, <code class="docutils literal notranslate"><span class="pre">system.methodHelp</span></code> y <code class="docutils literal notranslate"><span class="pre">system.methodSignature</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler.register_multicall_functions">
+<span class="sig-prename descclassname"><span class="pre">CGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">register_multicall_functions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler.register_multicall_functions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra la función de llamada múltiple XML-RPC <code class="docutils literal notranslate"><span class="pre">system.multicall</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.CGIXMLRPCRequestHandler.handle_request">
+<span class="sig-prename descclassname"><span class="pre">CGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">handle_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.CGIXMLRPCRequestHandler.handle_request" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Maneja una solicitud XML-RPC. Si se proporciona <em>request_text</em>, deberían ser los datos POST proporcionados por el servidor HTTP, de lo contrario se utilizará el contenido de stdin.</p>
+</dd></dl>
+
+<p>Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyFuncs</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+
+<span class="n">handler</span> <span class="o">=</span> <span class="n">CGIXMLRPCRequestHandler</span><span class="p">()</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="nb">pow</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">register_introspection_functions</span><span class="p">()</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">register_instance</span><span class="p">(</span><span class="n">MyFuncs</span><span class="p">())</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="documenting-xmlrpc-server">
+<h2>Documentando el servidor XMLRPC<a class="headerlink" href="#documenting-xmlrpc-server" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Estas clases amplían las clases anteriores para proporcionar documentación HTML en respuesta a solicitudes HTTP GET. Los servidores pueden ser independientes, usando <a class="reference internal" href="#xmlrpc.server.DocXMLRPCServer" title="xmlrpc.server.DocXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocXMLRPCServer</span></code></a>, o integrados en un entorno CGI, usando <a class="reference internal" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler" title="xmlrpc.server.DocCGIXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocCGIXMLRPCRequestHandler</span></code></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.DocXMLRPCServer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">DocXMLRPCServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requestHandler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DocXMLRPCRequestHandler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logRequests</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_none</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bind_and_activate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_builtin_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocXMLRPCServer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia de servidor. Todos los parámetros tienen el mismo significado que para <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer" title="xmlrpc.server.SimpleXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCServer</span></code></a>; <em>requestHandler</em> tiene como valor predeterminado <a class="reference internal" href="#xmlrpc.server.DocXMLRPCRequestHandler" title="xmlrpc.server.DocXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocXMLRPCRequestHandler</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Se ha añadido el indicador <em>use_builtin_types</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.DocCGIXMLRPCRequestHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">DocCGIXMLRPCRequestHandler</span></span><a class="headerlink" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia para manejar solicitudes XML-RPC en un entorno CGI.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xmlrpc.server.DocXMLRPCRequestHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xmlrpc.server.</span></span><span class="sig-name descname"><span class="pre">DocXMLRPCRequestHandler</span></span><a class="headerlink" href="#xmlrpc.server.DocXMLRPCRequestHandler" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva instancia de controlador de solicitudes. Este controlador de solicitudes admite solicitudes XML-RPC POST, solicitudes GET de documentación y modifica el registro para que se respete el parámetro <em>logRequests</em> del parámetro constructor <a class="reference internal" href="#xmlrpc.server.DocXMLRPCServer" title="xmlrpc.server.DocXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocXMLRPCServer</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="docxmlrpcserver-objects">
+<span id="doc-xmlrpc-servers"></span><h2>Objetos DocXMLRPCServer<a class="headerlink" href="#docxmlrpcserver-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La clase <a class="reference internal" href="#xmlrpc.server.DocXMLRPCServer" title="xmlrpc.server.DocXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocXMLRPCServer</span></code></a> se deriva de <a class="reference internal" href="#xmlrpc.server.SimpleXMLRPCServer" title="xmlrpc.server.SimpleXMLRPCServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleXMLRPCServer</span></code></a> y proporciona un medio para crear servidores XML-RPC autónomos y autodocumentados. Las solicitudes HTTP POST se manejan como llamadas al método XML-RPC. Las solicitudes HTTP GET se manejan generando documentación HTML al estilo pydoc. Esto permite que un servidor proporcione su propia documentación basada en web.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocXMLRPCServer.set_server_title">
+<span class="sig-prename descclassname"><span class="pre">DocXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">set_server_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_title</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocXMLRPCServer.set_server_title" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el título utilizado en la documentación HTML generada. Este título se utilizará dentro del elemento HTML «title».</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocXMLRPCServer.set_server_name">
+<span class="sig-prename descclassname"><span class="pre">DocXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">set_server_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocXMLRPCServer.set_server_name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el nombre utilizado en la documentación HTML generada. Este nombre aparecerá en la parte superior de la documentación generada dentro de un elemento «h1».</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocXMLRPCServer.set_server_documentation">
+<span class="sig-prename descclassname"><span class="pre">DocXMLRPCServer.</span></span><span class="sig-name descname"><span class="pre">set_server_documentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_documentation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocXMLRPCServer.set_server_documentation" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca la descripción utilizada en la documentación HTML generada. Esta descripción aparecerá como un párrafo, debajo del nombre del servidor, en la documentación.</p>
+</dd></dl>
+
+</section>
+<section id="doccgixmlrpcrequesthandler">
+<h2>DocCGIXMLRPCRequestHandler<a class="headerlink" href="#doccgixmlrpcrequesthandler" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La clase <a class="reference internal" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler" title="xmlrpc.server.DocCGIXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocCGIXMLRPCRequestHandler</span></code></a> se deriva de <a class="reference internal" href="#xmlrpc.server.CGIXMLRPCRequestHandler" title="xmlrpc.server.CGIXMLRPCRequestHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">CGIXMLRPCRequestHandler</span></code></a> y proporciona un medio para crear scripts CGI XML-RPC autodocumentados. Las solicitudes HTTP POST se manejan como llamadas al método XML-RPC. Las solicitudes HTTP GET se manejan generando documentación HTML al estilo pydoc. Esto permite que un servidor proporcione su propia documentación basada en web.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_title">
+<span class="sig-prename descclassname"><span class="pre">DocCGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">set_server_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_title</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_title" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el título utilizado en la documentación HTML generada. Este título se utilizará dentro del elemento HTML «title».</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_name">
+<span class="sig-prename descclassname"><span class="pre">DocCGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">set_server_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el nombre utilizado en la documentación HTML generada. Este nombre aparecerá en la parte superior de la documentación generada dentro de un elemento «h1».</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_documentation">
+<span class="sig-prename descclassname"><span class="pre">DocCGIXMLRPCRequestHandler.</span></span><span class="sig-name descname"><span class="pre">set_server_documentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server_documentation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xmlrpc.server.DocCGIXMLRPCRequestHandler.set_server_documentation" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca la descripción utilizada en la documentación HTML generada. Esta descripción aparecerá como un párrafo, debajo del nombre del servidor, en la documentación.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code> — Servidores básicos XML-RPC</a><ul>
+<li><a class="reference internal" href="#simplexmlrpcserver-objects">Objetos SimpleXMLRPCServer</a><ul>
+<li><a class="reference internal" href="#simplexmlrpcserver-example">Ejemplo de SimpleXMLRPCServer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cgixmlrpcrequesthandler">CGIXMLRPCRequestHandler</a></li>
+<li><a class="reference internal" href="#documenting-xmlrpc-server">Documentando el servidor XMLRPC</a></li>
+<li><a class="reference internal" href="#docxmlrpcserver-objects">Objetos DocXMLRPCServer</a></li>
+<li><a class="reference internal" href="#doccgixmlrpcrequesthandler">DocCGIXMLRPCRequestHandler</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="xmlrpc.client.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.client</span></code> — acceso cliente XML-RPC</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="ipaddress.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ipaddress</span></code> — Biblioteca de manipulación IPv4 / IPv6</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/xmlrpc.server.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="ipaddress.html" title="ipaddress — Biblioteca de manipulación IPv4 / IPv6"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="xmlrpc.client.html" title="xmlrpc.client — acceso cliente XML-RPC"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="internet.html" >Protocolos y soporte de Internet</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">xmlrpc.server</span></code> — Servidores básicos XML-RPC</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

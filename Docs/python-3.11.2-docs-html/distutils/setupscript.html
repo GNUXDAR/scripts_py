@@ -1,0 +1,762 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="2. Escribir el script de configuración" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/distutils/setupscript.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="El script de configuración es el centro de toda actividad en la construcción, distribución e instalación de módulos utilizando Distutils. El propósito principal del script de configuración es descr..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="El script de configuración es el centro de toda actividad en la construcción, distribución e instalación de módulos utilizando Distutils. El propósito principal del script de configuración es descr..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>2. Escribir el script de configuración &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="3. Escribiendo el archivo de configuración de instalación (setup)" href="configfile.html" />
+    <link rel="prev" title="1. Una introducción a distutils" href="introduction.html" />
+    <link rel="canonical" href="https://docs.python.org/3/distutils/setupscript.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">2. Escribir el script de configuración</a><ul>
+<li><a class="reference internal" href="#listing-whole-packages">2.1. Listado de paquetes completos</a></li>
+<li><a class="reference internal" href="#listing-individual-modules">2.2. Listado de módulos individuales</a></li>
+<li><a class="reference internal" href="#describing-extension-modules">2.3. Describiendo módulos de extensión</a><ul>
+<li><a class="reference internal" href="#extension-names-and-packages">2.3.1. Nombres de extensión y paquetes</a></li>
+<li><a class="reference internal" href="#extension-source-files">2.3.2. Extensión de archivos fuente</a></li>
+<li><a class="reference internal" href="#preprocessor-options">2.3.3. Opciones de preprocesador</a></li>
+<li><a class="reference internal" href="#library-options">2.3.4. Opciones de biblioteca</a></li>
+<li><a class="reference internal" href="#other-options">2.3.5. Otras opciones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relationships-between-distributions-and-packages">2.4. Relaciones entre distribuciones y paquetes</a></li>
+<li><a class="reference internal" href="#installing-scripts">2.5. Instalar scripts</a></li>
+<li><a class="reference internal" href="#installing-package-data">2.6. Instalar datos del paquete</a></li>
+<li><a class="reference internal" href="#installing-additional-files">2.7. Instalar archivos adicionales</a></li>
+<li><a class="reference internal" href="#additional-meta-data">2.8. Metadatos adicionales</a></li>
+<li><a class="reference internal" href="#debugging-the-setup-script">2.9. Depuración del script de configuración</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="introduction.html"
+                          title="capítulo anterior"><span class="section-number">1. </span>Una introducción a distutils</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="configfile.html"
+                          title="próximo capítulo"><span class="section-number">3. </span>Escribiendo el archivo de configuración de instalación (<em>setup</em>)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/distutils/setupscript.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="configfile.html" title="3. Escribiendo el archivo de configuración de instalación (setup)"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="1. Una introducción a distutils"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Distribución de módulos de Python (versión heredada)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>Escribir el script de configuración</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="writing-the-setup-script">
+<span id="setup-script"></span><h1><span class="section-number">2. </span>Escribir el script de configuración<a class="headerlink" href="#writing-the-setup-script" title="Enlazar permanentemente con este título">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Este documento se conserva únicamente hasta que la documentación de <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> en <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/setuptools.html">https://setuptools.readthedocs.io/en/latest/setuptools.html</a> cubra de forma independiente toda la información relevante que se incluye actualmente aquí.</p>
+</div>
+<p>El script de configuración es el centro de toda actividad en la construcción, distribución e instalación de módulos utilizando Distutils. El propósito principal del script de configuración es describir la distribución de su módulo a Distutils, de modo que los diversos comandos que operan en sus módulos hagan lo correcto. Como vimos en la sección <a class="reference internal" href="introduction.html#distutils-simple-example"><span class="std std-ref">ejemplo simple de distutils</span></a> anterior, el script de configuración consiste principalmente en una llamada a <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>, y la mayoría de la información suministrada a Distutils por el desarrollador del módulo se proporciona como argumentos de palabras clave para <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>.</p>
+<p>Aquí hay un ejemplo un poco más complicado, que seguiremos en las próximas secciones: el propio script de configuración de Distutils. (Tenga en cuenta que aunque los Distutils se incluyen con Python 1.6 y posteriores, también tienen una existencia independiente para que los usuarios de Python 1.5.2 puedan usarlos para instalar otras distribuciones de módulos. Se utiliza el propio script de configuración de Distutils, que se muestra aquí). instalar el paquete en Python 1.5.2.)</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Distutils&#39;</span><span class="p">,</span>
+      <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">,</span>
+      <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Python Distribution Utilities&#39;</span><span class="p">,</span>
+      <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Greg Ward&#39;</span><span class="p">,</span>
+      <span class="n">author_email</span><span class="o">=</span><span class="s1">&#39;gward@python.net&#39;</span><span class="p">,</span>
+      <span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://www.python.org/sigs/distutils-sig/&#39;</span><span class="p">,</span>
+      <span class="n">packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;distutils&#39;</span><span class="p">,</span> <span class="s1">&#39;distutils.command&#39;</span><span class="p">],</span>
+     <span class="p">)</span>
+</pre></div>
+</div>
+<p>Solo hay dos diferencias entre esto y la trivial distribución de un archivo presentada en la sección <a class="reference internal" href="introduction.html#distutils-simple-example"><span class="std std-ref">ejemplo simple de distutils</span></a>: más metadatos y la especificación de módulos Python puros por paquete, en lugar de por módulo. Esto es importante ya que los Distutils consisten en un par de docenas de módulos divididos en (hasta ahora) dos paquetes; Una lista explícita de cada módulo sería tediosa de generar y difícil de mantener. Para obtener más información sobre los metadatos adicionales, consulte la sección <a class="reference internal" href="#meta-data"><span class="std std-ref">Metadatos adicionales</span></a>.</p>
+<p>Tenga en cuenta que los nombres de ruta (archivos o directorios) proporcionados en el script de configuración deben escribirse utilizando la convención de Unix, es decir, separados por barras. Distutils se encargará de convertir esta representación neutral de la plataforma en lo que sea apropiado en su plataforma actual antes de usar el nombre de ruta. Esto hace que su script de configuración sea portátil en todos los sistemas operativos, lo que, por supuesto, es uno de los principales objetivos de Distutils. En este espíritu, todos los nombres de ruta en este documento están separados por barras.</p>
+<p>Esto, por supuesto, solo se aplica a los nombres de ruta asignados a las funciones de Distutils. Si, por ejemplo, utiliza funciones estándar de Python como <a class="reference internal" href="../library/glob.html#glob.glob" title="glob.glob"><code class="xref py py-func docutils literal notranslate"><span class="pre">glob.glob()</span></code></a> o <a class="reference internal" href="../library/os.html#os.listdir" title="os.listdir"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.listdir()</span></code></a> para especificar archivos, debe tener cuidado al escribir código portátil en lugar de codificar separadores de ruta:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;mydir&#39;</span><span class="p">,</span> <span class="s1">&#39;subdir&#39;</span><span class="p">,</span> <span class="s1">&#39;*.html&#39;</span><span class="p">))</span>
+<span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;mydir&#39;</span><span class="p">,</span> <span class="s1">&#39;subdir&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<section id="listing-whole-packages">
+<span id="listing-packages"></span><h2><span class="section-number">2.1. </span>Listado de paquetes completos<a class="headerlink" href="#listing-whole-packages" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">packages</span></code> le dice a Distutils que procese (compile, distribuya, instale, etc.) todos los módulos de Python puros que se encuentran en cada paquete mencionado en la lista de <code class="docutils literal notranslate"><span class="pre">packages</span></code>. Para hacer esto, por supuesto, debe haber una correspondencia entre los nombres de los paquetes y los directorios en el sistema de archivos. La correspondencia predeterminada es la más obvia, es decir, el paquete <a class="reference internal" href="../library/distutils.html#module-distutils" title="distutils: Support for building and installing Python modules into an existing Python installation."><code class="xref py py-mod docutils literal notranslate"><span class="pre">distutils</span></code></a> se encuentra en el directorio <code class="file docutils literal notranslate"><span class="pre">distutils</span></code> en relación con la raíz de distribución. Por lo tanto, cuando diga <code class="docutils literal notranslate"><span class="pre">packages</span> <span class="pre">=</span> <span class="pre">['foo']</span></code> en su secuencia de comandos de configuración, promete que Distutils encontrará un archivo <code class="file docutils literal notranslate"><span class="pre">foo/__init__.py</span></code> (que podría estar escrito de manera diferente en su sistema , pero te haces una idea) en relación con el directorio donde vive tu script de configuración. Si no cumple esta promesa, Distutils emitirá una advertencia pero de todos modos procesará el paquete roto.</p>
+<p>Si usa una convención diferente para diseñar su directorio de origen, no hay problema: solo tiene que proporcionar la opción <code class="docutils literal notranslate"><span class="pre">package_dir</span></code> para informar a los Distutils sobre su convención. Por ejemplo, supongamos que mantiene toda la fuente de Python en <code class="file docutils literal notranslate"><span class="pre">lib</span></code>, de modo que los módulos en el «paquete raíz» (es decir, no en ningún paquete) estén en <code class="file docutils literal notranslate"><span class="pre">lib</span></code>, módulos en el paquete <code class="xref py py-mod docutils literal notranslate"><span class="pre">foo</span></code> está en archivo <code class="file docutils literal notranslate"><span class="pre">lib/foo</span></code>, y así sucesivamente. Entonces pondrías</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">package_dir</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="s1">&#39;lib&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>en tu script de configuración. Las claves de este diccionario son nombres de paquetes, y un nombre de paquete vacío representa el paquete raíz. Los valores son nombres de directorio relativos a su raíz de distribución. En este caso, cuando dices <code class="docutils literal notranslate"><span class="pre">packages</span> <span class="pre">=</span> <span class="pre">['foo']</span></code>, estás prometiendo que el archivo <code class="file docutils literal notranslate"><span class="pre">lib/foo/__init__.py</span></code> existe.</p>
+<p>Otra posible convención es colocar el paquete <code class="xref py py-mod docutils literal notranslate"><span class="pre">foo</span></code> directamente en <code class="file docutils literal notranslate"><span class="pre">lib</span></code>, el paquete <code class="xref py py-mod docutils literal notranslate"><span class="pre">foo.bar</span></code> en <code class="file docutils literal notranslate"><span class="pre">lib/bar</span></code>, etc. Esto se escribiría en el script de configuración como</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">package_dir</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;lib&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Una entrada <code class="docutils literal notranslate"><span class="pre">package:</span> <span class="pre">dir</span></code> en el diccionario <code class="docutils literal notranslate"><span class="pre">package_dir</span></code> se aplica implícitamente a todos los paquetes debajo de <em>package</em>, por lo que el caso <code class="xref py py-mod docutils literal notranslate"><span class="pre">foo.bar</span></code> se maneja automáticamente aquí. En este ejemplo, tener <code class="docutils literal notranslate"><span class="pre">packages</span> <span class="pre">=</span> <span class="pre">['foo',</span> <span class="pre">'foo.bar']</span></code> le dice a los Distutils que busquen <code class="file docutils literal notranslate"><span class="pre">lib/__init__.py</span></code> y <code class="file docutils literal notranslate"><span class="pre">lib/bar/__init__.py</span></code>. (Tenga en cuenta que, aunque <code class="docutils literal notranslate"><span class="pre">package_dir</span></code> se aplica de forma recursiva, debe enumerar explícitamente todos los paquetes en <code class="docutils literal notranslate"><span class="pre">packages</span></code>: los Distutils <em>no</em> escanearán recursivamente su árbol de origen buscando cualquier directorio con un archivo <code class="file docutils literal notranslate"><span class="pre">__init__.py</span></code>.)</p>
+</section>
+<section id="listing-individual-modules">
+<span id="listing-modules"></span><h2><span class="section-number">2.2. </span>Listado de módulos individuales<a class="headerlink" href="#listing-individual-modules" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Para una distribución de módulos pequeños, es posible que prefiera enumerar todos los módulos en lugar de enumerar los paquetes, especialmente el caso de un solo módulo que va en el «paquete raíz» (es decir, ningún paquete). Este caso más simple se mostró en la sección <a class="reference internal" href="introduction.html#distutils-simple-example"><span class="std std-ref">Un ejemplo simple</span></a>; Aquí hay un ejemplo un poco más complicado:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">py_modules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mod1&#39;</span><span class="p">,</span> <span class="s1">&#39;pkg.mod2&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Esto describe dos módulos, uno en el paquete «raíz», el otro en el paquete <code class="xref py py-mod docutils literal notranslate"><span class="pre">pkg</span></code>. Nuevamente, el diseño predeterminado del paquete/directorio implica que estos dos módulos se pueden encontrar en <code class="file docutils literal notranslate"><span class="pre">mod1.py</span></code> y <code class="file docutils literal notranslate"><span class="pre">pkg/mod2.py</span></code>, y que <code class="file docutils literal notranslate"><span class="pre">pkg/__init__.py</span></code> existe también. Y nuevamente, puede anular la correspondencia paquete/directorio utilizando la opción <code class="docutils literal notranslate"><span class="pre">package_dir</span></code>.</p>
+</section>
+<section id="describing-extension-modules">
+<span id="describing-extensions"></span><h2><span class="section-number">2.3. </span>Describiendo módulos de extensión<a class="headerlink" href="#describing-extension-modules" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Así como escribir módulos de extensión Python es un poco más complicado que escribir módulos Python puros, describirlos a Distutils es un poco más complicado. A diferencia de los módulos puros, no basta con enumerar módulos o paquetes y esperar que Distutils salga y encuentre los archivos correctos; debe especificar el nombre de la extensión, el (los) archivo (s) de origen y cualquier requisito de compilación/enlace (incluir directorios, bibliotecas para enlazadores, etc.).</p>
+<p>Todo esto se realiza a través de otro argumento de palabra clave para <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>, la opción <code class="docutils literal notranslate"><span class="pre">ext_modules</span></code>. <code class="docutils literal notranslate"><span class="pre">ext_modules</span></code> es solo una lista de instancias <a class="reference internal" href="apiref.html#distutils.core.Extension" title="distutils.core.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code></a>, cada una de las cuales describe un único módulo de extensión. Suponga que su distribución incluye una sola extensión, llamada <code class="xref py py-mod docutils literal notranslate"><span class="pre">foo</span></code> e implementada por <code class="file docutils literal notranslate"><span class="pre">foo.c</span></code>. Si no se necesitan instrucciones adicionales para el compilador/enlazador, describir esta extensión es bastante simple:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.c&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>La clase <code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code> se puede importar desde <a class="reference internal" href="apiref.html#module-distutils.core" title="distutils.core: The core Distutils functionality"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distutils.core</span></code></a> junto con <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>. Por lo tanto, el script de configuración para una distribución de módulo que contiene solo esta extensión y nada más podría ser:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="n">setup</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+      <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">,</span>
+      <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.c&#39;</span><span class="p">])],</span>
+      <span class="p">)</span>
+</pre></div>
+</div>
+<p>La clase <code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code> (en realidad, la maquinaria de construcción de extensiones subyacente implementada por el comando <strong class="command">build_ext</strong>) admite una gran flexibilidad al describir las extensiones de Python, que se explica en las siguientes secciones.</p>
+<section id="extension-names-and-packages">
+<h3><span class="section-number">2.3.1. </span>Nombres de extensión y paquetes<a class="headerlink" href="#extension-names-and-packages" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El primer argumento para el constructor <a class="reference internal" href="apiref.html#distutils.core.Extension" title="distutils.core.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code></a> es siempre el nombre de la extensión, incluidos los nombres de los paquetes. Por ejemplo,</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;src/foo1.c&#39;</span><span class="p">,</span> <span class="s1">&#39;src/foo2.c&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>describe una extensión que vive en el paquete raíz, mientras que</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;pkg.foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;src/foo1.c&#39;</span><span class="p">,</span> <span class="s1">&#39;src/foo2.c&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>describe la misma extensión en el paquete <code class="xref py py-mod docutils literal notranslate"><span class="pre">pkg</span></code>. Los archivos fuente y el código objeto resultante son idénticos en ambos casos; la única diferencia es dónde en el sistema de archivos (y, por lo tanto, dónde en la jerarquía del espacio de nombres de Python) vive la extensión resultante.</p>
+<p>Si tiene varias extensiones, todas en el mismo paquete (o todas en el mismo paquete base), use el argumento de palabra clave <code class="docutils literal notranslate"><span class="pre">ext_package</span></code> para <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>. Por ejemplo,</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">ext_package</span><span class="o">=</span><span class="s1">&#39;pkg&#39;</span><span class="p">,</span>
+      <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.c&#39;</span><span class="p">]),</span>
+                   <span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;subpkg.bar&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bar.c&#39;</span><span class="p">])],</span>
+     <span class="p">)</span>
+</pre></div>
+</div>
+<p>compilará <code class="file docutils literal notranslate"><span class="pre">foo.c</span></code> a la extensión <code class="xref py py-mod docutils literal notranslate"><span class="pre">pkg.foo</span></code>, y <code class="file docutils literal notranslate"><span class="pre">bar.c</span></code> a <code class="xref py py-mod docutils literal notranslate"><span class="pre">pkg.subpkg.bar</span></code>.</p>
+</section>
+<section id="extension-source-files">
+<h3><span class="section-number">2.3.2. </span>Extensión de archivos fuente<a class="headerlink" href="#extension-source-files" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El segundo argumento para el constructor <a class="reference internal" href="apiref.html#distutils.core.Extension" title="distutils.core.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code></a> es una lista de archivos fuente. Dado que Distutils actualmente solo admite extensiones C, C++ y Objective-C, estos normalmente son archivos fuente C/C++/Objective-C. (Asegúrese de usar las extensiones apropiadas para distinguir los archivos fuente de C++ <code class="file docutils literal notranslate"><span class="pre">.cc</span></code> y <code class="file docutils literal notranslate"><span class="pre">.cpp</span></code> que parecen ser reconocidos por los compiladores de Unix y Windows).</p>
+<p>Sin embargo, también puede incluir archivos de interfaz SWIG (<code class="file docutils literal notranslate"><span class="pre">.i</span></code>) en la lista; el comando <strong class="command">build_ext</strong> sabe cómo manejar las extensiones SWIG: ejecutará SWIG en el archivo de interfaz y compilará el archivo C/C++ resultante en su extensión.</p>
+<p>A pesar de esta advertencia, las opciones para SWIG se pueden pasar actualmente de esta manera:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;_foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.i&#39;</span><span class="p">],</span>
+                             <span class="n">swig_opts</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-modern&#39;</span><span class="p">,</span> <span class="s1">&#39;-I../include&#39;</span><span class="p">])],</span>
+      <span class="n">py_modules</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+     <span class="p">)</span>
+</pre></div>
+</div>
+<p>O en la línea de comandos como esta</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">swig</span><span class="o">-</span><span class="n">opts</span><span class="o">=</span><span class="s2">&quot;-modern -I../include&quot;</span>
+</pre></div>
+</div>
+<p>En algunas plataformas, puede incluir archivos que no sean de origen procesados por el compilador e incluidos en su extensión. Actualmente, esto solo significa archivos de texto de mensaje de Windows (<code class="file docutils literal notranslate"><span class="pre">.mc</span></code>) y archivos de definición de recursos (<code class="file docutils literal notranslate"><span class="pre">.rc</span></code>) para Visual C ++. Estos serán compilados en archivos de recursos binarios (<code class="file docutils literal notranslate"><span class="pre">.res</span></code>) y enlazados.</p>
+</section>
+<section id="preprocessor-options">
+<h3><span class="section-number">2.3.3. </span>Opciones de preprocesador<a class="headerlink" href="#preprocessor-options" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Tres argumentos opcionales para <a class="reference internal" href="apiref.html#distutils.core.Extension" title="distutils.core.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code></a> le ayudarán si necesita especificar directorios de inclusión para buscar o preprocesar macros para definir/indefinir: <code class="docutils literal notranslate"><span class="pre">include_dirs</span></code>, <code class="docutils literal notranslate"><span class="pre">define_macros</span></code> y <code class="docutils literal notranslate"><span class="pre">undef_macros</span></code>.</p>
+<p>Por ejemplo, si su extensión requiere archivos de encabezado en el directorio <code class="file docutils literal notranslate"><span class="pre">include</span></code> bajo su raíz de distribución, use la opción <code class="docutils literal notranslate"><span class="pre">include_dirs</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.c&#39;</span><span class="p">],</span> <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Puede especificar directorios absolutos allí; si sabe que su extensión solo se construirá en sistemas Unix con X11R6 instalado en <code class="file docutils literal notranslate"><span class="pre">/usr</span></code>, puede salirse con</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;foo.c&#39;</span><span class="p">],</span> <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;/usr/include/X11&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Debería evitar este tipo de uso no portátil si planea distribuir su código: probablemente sea mejor escribir código C como</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;X11/Xlib.h&gt;</span>
+</pre></div>
+</div>
+<p>Si necesita incluir archivos de encabezado de alguna otra extensión de Python, puede aprovechar el hecho de que los archivos de encabezado se instalan de manera coherente mediante el comando Distutils <strong class="command">install_headers</strong>. Por ejemplo, los archivos de encabezado Python numéricos se instalan (en una instalación estándar de Unix) en <code class="file docutils literal notranslate"><span class="pre">/usr/local/include/python1.5/</span> <span class="pre">Numerical</span></code>. (La ubicación exacta diferirá según la plataforma y la instalación de Python). Dado que el directorio de inclusión de Python — <code class="file docutils literal notranslate"><span class="pre">/usr/local/include/python1.5</span></code> en este caso — siempre se incluye en ruta de búsqueda al construir extensiones de Python, el mejor enfoque es escribir código C como</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;Numerical/arrayobject.h&gt;</span>
+</pre></div>
+</div>
+<p>Sin embargo, si debe colocar el directorio <code class="file docutils literal notranslate"><span class="pre">Numerical</span></code> en la ruta de búsqueda del encabezado, puede encontrar ese directorio utilizando el módulo Distutils <a class="reference internal" href="apiref.html#module-distutils.sysconfig" title="distutils.sysconfig: Low-level access to configuration information of the Python interpreter."><code class="xref py py-mod docutils literal notranslate"><span class="pre">distutils.sysconfig</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="kn">import</span> <span class="n">get_python_inc</span>
+<span class="n">incdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_inc</span><span class="p">(</span><span class="n">plat_specific</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;Numerical&#39;</span><span class="p">)</span>
+<span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">Extension</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="n">incdir</span><span class="p">]),</span>
+      <span class="p">)</span>
+</pre></div>
+</div>
+<p>Aunque esto es bastante portátil, funcionará en cualquier instalación de Python, independientemente de la plataforma, probablemente sea más fácil escribir su código C de manera sensata.</p>
+<p>Puede definir y no definir macros de preprocesador con las opciones <code class="docutils literal notranslate"><span class="pre">define_macros</span></code> y <code class="docutils literal notranslate"><span class="pre">undef_macros</span></code>. <code class="docutils literal notranslate"><span class="pre">define_macros</span></code> toma una lista de tuplas <code class="docutils literal notranslate"><span class="pre">(name,</span> <span class="pre">value)</span></code>, donde <code class="docutils literal notranslate"><span class="pre">name</span></code> es el nombre de la macro a definir (una cadena de caracteres) y <code class="docutils literal notranslate"><span class="pre">value</span></code> es su valor: ya sea un cadena de caracteres o <code class="docutils literal notranslate"><span class="pre">None</span></code>. (Definir una macro <code class="docutils literal notranslate"><span class="pre">FOO</span></code> en <code class="docutils literal notranslate"><span class="pre">None</span></code> es el equivalente de un simple <code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">FOO</span></code> en su fuente C: con la mayoría de los compiladores, esto establece <code class="docutils literal notranslate"><span class="pre">FOO</span></code> en la cadena <code class="docutils literal notranslate"><span class="pre">1</span></code>.) <code class="docutils literal notranslate"><span class="pre">undef_macros</span></code> es solo una lista de macros para indefinir.</p>
+<p>Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+          <span class="n">define_macros</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;NDEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span>
+                         <span class="p">(</span><span class="s1">&#39;HAVE_STRFTIME&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)],</span>
+          <span class="n">undef_macros</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;HAVE_FOO&#39;</span><span class="p">,</span> <span class="s1">&#39;HAVE_BAR&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>es el equivalente a tener esto en la parte superior de cada archivo fuente C:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#define NDEBUG 1</span>
+<span class="c1">#define HAVE_STRFTIME</span>
+<span class="c1">#undef HAVE_FOO</span>
+<span class="c1">#undef HAVE_BAR</span>
+</pre></div>
+</div>
+</section>
+<section id="library-options">
+<h3><span class="section-number">2.3.4. </span>Opciones de biblioteca<a class="headerlink" href="#library-options" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>También puede especificar las bibliotecas para enlazarlas al crear su extensión y los directorios para buscar esas bibliotecas. La opción <code class="docutils literal notranslate"><span class="pre">bibliotecas</span></code> es una lista de bibliotecas para enlazar, <code class="docutils literal notranslate"><span class="pre">library_dirs</span></code> es una lista de directorios para buscar bibliotecas en el momento del enlace, y <code class="docutils literal notranslate"><span class="pre">runtime_library_dirs</span></code> es una lista de directorios para buscar compartidos (cargadas dinámicamente) bibliotecas en tiempo de ejecución.</p>
+<p>Por ejemplo, si necesita enlazar con bibliotecas que se sabe que están en la ruta de búsqueda de biblioteca estándar en los sistemas de destino:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+          <span class="n">libraries</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gdbm&#39;</span><span class="p">,</span> <span class="s1">&#39;readline&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Si necesita enlazar con bibliotecas en una ubicación no estándar, deberá incluir la ubicación en <code class="docutils literal notranslate"><span class="pre">library_dirs</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Extension</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+          <span class="n">library_dirs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;/usr/X11R6/lib&#39;</span><span class="p">],</span>
+          <span class="n">libraries</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X11&#39;</span><span class="p">,</span> <span class="s1">&#39;Xt&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>(Nuevamente, este tipo de construcción no portátil debe evitarse si tiene la intención de distribuir su código.)</p>
+</section>
+<section id="other-options">
+<h3><span class="section-number">2.3.5. </span>Otras opciones<a class="headerlink" href="#other-options" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Todavía hay algunas otras opciones que se pueden usar para manejar casos especiales.</p>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">optional</span></code> es booleana; si es cierto, una falla de compilación en la extensión no abortará el proceso de compilación, sino que simplemente no instalará la extensión que falla.</p>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">extra_objects</span></code> es una lista de archivos de objetos que se pasarán al enlazador. Estos archivos no deben tener extensiones, ya que se usa la extensión predeterminada para el compilador.</p>
+<p><code class="docutils literal notranslate"><span class="pre">extra_compile_args</span></code> y <code class="docutils literal notranslate"><span class="pre">extra_link_args</span></code> se pueden usar para especificar opciones de línea de comando adicionales para las líneas de comando del compilador y enlazador respectivo.</p>
+<p><code class="docutils literal notranslate"><span class="pre">export_symbols</span></code> solo es útil en Windows. Puede contener una lista de símbolos (funciones o variables) para exportar. Esta opción no es necesaria cuando se crean extensiones compiladas: Distutils agregará automáticamente <code class="docutils literal notranslate"><span class="pre">initmodule</span></code> a la lista de símbolos exportados.</p>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">depends</span></code> es una lista de archivos de los que depende la extensión (por ejemplo, archivos de encabezado). El comando de compilación llamará al compilador en las fuentes para reconstruir la extensión si alguno de estos archivos se ha modificado desde la compilación anterior.</p>
+</section>
+</section>
+<section id="relationships-between-distributions-and-packages">
+<h2><span class="section-number">2.4. </span>Relaciones entre distribuciones y paquetes<a class="headerlink" href="#relationships-between-distributions-and-packages" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una distribución puede relacionarse con paquetes de tres maneras específicas:</p>
+<ol class="arabic simple">
+<li><p>Puede requerir paquetes o módulos.</p></li>
+<li><p>Puede proporcionar paquetes o módulos.</p></li>
+<li><p>Puede paquetes o módulos obsoletos.</p></li>
+</ol>
+<p>Estas relaciones se pueden especificar utilizando argumentos de palabras clave para la función <a class="reference internal" href="apiref.html#distutils.core.setup" title="distutils.core.setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">distutils.core.setup()</span></code></a>.</p>
+<p>Las dependencias en otros módulos y paquetes de Python se pueden especificar proporcionando el argumento de palabra clave <em>requires</em> a <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>. El valor debe ser una lista de cadenas de caracteres. Cada cadena especifica un paquete que se requiere y, opcionalmente, qué versiones son suficientes.</p>
+<p>Para especificar que se requiere cualquier versión de un módulo o paquete, la cadena debe consistir completamente en el nombre del módulo o paquete. Los ejemplos incluyen <code class="docutils literal notranslate"><span class="pre">'mymodule'</span></code> y <code class="docutils literal notranslate"><span class="pre">'xml.parsers.expat'</span></code>.</p>
+<p>Si se requieren versiones específicas, se puede proporcionar una secuencia de calificadores entre paréntesis. Cada calificador puede consistir en un operador de comparación y un número de versión. Los operadores de comparación aceptados son:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span>    <span class="o">&gt;</span>    <span class="o">==</span>
+<span class="o">&lt;=</span>   <span class="o">&gt;=</span>   <span class="o">!=</span>
+</pre></div>
+</div>
+<p>Estos se pueden combinar usando múltiples calificadores separados por comas (y espacios en blanco opcionales). En este caso, todos los calificadores deben coincidir; Se utiliza un AND lógico para combinar las evaluaciones.</p>
+<p>Veamos algunos ejemplos:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Expresión Requiere</p></th>
+<th class="head"><p>Explicación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">==1.0</span></code></p></td>
+<td><p>Solo la versión <code class="docutils literal notranslate"><span class="pre">1.0</span></code> es compatible</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;1.0,</span> <span class="pre">!=1.5.1,</span> <span class="pre">&lt;2.0</span></code></p></td>
+<td><p>Cualquier versión posterior a <code class="docutils literal notranslate"><span class="pre">1.0</span></code> y anterior a <code class="docutils literal notranslate"><span class="pre">2.0</span></code> es compatible, excepto <code class="docutils literal notranslate"><span class="pre">1.5.1</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Ahora que podemos especificar dependencias, también debemos poder especificar qué proporcionamos que otras distribuciones pueden requerir. Esto se hace usando el argumento de palabra clave <em>provides</em> para <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>. El valor de esta palabra clave es una lista de cadenas, cada una de las cuales nombra un módulo o paquete Python, y opcionalmente identifica la versión. Si no se especifica la versión, se supone que coincide con la de la distribución.</p>
+<p>Algunos ejemplos:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 69%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Expresión Proporciona</p></th>
+<th class="head"><p>Explicación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mypkg</span></code></p></td>
+<td><p>Proporciona <code class="docutils literal notranslate"><span class="pre">mypkg</span></code>, utilizando la versión de distribución</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mypkg</span> <span class="pre">(1.1)</span></code></p></td>
+<td><p>Proporcione <code class="docutils literal notranslate"><span class="pre">mypkg</span></code> versión 1.1, independientemente de la versión de distribución</p></td>
+</tr>
+</tbody>
+</table>
+<p>Un paquete puede declarar que obsoleto otros paquetes utilizando el argumento de palabra clave <em>obsoletes</em>. El valor para esto es similar al de la palabra clave <em>requires</em>: una lista de cadenas que dan especificadores de módulo o paquete. Cada especificador consta de un nombre de módulo o paquete opcionalmente seguido de uno o más calificadores de versión. Los calificadores de versión se dan entre paréntesis después del nombre del módulo o paquete.</p>
+<p>Las versiones identificadas por los calificadores son aquellas que están obsoletas por la distribución que se describe. Si no se dan calificadores, se entiende que todas las versiones del módulo o paquete nombrado están obsoletas.</p>
+</section>
+<section id="installing-scripts">
+<span id="distutils-installing-scripts"></span><h2><span class="section-number">2.5. </span>Instalar scripts<a class="headerlink" href="#installing-scripts" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hasta ahora hemos estado tratando con módulos Python puros y no puros, que generalmente no se ejecutan solos sino que se importan mediante scripts.</p>
+<p>Los scripts son archivos que contienen el código fuente de Python, destinados a iniciarse desde la línea de comandos. Los scripts no requieren que Distutils haga nada muy complicado. La única característica inteligente es que si la primera línea del script comienza con <code class="docutils literal notranslate"><span class="pre">#!</span></code> Y contiene la palabra «python», Distutils ajustará la primera línea para referirse a la ubicación actual del intérprete. Por defecto, se reemplaza con la ubicación actual del intérprete. La opción <code class="xref std std-option docutils literal notranslate"><span class="pre">-executable</span></code> (o <code class="xref std std-option docutils literal notranslate"><span class="pre">-e</span></code>) permitirá que la ruta del intérprete se anule explícitamente.</p>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">scripts</span></code> simplemente es una lista de archivos a manejar de esta manera. Desde el script de configuración PyXML:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">scripts</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scripts/xmlproc_parse&#39;</span><span class="p">,</span> <span class="s1">&#39;scripts/xmlproc_val&#39;</span><span class="p">]</span>
+      <span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span>Todos los scripts también se agregarán al archivo <code class="docutils literal notranslate"><span class="pre">MANIFEST</span></code> si no se proporciona una plantilla. Ver <a class="reference internal" href="sourcedist.html#manifest"><span class="std std-ref">Especificar los archivos a distribuir</span></a>.</p>
+</div>
+</section>
+<section id="installing-package-data">
+<span id="distutils-installing-package-data"></span><h2><span class="section-number">2.6. </span>Instalar datos del paquete<a class="headerlink" href="#installing-package-data" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>A menudo, se necesitan instalar archivos adicionales en un paquete. Estos archivos son a menudo datos que están estrechamente relacionados con la implementación del paquete, o archivos de texto que contienen documentación que podría ser de interés para los programadores que usan el paquete. Estos archivos se llaman <em class="dfn">paquetes de datos &lt;package data&gt;</em>.</p>
+<p>Los datos del paquete se pueden agregar a los paquetes utilizando el argumento de palabra clave <code class="docutils literal notranslate"><span class="pre">package_data</span></code> para la función <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code>. El valor debe ser una asignación del nombre del paquete a una lista de nombres de ruta relativos que deben copiarse en el paquete. Las rutas se interpretan como relativas al directorio que contiene el paquete (la información de la asignación <code class="docutils literal notranslate"><span class="pre">package_dir</span></code> se usa si corresponde); es decir, se espera que los archivos formen parte del paquete en los directorios de origen. También pueden contener patrones glob.</p>
+<p>Los nombres de ruta pueden contener porciones de directorio; cualquier directorio necesario se creará en la instalación.</p>
+<p>Por ejemplo, si un paquete debe contener un subdirectorio con varios archivos de datos, los archivos se pueden organizar de esta manera en el árbol de origen:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="o">.</span><span class="n">py</span>
+<span class="n">src</span><span class="o">/</span>
+    <span class="n">mypkg</span><span class="o">/</span>
+        <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">py</span>
+        <span class="n">data</span><span class="o">/</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">dat</span>
+            <span class="n">spoons</span><span class="o">.</span><span class="n">dat</span>
+            <span class="n">forks</span><span class="o">.</span><span class="n">dat</span>
+</pre></div>
+</div>
+<p>La llamada correspondiente a <code class="xref py py-func docutils literal notranslate"><span class="pre">setup()</span></code> podría ser:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mypkg&#39;</span><span class="p">],</span>
+      <span class="n">package_dir</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mypkg&#39;</span><span class="p">:</span> <span class="s1">&#39;src/mypkg&#39;</span><span class="p">},</span>
+      <span class="n">package_data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mypkg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;data/*.dat&#39;</span><span class="p">]},</span>
+      <span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span>Todos los archivos que coincidan con <code class="docutils literal notranslate"><span class="pre">package_data</span></code> se agregarán al archivo <code class="docutils literal notranslate"><span class="pre">MANIFEST</span></code> si no se proporciona una plantilla. Ver <a class="reference internal" href="sourcedist.html#manifest"><span class="std std-ref">Especificar los archivos a distribuir</span></a>.</p>
+</div>
+</section>
+<section id="installing-additional-files">
+<span id="distutils-additional-files"></span><h2><span class="section-number">2.7. </span>Instalar archivos adicionales<a class="headerlink" href="#installing-additional-files" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La opción <code class="docutils literal notranslate"><span class="pre">data_files</span></code> se puede usar para especificar archivos adicionales necesarios para la distribución del módulo: archivos de configuración, catálogos de mensajes, archivos de datos, cualquier cosa que no se ajuste a las categorías anteriores.</p>
+<p><code class="docutils literal notranslate"><span class="pre">data_files</span></code> especifica una secuencia de pares (<em>directory</em>, <em>files</em>) de la siguiente manera:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">data_files</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;bitmaps&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bm/b1.gif&#39;</span><span class="p">,</span> <span class="s1">&#39;bm/b2.gif&#39;</span><span class="p">]),</span>
+                  <span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cfg/data.cfg&#39;</span><span class="p">])],</span>
+     <span class="p">)</span>
+</pre></div>
+</div>
+<p>Cada par (<em>directory</em>, <em>files</em>) en la secuencia especifica el directorio de instalación y los archivos a instalar allí.</p>
+<p>Cada nombre de archivo en <em>files</em> se interpreta en relación con el script <code class="file docutils literal notranslate"><span class="pre">setup.py</span></code> en la parte superior de la distribución de origen del paquete. Tenga en cuenta que puede especificar el directorio donde se instalarán los archivos de datos, pero no puede cambiar el nombre de los archivos de datos.</p>
+<p>El <em>directory</em> debe ser una ruta relativa. Se interpreta en relación con el prefijo de instalación (<code class="docutils literal notranslate"><span class="pre">sys.prefix</span></code> de Python para instalaciones del sistema; <code class="docutils literal notranslate"><span class="pre">site.USER_BASE</span></code> para instalaciones de usuario). Distutils permite que <em>directory</em> sea una ruta de instalación absoluta, pero esto se desaconseja ya que es incompatible con el formato de empaquetado de la rueda. No se utiliza información de directorio de <em>files</em> para determinar la ubicación final del archivo instalado; solo se usa el nombre del archivo.</p>
+<p>Puede especificar las opciones <code class="docutils literal notranslate"><span class="pre">data_files</span></code> como una secuencia simple de archivos sin especificar un directorio de destino, pero esto no es recomendable, y el comando <strong class="command">install</strong> imprimirá una advertencia en este caso. Para instalar archivos de datos directamente en el directorio de destino, se debe dar una cadena vacía como directorio.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span>Todos los archivos que coincidan con <code class="docutils literal notranslate"><span class="pre">data_files</span></code> se agregarán al archivo <code class="docutils literal notranslate"><span class="pre">MANIFEST</span></code> si no se proporciona una plantilla. Ver <a class="reference internal" href="sourcedist.html#manifest"><span class="std std-ref">Especificar los archivos a distribuir</span></a>.</p>
+</div>
+</section>
+<section id="additional-meta-data">
+<span id="meta-data"></span><h2><span class="section-number">2.8. </span>Metadatos adicionales<a class="headerlink" href="#additional-meta-data" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El script de configuración puede incluir metadatos adicionales más allá del nombre y la versión. Esta información incluye:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 36%" />
+<col style="width: 23%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metadatos</p></th>
+<th class="head"><p>Descripción</p></th>
+<th class="head"><p>Valor</p></th>
+<th class="head"><p>Notas</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>nombre del paquete</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td><p>(1)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>versión de este lanzamiento</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td><p>(1)(2)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">author</span></code></p></td>
+<td><p>nombre del autor del paquete</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td><p>(3)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">author_email</span></code></p></td>
+<td><p>dirección de correo electrónico del autor del paquete</p></td>
+<td><p>dirección de correo electrónico</p></td>
+<td><p>(3)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">maintainer</span></code></p></td>
+<td><p>nombre del responsable del paquete</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td><p>(3)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maintainer_email</span></code></p></td>
+<td><p>dirección de correo electrónico del mantenedor del paquete</p></td>
+<td><p>dirección de correo electrónico</p></td>
+<td><p>(3)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">url</span></code></p></td>
+<td><p>página de inicio del paquete</p></td>
+<td><p>URL</p></td>
+<td><p>(1)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>descripción breve y resumida del paquete</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">long_description</span></code></p></td>
+<td><p>descripción más larga del paquete</p></td>
+<td><p>cadena de caracteres larga</p></td>
+<td><p>(4)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">download_url</span></code></p></td>
+<td><p>ubicación donde se puede descargar el paquete</p></td>
+<td><p>URL</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">classifiers</span></code></p></td>
+<td><p>una lista de clasificadores</p></td>
+<td><p>lista de cadenas de caracteres</p></td>
+<td><p>(6)(7)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">platforms</span></code></p></td>
+<td><p>una lista de plataformas</p></td>
+<td><p>lista de cadenas de caracteres</p></td>
+<td><p>(6)(8)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">keywords</span></code></p></td>
+<td><p>una lista de palabras clave</p></td>
+<td><p>lista de cadenas de caracteres</p></td>
+<td><p>(6)(8)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license</span></code></p></td>
+<td><p>licencia para el paquete</p></td>
+<td><p>cadena de caracteres corta</p></td>
+<td><p>(5)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Notas:</p>
+<ol class="arabic simple">
+<li><p>Estos campos son obligatorios.</p></li>
+<li><p>Se recomienda que las versiones tomen la forma <em>major.minor[.patch[.sub]]</em>.</p></li>
+<li><p>Se debe identificar al autor o al mantenedor. Si se proporciona el mantenedor, distutils lo enumera como el autor en <code class="file docutils literal notranslate"><span class="pre">PKG-INFO</span></code>.</p></li>
+<li><p>PyPI utiliza el campo <code class="docutils literal notranslate"><span class="pre">long_description</span></code> cuando publica un paquete para construir su página de proyecto.</p></li>
+<li><p>El campo <code class="docutils literal notranslate"><span class="pre">license</span></code> es un texto que indica la licencia que cubre el paquete donde la licencia no es una selección de los clasificadores de Trove <em>«License»</em>. Vea el campo <code class="docutils literal notranslate"><span class="pre">Classifier</span></code>. Tenga en cuenta que hay una opción de distribución de <code class="docutils literal notranslate"><span class="pre">license</span></code> que está en desuso pero que aún actúa como un alias para la <code class="docutils literal notranslate"><span class="pre">license</span></code>.</p></li>
+<li><p>Este campo debe ser una lista.</p></li>
+<li><p>Los clasificadores válidos se enumeran en <a class="reference external" href="https://pypi.org/classifiers">PyPI</a>.</p></li>
+<li><p>Para preservar la compatibilidad con versiones anteriores, este campo también acepta una cadena. Si pasa una cadena separada por comas <code class="docutils literal notranslate"><span class="pre">'foo,</span> <span class="pre">bar'</span></code>, se convertirá en <code class="docutils literal notranslate"><span class="pre">['foo',</span> <span class="pre">'bar']</span></code>, de lo contrario, se convertirá en una lista de una cadena de caracteres.</p></li>
+</ol>
+<dl class="simple">
+<dt>“cadenas de caracteres cortas”</dt><dd><p>Una sola línea de texto, no más de 200 caracteres.</p>
+</dd>
+<dt>“cadenas de caracteres largas”</dt><dd><p>Múltiples líneas de texto plano en formato reStructuredText (consulte <a class="reference external" href="http://docutils.sourceforge.net/">http://docutils.sourceforge.net/</a>).</p>
+</dd>
+<dt>“lista de cadenas de caracteres”</dt><dd><p>Vea abajo.</p>
+</dd>
+</dl>
+<p>Codificar la información de la versión es un arte en sí mismo. Los paquetes de Python generalmente se adhieren al formato de versión <em>major.minor[.patch][sub]</em>. El número principal es 0 para las versiones iniciales y experimentales de software. Se incrementa para versiones que representan hitos importantes en un paquete. El número menor se incrementa cuando se agregan nuevas características importantes al paquete. El número de parche aumenta cuando se realizan versiones de corrección de errores. La información adicional de la versión final a veces se usa para indicar sublanzamientos. Estos son «a1, a2, …, aN» (para versiones alfa, donde la funcionalidad y la API pueden cambiar), «b1, b2, …, bN» (para versiones beta, que solo corrigen errores) y «pr1 , pr2, …, prN» (para la prueba final de lanzamiento previo al lanzamiento). Algunos ejemplos:</p>
+<dl class="simple">
+<dt>0.1.0</dt><dd><p>el primer lanzamiento experimental de un paquete</p>
+</dd>
+<dt>1.0.1a2</dt><dd><p>la segunda versión alfa de la primera versión del parche 1.0</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">classifiers</span></code> debe ser especificado en una lista:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+      <span class="n">classifiers</span><span class="o">=</span><span class="p">[</span>
+          <span class="s1">&#39;Development Status :: 4 - Beta&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Environment :: Console&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Environment :: Web Environment&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Intended Audience :: End Users/Desktop&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Intended Audience :: Developers&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Intended Audience :: System Administrators&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;License :: OSI Approved :: Python Software Foundation License&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Operating System :: MacOS :: MacOS X&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Operating System :: Microsoft :: Windows&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Operating System :: POSIX&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Programming Language :: Python&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Topic :: Communications :: Email&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Topic :: Office/Business&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Topic :: Software Development :: Bug Tracking&#39;</span><span class="p">,</span>
+          <span class="p">],</span>
+      <span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span><a class="reference internal" href="apiref.html#distutils.core.setup" title="distutils.core.setup"><code class="xref py py-class docutils literal notranslate"><span class="pre">setup</span></code></a> ahora advierte cuando los campos <code class="docutils literal notranslate"><span class="pre">classifiers</span></code>, <code class="docutils literal notranslate"><span class="pre">keywords</span></code> o <code class="docutils literal notranslate"><span class="pre">platforms</span></code> no se especifican como una lista o una cadena de caracteres.</p>
+</div>
+</section>
+<section id="debugging-the-setup-script">
+<span id="debug-setup-script"></span><h2><span class="section-number">2.9. </span>Depuración del script de configuración<a class="headerlink" href="#debugging-the-setup-script" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>A veces las cosas salen mal y el script de configuración no hace lo que el desarrollador quiere.</p>
+<p>Distutils detecta cualquier excepción al ejecutar el script de configuración e imprime un mensaje de error simple antes de que finalice el script. La motivación para este comportamiento es no confundir a los administradores que no saben mucho acerca de Python y están tratando de instalar un paquete. Si obtienen un gran rastreo desde las profundidades de Distutils, pueden pensar que el paquete o la instalación de Python están rotos porque no leen hasta el final y ven que es un problema de permiso.</p>
+<p>Por otro lado, esto no ayuda al desarrollador a encontrar la causa de la falla. Para este propósito, la variable de entorno <span class="target" id="index-2"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DISTUTILS_DEBUG</span></code> se puede establecer en cualquier cosa excepto una cadena vacía, y distutils ahora imprimirá información detallada sobre lo que está haciendo, volcará el rastreo completo cuando ocurra una excepción e imprimirá todo el comando línea cuando falla un programa externo (como un compilador de C).</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">2. Escribir el script de configuración</a><ul>
+<li><a class="reference internal" href="#listing-whole-packages">2.1. Listado de paquetes completos</a></li>
+<li><a class="reference internal" href="#listing-individual-modules">2.2. Listado de módulos individuales</a></li>
+<li><a class="reference internal" href="#describing-extension-modules">2.3. Describiendo módulos de extensión</a><ul>
+<li><a class="reference internal" href="#extension-names-and-packages">2.3.1. Nombres de extensión y paquetes</a></li>
+<li><a class="reference internal" href="#extension-source-files">2.3.2. Extensión de archivos fuente</a></li>
+<li><a class="reference internal" href="#preprocessor-options">2.3.3. Opciones de preprocesador</a></li>
+<li><a class="reference internal" href="#library-options">2.3.4. Opciones de biblioteca</a></li>
+<li><a class="reference internal" href="#other-options">2.3.5. Otras opciones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relationships-between-distributions-and-packages">2.4. Relaciones entre distribuciones y paquetes</a></li>
+<li><a class="reference internal" href="#installing-scripts">2.5. Instalar scripts</a></li>
+<li><a class="reference internal" href="#installing-package-data">2.6. Instalar datos del paquete</a></li>
+<li><a class="reference internal" href="#installing-additional-files">2.7. Instalar archivos adicionales</a></li>
+<li><a class="reference internal" href="#additional-meta-data">2.8. Metadatos adicionales</a></li>
+<li><a class="reference internal" href="#debugging-the-setup-script">2.9. Depuración del script de configuración</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="introduction.html"
+                          title="capítulo anterior"><span class="section-number">1. </span>Una introducción a distutils</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="configfile.html"
+                          title="próximo capítulo"><span class="section-number">3. </span>Escribiendo el archivo de configuración de instalación (<em>setup</em>)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/distutils/setupscript.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="configfile.html" title="3. Escribiendo el archivo de configuración de instalación (setup)"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="1. Una introducción a distutils"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Distribución de módulos de Python (versión heredada)</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">2. </span>Escribir el script de configuración</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

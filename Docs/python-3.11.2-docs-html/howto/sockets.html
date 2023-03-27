@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="HOW TO - Programación con sockets" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/howto/sockets.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Autor, Gordon McMillan,. Resumen: Los sockets son usados casi en todas partes pero son una de las tecnologías más incomprendidas. Esta es una descripción general de los sockets. No es realmente un ..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Autor, Gordon McMillan,. Resumen: Los sockets son usados casi en todas partes pero son una de las tecnologías más incomprendidas. Esta es una descripción general de los sockets. No es realmente un ..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>HOW TO - Programación con sockets &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="HOW TO - Ordenar" href="sorting.html" />
+    <link rel="prev" title="Expresiones regulares COMOS (HOWTO)" href="regex.html" />
+    <link rel="canonical" href="https://docs.python.org/3/howto/sockets.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">HOW TO - Programación con sockets</a><ul>
+<li><a class="reference internal" href="#sockets">Sockets</a><ul>
+<li><a class="reference internal" href="#history">Historia</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-socket">Creando un socket</a><ul>
+<li><a class="reference internal" href="#ipc">IPC</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-a-socket">Usando un socket</a><ul>
+<li><a class="reference internal" href="#binary-data">Datos binarios</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#disconnecting">Desconectando</a><ul>
+<li><a class="reference internal" href="#when-sockets-die">Cuando los sockets mueren</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#non-blocking-sockets"><em>Sockets</em> no bloqueantes</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="regex.html"
+                          title="capítulo anterior">Expresiones regulares COMOS (<em>HOWTO</em>)</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="sorting.html"
+                          title="próximo capítulo">HOW TO - Ordenar</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/howto/sockets.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="HOW TO - Ordenar"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="Expresiones regulares COMOS (HOWTO)"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HOW TO - Programación con sockets</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="socket-programming-howto">
+<span id="socket-howto"></span><h1>HOW TO - Programación con sockets<a class="headerlink" href="#socket-programming-howto" title="Enlazar permanentemente con este título">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Autor</dt>
+<dd class="field-odd"><p>Gordon McMillan</p>
+</dd>
+</dl>
+<div class="topic">
+<p class="topic-title">Resumen</p>
+<p>Los sockets son usados casi en todas partes pero son una de las tecnologías más incomprendidas. Esta es una descripción general de los sockets. No es realmente un tutorial, todavía tendrás trabajo para hacer que las cosas funcionen. No cubre los pequeños detalles (y hay muchos de ellos) pero espero que pueda dar suficiente información para comenzar a usarlos decentemente.</p>
+</div>
+<section id="sockets">
+<h2>Sockets<a class="headerlink" href="#sockets" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Solo voy a hablar de los sockets <em>INET</em> (como IPv4), pues solo ellos cubren el 99% del uso de los sockets. Y solo voy a hablar sobre los sockets <em>STREAM</em> (como TCP), a menos que realmente sepas lo que haces (y en ese caso esta guía no es para ti), tendrás mejor comportamiento y rendimiento con un socket <em>STREAM</em> que con cualquier otro. Voy a tratar de aclarar el misterio de que es un socket, además de algunas ideas sobre como trabajar con sockets bloqueantes y no bloqueantes. Pero voy a comenzar hablando de los sockets bloqueantes, necesitarás saber como funcionan antes de lidiar con los no bloqueantes.</p>
+<p>Parte del problema para entenderlos es que «socket» puede significar un número de cosas ligeramente diferentes dependiendo del contexto. Entonces, primero vamos a hacer una distinción entre sockets «cliente» - un extremo de una conversación, y un socket «servidor», que es más como una central de teléfonos. La aplicación cliente (tu navegador, por ejemplo) usa sockets «cliente» exclusivamente; el servidor web con quien se está comunicando usa sockets «cliente» y «servidor».</p>
+<section id="history">
+<h3>Historia<a class="headerlink" href="#history" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>De las varias formas de comunicación entre procesos (<abbr title="Inter Process Communication">IPC</abbr>) los sockets son, por mucho, la más popular. En cualquier plataforma es probable que existan otras formas de IPC más rápidas, pero en comunicación multiplataforma los sockets son los únicos competidores.</p>
+<p>Fueron inventados en Berkeley como parte del sabor BSD de Unix. Se propagaron como la pólvora con Internet. Con razón: la combinación de sockets con INET hace que hablar con máquinas arbitrarias de todo el mundo sea increíblemente fácil (al menos en comparación con otros esquemas).</p>
+</section>
+</section>
+<section id="creating-a-socket">
+<h2>Creando un socket<a class="headerlink" href="#creating-a-socket" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>De manera general, cuando hiciste click en el enlace que te trajo a esta página tu navegador hizo algo como lo siguiente:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create an INET, STREAMing socket</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="c1"># now connect to the web server on port 80 - the normal http port</span>
+<span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s2">&quot;www.python.org&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Cuando <code class="docutils literal notranslate"><span class="pre">connect</span></code> termina, el socket <code class="docutils literal notranslate"><span class="pre">s</span></code> puede ser usado en una petición para traer el texto de la página. El mismo socket leerá la respuesta y luego será destruido. Así es, destruido. Los sockets cliente son normalmente usados solo para un intercambio (o un pequeño numero se intercambios secuenciales).</p>
+<p>Lo que sucede en el servidor web es un poco más complejo. Primero, el servidor web crea un «socket servidor»:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create an INET, STREAMing socket</span>
+<span class="n">serversocket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="c1"># bind the socket to a public host, and a well-known port</span>
+<span class="n">serversocket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="mi">80</span><span class="p">))</span>
+<span class="c1"># become a server socket</span>
+<span class="n">serversocket</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Un par de cosas que señalar: usamos <code class="docutils literal notranslate"><span class="pre">socket.gethostname()</span></code> para que el socket fuera visible al mundo exterior. Si hubiésemos usado <code class="docutils literal notranslate"><span class="pre">s.bind(('localhost',</span> <span class="pre">80))</span></code> o <code class="docutils literal notranslate"><span class="pre">s.bind(('127.0.0.1',</span> <span class="pre">80))</span></code> habríamos tenido un socket servidor pero solo habría sido visible en la misma máquina. <code class="docutils literal notranslate"><span class="pre">s.bind(('',</span> <span class="pre">80))</span></code> especifica que el socket es accesible desde cualquier dirección que tenga la máquina.</p>
+<p>Algo más para señalar: los números de puerto bajos son normalmente reservados para servicios «conocidos» (HTTP, SNMP, etc.). Si estás probando los sockets usa un número grande (4 dígitos).</p>
+<p>Finalmente, el argumento que se le pasa a <code class="docutils literal notranslate"><span class="pre">listen</span></code> le indica a la librería del socket que queremos poner en cola no más de 5 solicitudes de conexión (el máximo normal) antes de rechazar conexiones externas. Si el resto del código está escrito correctamente eso debería ser suficiente.</p>
+<p>Ahora que tenemos un socket servidor escuchando en el puerto 80 ya podemos entrar al bucle principal del servidor web:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="c1"># accept connections from outside</span>
+    <span class="p">(</span><span class="n">clientsocket</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span> <span class="o">=</span> <span class="n">serversocket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="c1"># now do something with the clientsocket</span>
+    <span class="c1"># in this case, we&#39;ll pretend this is a threaded server</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">client_thread</span><span class="p">(</span><span class="n">clientsocket</span><span class="p">)</span>
+    <span class="n">ct</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Existen en realidad 3 maneras generales en las cuales este bucle puede funcionar - despachar un hilo para manejar <code class="docutils literal notranslate"><span class="pre">clientsocket</span></code>, crear un proceso nuevo para manejar <code class="docutils literal notranslate"><span class="pre">clientsocket</span></code> o reestructurar esta aplicación para usar sockets no bloqueantes y multiplexar entre nuestro «socket servidor» y cualquier <code class="docutils literal notranslate"><span class="pre">clientsocket</span></code> activo usando <code class="docutils literal notranslate"><span class="pre">select</span></code>. Más sobre esto después. Lo importante a entender ahora es: esto es <em>todo</em> lo que un «socket servidor hace». No manda ningún dato. No recibe ningún dato. Solo produce «sockets clientes». Cada <code class="docutils literal notranslate"><span class="pre">clientsocket</span></code> es creado en respuesta a algún otro «socket cliente» que hace <code class="docutils literal notranslate"><span class="pre">connect()</span></code> al host y al puerto al que estamos vinculados. Tan pronto como hemos credo ese <code class="docutils literal notranslate"><span class="pre">clientsocket</span></code> volvemos a escuchar por más conexiones. Los dos «clientes» son libres de «conversar» entre ellos - están usando algún puerto asignado dinámicamente que será reciclado cuando la conversación termine.</p>
+<section id="ipc">
+<h3>IPC<a class="headerlink" href="#ipc" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Si necesitas conexiones IPC rápidas entre dos procesos en una misma máquina puedes revisar los <em>pipes</em> o la memoria compartida. Si decides usar sockets <code class="docutils literal notranslate"><span class="pre">AF_INET</span></code>, vincula el servidor con <code class="docutils literal notranslate"><span class="pre">&quot;localhost&quot;</span></code>. En la mayoría de las plataformas, esto tomará un atajo alrededor de algunas capas del código de red y será un poco más rápido.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El módulo <a class="reference internal" href="../library/multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> integra IPC multiplataforma en un API de alto nivel.</p>
+</div>
+</section>
+</section>
+<section id="using-a-socket">
+<h2>Usando un socket<a class="headerlink" href="#using-a-socket" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Lo primero a señalar es que el «socket cliente» del navegador y el «socket cliente» del servidor web son bestias idénticas. Es decir, esta es una conversación <em>peer to peer</em>. O para decirlo de otra manera, <em>como diseñador, tendrás que decidir cuáles son las reglas de etiqueta para una conversación</em>. Normalmente, el socket que se conecta inicia la conversación, enviando una solicitud o tal vez un inicio de sesión. Pero esa es una decisión de diseño: no es una regla de los sockets.</p>
+<p>Hay dos conjuntos de verbos que se usan para la comunicación. Puedes usar <code class="docutils literal notranslate"><span class="pre">send</span></code> y <code class="docutils literal notranslate"><span class="pre">recv</span></code> o puedes transformar tu socket cliente en algo similar a un archivo y usar <code class="docutils literal notranslate"><span class="pre">read</span></code> y <code class="docutils literal notranslate"><span class="pre">write</span></code>. Esta última es la forma en la que Java presenta sus sockets. No voy a hablar acerca de eso aquí, excepto para advertirte que necesitas usar <code class="docutils literal notranslate"><span class="pre">flush</span></code> en los sockets. Estos son archivos en buffer, y un error común es usar <code class="docutils literal notranslate"><span class="pre">write</span></code> para escribir algo y luego usar <code class="docutils literal notranslate"><span class="pre">read</span></code> para leer la respuesta. Sin usar <code class="docutils literal notranslate"><span class="pre">flush</span></code> en este caso, puedes terminar esperando la respuesta por siempre porque la petición estaría aún en el buffer de salida.</p>
+<p>Ahora llegamos al principal problema de los sockets - <code class="docutils literal notranslate"><span class="pre">send</span></code> y <code class="docutils literal notranslate"><span class="pre">recv</span></code> operan en los buffers de red. Ellos no manejan necesariamente todos los bytes que se les entrega (o espera de ellos), porque su enfoque principal es manejar los buffers de red. En general, ellos retornan cuando los buffers de red asociados se han llenado (<code class="docutils literal notranslate"><span class="pre">send</span></code>) o vaciado (<code class="docutils literal notranslate"><span class="pre">recv</span></code>). Luego ellos dicen cuántos bytes manejaron. Es <em>tu</em> responsabilidad llamarlos nuevamente hasta que su mensaje haya sido tratado por completo.</p>
+<p>Cuando <code class="docutils literal notranslate"><span class="pre">recv</span></code> retorna 0 bytes significa que el otro lado ha cerrado (o está en el proceso de cerrar) la conexión. No recibirás más datos de esta conexión. Nunca. Es posible que puedas mandar datos exitosamente. De eso voy a hablar más tarde.</p>
+<p>Un protocolo como HTTP usa un socket para una sola transferencia. El cliente manda una petición, luego lee la respuesta. Eso es todo. El socket es descartado. Esto significa que un cliente puede detectar el final de la respuesta al recibir 0 bytes.</p>
+<p>Pero si planeas reusar el socket para más transferencias, tienes que darte cuenta que <em>no hay</em> <abbr title="End of Transfer">EOT</abbr> <em>en un socket.</em> Repito: si la llamada a <code class="docutils literal notranslate"><span class="pre">send</span></code> o <code class="docutils literal notranslate"><span class="pre">recv</span></code> de un socket retorna después de manejar 0 bytes, la conexión se ha interrumpido. Si la conexión <em>no</em> se ha interrumpido, puedes esperar un <code class="docutils literal notranslate"><span class="pre">recv</span></code> para siempre, porque el socket no te dirá cuando no hay más nada por leer (por ahora). Ahora, si piensas sobre eso un poco, te darás cuenta de una verdad fundamental de los sockets: <em>los mensajes deben ser de longitud fija</em> (ouch), <em>o ser delimitados</em> (ouch), <em>o indicar que tan largo son</em> (mucho mejor), <em>o terminar cerrando la conexión.</em> La elección es completamente tuya (pero hay algunas vías más correctas que otras).</p>
+<p>Asumiendo que no quieres terminar la conexión, la solución más simple es un mensaje de longitud fija:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MySocket</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;demonstration class only</span>
+<span class="sd">      - coded for clarity, not efficiency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sock</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sock</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span>
+                            <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">sock</span>
+
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">mysend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">totalsent</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">totalsent</span> <span class="o">&lt;</span> <span class="n">MSGLEN</span><span class="p">:</span>
+            <span class="n">sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">totalsent</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">sent</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;socket connection broken&quot;</span><span class="p">)</span>
+            <span class="n">totalsent</span> <span class="o">=</span> <span class="n">totalsent</span> <span class="o">+</span> <span class="n">sent</span>
+
+    <span class="k">def</span> <span class="nf">myreceive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bytes_recd</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">bytes_recd</span> <span class="o">&lt;</span> <span class="n">MSGLEN</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">MSGLEN</span> <span class="o">-</span> <span class="n">bytes_recd</span><span class="p">,</span> <span class="mi">2048</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">chunk</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;socket connection broken&quot;</span><span class="p">)</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="n">bytes_recd</span> <span class="o">=</span> <span class="n">bytes_recd</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El código de envío aquí es usable para prácticamente cualquier esquema de mensajería - en Python envías cadenas y usas <code class="docutils literal notranslate"><span class="pre">len()</span></code> para determinar su longitud (incluso si tiene caracteres <code class="docutils literal notranslate"><span class="pre">\0</span></code> incrustados). Es principalmente el código receptor el que se vuelve más complejo. (Y en C no es mucho peor, excepto que no puedes usar <code class="docutils literal notranslate"><span class="pre">strlen</span></code> si el mensaje tiene <code class="docutils literal notranslate"><span class="pre">\0</span></code> incrustados).</p>
+<p>La mejora más fácil es hacer que el primer caracter del mensaje un indicador del tipo de mensaje y que el tipo determine la longitud. Ahora tienes dos <code class="docutils literal notranslate"><span class="pre">recv</span></code> - el primero para obtener (al menos) ese primer caracter para conocer la longitud, y el segundo en un bucle para obtener el resto. Si decides ir por el camino del delimitador, estarás recibiendo un fragmento de tamaño arbitrario (4096 o 8192 son a menudo buenas elecciones para tamaños de buffers de red) y escaneando lo que recibas en busca del delimitador.</p>
+<p>Hay una complicación de la que estar consiente: si el protocolo conversacional permite mandar múltiples mensajes consecutivos (sin ningún tipo de respuesta), y pasas a <code class="docutils literal notranslate"><span class="pre">recv</span></code> un tamaño de fragmento arbitrario poder terminar leyendo el inicio de un próximo mensaje. Tendrás que dejarlo aparte y guardarlo hasta que sea necesario.</p>
+<p>Prefijar el mensaje con su longitud (por ejemplo, 5 caracteres numéricos) se vuelve más complicado porque (créalo o no), puede que no recibas los 5 caracteres en una llamada a <code class="docutils literal notranslate"><span class="pre">recv</span></code>. Para proyectos pequeños te saldrás con la tuya; pero con altas cargas de red, tu código se romperá rápidamente a menos que uses dos <code class="docutils literal notranslate"><span class="pre">recv</span></code> en bucle - el primero para determinar la longitud, el segundo para obtener la parte del mensaje. Sucio. También será cuando descubras que <code class="docutils literal notranslate"><span class="pre">send</span></code> no siempre logra enviar todo de una sola vez. Y a pesar de haber leído esto eventualmente te va a morder!</p>
+<p>Con interés de espacio, la construcción de tu carácter (y preservar mi posición competitiva), estas mejoras se dejan como un ejercicio para el lector. Pasemos a la limpieza.</p>
+<section id="binary-data">
+<h3>Datos binarios<a class="headerlink" href="#binary-data" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>It is perfectly possible to send binary data over a socket. The major problem is
+that not all machines use the same formats for binary data. For example,
+<a class="reference external" href="https://en.wikipedia.org/wiki/Endianness#Networking">network byte order</a>
+is big-endian, with the most significant byte first,
+so a 16 bit integer with the value <code class="docutils literal notranslate"><span class="pre">1</span></code> would be the two hex bytes <code class="docutils literal notranslate"><span class="pre">00</span> <span class="pre">01</span></code>.
+However, most common processors (x86/AMD64, ARM, RISC-V), are little-endian,
+with the least significant byte first - that same <code class="docutils literal notranslate"><span class="pre">1</span></code> would be <code class="docutils literal notranslate"><span class="pre">01</span> <span class="pre">00</span></code>.</p>
+<p>Socket libraries have calls for converting 16 and 32 bit integers - <code class="docutils literal notranslate"><span class="pre">ntohl,</span>
+<span class="pre">htonl,</span> <span class="pre">ntohs,</span> <span class="pre">htons</span></code> where «n» means <em>network</em> and «h» means <em>host</em>, «s» means
+<em>short</em> and «l» means <em>long</em>. Where network order is host order, these do
+nothing, but where the machine is byte-reversed, these swap the bytes around
+appropriately.</p>
+<p>In these days of 64-bit machines, the ASCII representation of binary data is
+frequently smaller than the binary representation. That’s because a surprising
+amount of the time, most integers have the value 0, or maybe 1.
+The string <code class="docutils literal notranslate"><span class="pre">&quot;0&quot;</span></code> would be two bytes, while a full 64-bit integer would be 8.
+Of course, this doesn’t fit well with fixed-length messages.
+Decisions, decisions.</p>
+</section>
+</section>
+<section id="disconnecting">
+<h2>Desconectando<a class="headerlink" href="#disconnecting" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Estrictamente hablando, se supone que debes usar <code class="docutils literal notranslate"><span class="pre">shutdown</span></code> en un socket antes de cerrarlo con <code class="docutils literal notranslate"><span class="pre">close</span></code>. <code class="docutils literal notranslate"><span class="pre">shutdown</span></code> es un aviso para el socket en el otro lado. Dependiendo del argumento que se le pase, puede significar «No voy a mandar más datos, pero voy a escuchar» o «No estoy escuchando, adiós!». La mayoría de bibliotecas para sockets, sin embargo, están tan acostumbradas a que los programadores ignoren esta parte de la etiqueta que normalmente <code class="docutils literal notranslate"><span class="pre">close</span></code> es lo mismo que <code class="docutils literal notranslate"><span class="pre">shutdown();</span> <span class="pre">close()</span></code>. Por tanto en la mayoría de las situaciones usar <code class="docutils literal notranslate"><span class="pre">shutdown</span></code> de manera explícita no es necesario.</p>
+<p>Una forma de usar <code class="docutils literal notranslate"><span class="pre">shutdown</span></code> de manera efectiva es en un intercambio similar a <em>HTTP</em>. El cliente manda una petición y entonces hace un <code class="docutils literal notranslate"><span class="pre">shutdown(1)</span></code>. Esto le dice al servidor «El cliente terminó de enviar, pero todavía puede recibir». El servidor puede detectar «EOF» (Fin del Archivo) al recibir 0 bytes. Puede asumir que se completó la petición. El servidor envía una respuesta. Si el <code class="docutils literal notranslate"><span class="pre">send</span></code> termina satisfactoriamente entonces, en efecto, el cliente todavía estaba recibiendo.</p>
+<p>Python lleva el apagado automático un paso más allá, y dice que cuando un socket es eliminado por el recolector de basura, automáticamente llama a <code class="docutils literal notranslate"><span class="pre">close</span></code> si es necesario. Pero confiar en esto es un mal hábito. Si tu socket simplemente desaparece sin llamar a <code class="docutils literal notranslate"><span class="pre">close</span></code>, el socket del otro lado puede colgarse indefinidamente, pensando que solo estas siendo lento. <em>Por favor</em> cierra los sockets cuando termines.</p>
+<section id="when-sockets-die">
+<h3>Cuando los sockets mueren<a class="headerlink" href="#when-sockets-die" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Probablemente lo peor de usar sockets bloqueantes es lo que pasa cuando el otro lado se apaga inesperadamente (sin llamar a <code class="docutils literal notranslate"><span class="pre">close</span></code>). Tu socket es probable que se cuelgue. TCP es un protocolo confiable, y va a esperar un largo, largo tiempo antes de rendirse con una conexión. Si estás usando hilos, todo el hilo está esencialmente muerto. No hay mucho que puedas hacer respecto a eso. A menos que no estés haciendo algo tonto, como mantener un bloqueo mientras se realiza una lectura bloqueante, el hilo realmente no estará consumiendo muchos recursos. <em>No</em> trates de matar el hilo - parte de la razón por la que los hilos son más eficientes que los procesos es que evitan la complicación asociada con el reciclaje automático de recursos. En otras palabras, si te las arreglas para matar el hilo, es muy probable que todo el proceso termine arruinado.</p>
+</section>
+</section>
+<section id="non-blocking-sockets">
+<h2><em>Sockets</em> no bloqueantes<a class="headerlink" href="#non-blocking-sockets" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Si has entendido todo lo anterior, ya conoces la mayor parte de lo que necesitas saber sobre las mecánicas del uso de los sockets. Usarás las mismas llamadas, de la misma manera. Es solo eso, si lo haces correctamente, tu aplicación estará casi correcta.</p>
+<p>En Python, usa <code class="docutils literal notranslate"><span class="pre">socket.setblocking(False)</span></code> para que no sea bloqueante. En C, es más complejo (por un lado, deberá elegir entre el sabor BSD <code class="docutils literal notranslate"><span class="pre">O_NONBLOCK</span></code> y el sabor POSIX casi indistinguible <code class="docutils literal notranslate"><span class="pre">O_NDELAY</span></code>, que es completamente diferente de <code class="docutils literal notranslate"><span class="pre">TCP_NODELAY</span></code>) , pero es exactamente la misma idea. Haz esto después de crear el socket, pero antes de usarlo. (En realidad, si estás loco, puedes cambiar de un lado a otro).</p>
+<p>La principal diferencia mecánica es que <code class="docutils literal notranslate"><span class="pre">send</span></code>, <code class="docutils literal notranslate"><span class="pre">recv</span></code>, <code class="docutils literal notranslate"><span class="pre">connect</span></code> y <code class="docutils literal notranslate"><span class="pre">accept</span></code> pueden retornar sin haber hecho nada. Tu tienes (por supuesto) un número de elecciones. Puedes verificar el código de retorno y los códigos de error y en general volverte loco. Si no me crees pruébalo alguna vez. Tu aplicación crecerá grande, con errores y consumirá todo el CPU. Así que vamos a saltarnos las soluciones descerebradas y hacerlo correctamente.</p>
+<p>Usando <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
+<p>En C, usar <code class="docutils literal notranslate"><span class="pre">select</span></code> es algo complejo. En Python es pan comido, pero está lo suficientemente cercano a la versión de C que si entiendes el <code class="docutils literal notranslate"><span class="pre">select</span></code> en Python tendrás pocos problemas con él el C:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">ready_to_read</span><span class="p">,</span> <span class="n">ready_to_write</span><span class="p">,</span> <span class="n">in_error</span> <span class="o">=</span> \
+               <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                  <span class="n">potential_readers</span><span class="p">,</span>
+                  <span class="n">potential_writers</span><span class="p">,</span>
+                  <span class="n">potential_errs</span><span class="p">,</span>
+                  <span class="n">timeout</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">select</span></code> se le pasan tres listas: la primera contiene todos los sockets que puedes intentar leer; la segunda con todos los sockets que puedes intentar escribir, y la tercera (normalmente se deja vacía) todos los que quieras verificar los errores. Debes tener en cuenta que un socket puede ir en más de una lista. La llamada a <code class="docutils literal notranslate"><span class="pre">select</span></code> es bloqueante, pero puedes darle un tiempo de espera. Esto generalmente es una cosa sensata de hacer - dale un tiempo de espera largo (un minuto por ejemplo) a menos que tengas una buena razón para no hacerlo.</p>
+<p>En el retorno tendrás tres listas. Estas contienen los sockets que son realmente legibles, escribibles y con error. Cada una de estas lista es un subconjunto (posiblemente vacío) de la lista correspondiente que pasaste.</p>
+<p>Si un socket está en la lista retornada legible, puedes estar tan-seguro-como-podrías-estarlo-en-este-negocio que una llamada a <code class="docutils literal notranslate"><span class="pre">recv</span></code> en este socket va a retornar <em>algo</em>. La misma idea se aplica a la lista de escribibles. Serás capaz de mandar <em>algo</em>. Tal vez no todo lo que quieras, pero <em>algo</em> es mejor que nada. (Realmente, cualquier socket socket razonablemente saludable va a retornar como escribible - eso solo significa que el espacio de salida del buffer de red está disponible)</p>
+<p>Si tienes un socket <em>servidor</em>, ponlo en la lista de <em>potenciales legibles</em>. Se retorna en la lista de legibles, una llamada a <code class="docutils literal notranslate"><span class="pre">accept</span></code> va a funcionar (casi seguro). Se has creado un nuevo socket para llamar a <code class="docutils literal notranslate"><span class="pre">connect</span></code> para conectarte con otro, ponlo en la lista de <em>potenciales escribibles</em>. Si retorna en la lista de escribibles, tienes una buena oportunidad de que esté conectado.</p>
+<p>Realmente, <code class="docutils literal notranslate"><span class="pre">select</span></code> puede ser útil incluso con sockets bloqueantes. Es una manera de determinar si vas a bloquear - el socket retorna como leíble cuando hay algo en el buffer. Sin embargo, esto aun no sirve de ayuda con el problema de determinar si el otro extremo terminó, o solo está ocupado con otra cosa.</p>
+<p><strong>Alerta de portabilidad</strong>: En Unix, <code class="docutils literal notranslate"><span class="pre">select</span></code> funciona tanto con sockets como con archivos. No intentes esto en Windows. En Windows <code class="docutils literal notranslate"><span class="pre">select</span></code> funciona solo con sockets. También ten en cuenta que en C, muchas de las opciones más avanzadas de los sockets se hacen diferentes en Windows. De hecho, en Windows normalmente uso hilos (que funciona muy, muy bien) con los sockets.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">HOW TO - Programación con sockets</a><ul>
+<li><a class="reference internal" href="#sockets">Sockets</a><ul>
+<li><a class="reference internal" href="#history">Historia</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-socket">Creando un socket</a><ul>
+<li><a class="reference internal" href="#ipc">IPC</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-a-socket">Usando un socket</a><ul>
+<li><a class="reference internal" href="#binary-data">Datos binarios</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#disconnecting">Desconectando</a><ul>
+<li><a class="reference internal" href="#when-sockets-die">Cuando los sockets mueren</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#non-blocking-sockets"><em>Sockets</em> no bloqueantes</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="regex.html"
+                          title="capítulo anterior">Expresiones regulares COMOS (<em>HOWTO</em>)</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="sorting.html"
+                          title="próximo capítulo">HOW TO - Ordenar</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/howto/sockets.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="HOW TO - Ordenar"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="Expresiones regulares COMOS (HOWTO)"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HOW TO - Programación con sockets</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,468 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="heapq — Algoritmo de colas montículos (heap)" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/heapq.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/heapq.py Este módulo proporciona una implementación del algoritmo de montículos, también conocido como algoritmo de cola con prioridad. Los montículos son árboles binarios para l..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/heapq.py Este módulo proporciona una implementación del algoritmo de montículos, también conocido como algoritmo de cola con prioridad. Los montículos son árboles binarios para l..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>heapq — Algoritmo de colas montículos (heap) &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="bisect — Algoritmo de bisección de arreglos" href="bisect.html" />
+    <link rel="prev" title="collections.abc — Clases Base Abstractas para Contenedores" href="collections.abc.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/heapq.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">heapq</span></code> — Algoritmo de colas montículos (<em>heap</em>)</a><ul>
+<li><a class="reference internal" href="#basic-examples">Ejemplos Básicos</a></li>
+<li><a class="reference internal" href="#priority-queue-implementation-notes">Notas de Aplicación de la Cola de Prioridades</a></li>
+<li><a class="reference internal" href="#theory">Teoría</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="collections.abc.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">collections.abc</span></code> — Clases Base Abstractas para Contenedores</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="bisect.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">bisect</span></code> — Algoritmo de bisección de arreglos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/heapq.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="bisect.html" title="bisect — Algoritmo de bisección de arreglos"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="collections.abc.html" title="collections.abc — Clases Base Abstractas para Contenedores"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="datatypes.html" accesskey="U">Tipos de datos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">heapq</span></code> — Algoritmo de colas montículos (<em>heap</em>)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-heapq">
+<span id="heapq-heap-queue-algorithm"></span><h1><a class="reference internal" href="#module-heapq" title="heapq: Heap queue algorithm (a.k.a. priority queue)."><code class="xref py py-mod docutils literal notranslate"><span class="pre">heapq</span></code></a> — Algoritmo de colas montículos (<em>heap</em>)<a class="headerlink" href="#module-heapq" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/heapq.py">Lib/heapq.py</a></p>
+<hr class="docutils" />
+<p>Este módulo proporciona una implementación del algoritmo de montículos, también conocido como algoritmo de cola con prioridad.</p>
+<p>Los montículos son árboles binarios para los cuales cada nodo padre tiene un valor menor o igual que cualquiera de sus hijos. Esta implementación utiliza matrices para las cuales <code class="docutils literal notranslate"><span class="pre">heap[k]</span> <span class="pre">&lt;=</span> <span class="pre">heap[2*k+1]</span></code> y <code class="docutils literal notranslate"><span class="pre">heap[k]</span> <span class="pre">&lt;=</span> <span class="pre">heap[2*k+2]</span></code> para todo <em>k</em>, contando los elementos desde cero. Para poder comparar, los elementos inexistentes se consideran infinitos. La propiedad interesante de un montículo es que su elemento más pequeño es siempre la raíz, <code class="docutils literal notranslate"><span class="pre">heap[0]</span></code>.</p>
+<p>El API que se presenta a continuación difiere de los algoritmos de los libros de texto en dos aspectos: (a) Utilizamos la indexación basada en cero. Esto hace que la relación entre el índice de un nodo y los índices de sus hijos sea un poco menos evidente, pero es más adecuado ya que Python utiliza la indexación basada en cero. (b) Nuestro método «pop» retorna el elemento más pequeño, no el más grande (llamado «min heap» o montículo por mínimo en los libros de texto; un «max heap» o montículo por máximos es más común en los textos debido a su idoneidad para la clasificación in situ).</p>
+<p>Estos dos permiten ver el montículo como una lista Python normal sin sorpresas: <code class="docutils literal notranslate"><span class="pre">heap[0]</span></code> es el ítem más pequeño, y <code class="docutils literal notranslate"><span class="pre">heap.sort()</span></code> mantiene el montículo invariable!</p>
+<p>Para crear un montículo, usa una lista inicializada como <code class="docutils literal notranslate"><span class="pre">[]</span></code>, o puedes transformar una lista poblada en un montículo a través de la función <a class="reference internal" href="#heapq.heapify" title="heapq.heapify"><code class="xref py py-func docutils literal notranslate"><span class="pre">heapify()</span></code></a>.</p>
+<p>Las siguientes funciones están provistas:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.heappush">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">heappush</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.heappush" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Empujar el valor <em>item</em> en el <em>heap</em>, manteniendo el montículo invariable.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.heappop">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">heappop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heap</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.heappop" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desapila o <em>pop</em> y retorna el elemento más pequeño del <em>heap</em>, manteniendo el montículo invariable. Si el montículo está vacío, <a class="reference internal" href="exceptions.html#IndexError" title="IndexError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code></a> se lanza. Para acceder al elemento más pequeño sin necesidad de desapilar, usa <code class="docutils literal notranslate"><span class="pre">heap[0]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.heappushpop">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">heappushpop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.heappushpop" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila el elemento o <em>iem</em> en el montículo, y luego desapila y retorna el elemento más pequeño del montículo. La acción combinada se ejecuta más eficientemente que <a class="reference internal" href="#heapq.heappush" title="heapq.heappush"><code class="xref py py-func docutils literal notranslate"><span class="pre">heappush()</span></code></a> seguido de una llamada separada a <a class="reference internal" href="#heapq.heappop" title="heapq.heappop"><code class="xref py py-func docutils literal notranslate"><span class="pre">heappop()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.heapify">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">heapify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.heapify" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Transformar la lista <em>x</em> en un montículo, en el lugar, en tiempo lineal.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.heapreplace">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">heapreplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.heapreplace" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desapila y retorna el elemento más pequeño del <em>heap</em>, y también apile el nuevo <em>item</em>. El tamaño del montículo no cambia. Si el montículo está vacío, <a class="reference internal" href="exceptions.html#IndexError" title="IndexError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code></a> se lanza.</p>
+<p>Esta operación de un solo paso es más eficiente que un <a class="reference internal" href="#heapq.heappop" title="heapq.heappop"><code class="xref py py-func docutils literal notranslate"><span class="pre">heappop()</span></code></a> seguido por <a class="reference internal" href="#heapq.heappush" title="heapq.heappush"><code class="xref py py-func docutils literal notranslate"><span class="pre">heappush()</span></code></a> y puede ser más apropiada cuando se utiliza un montículo de tamaño fijo. La combinación pop/push siempre retorna un elemento del montículo y lo reemplaza con <em>item</em>.</p>
+<p>El valor retornado puede ser mayor que el <em>item</em> añadido. Si no se desea eso, considere usar <a class="reference internal" href="#heapq.heappushpop" title="heapq.heappushpop"><code class="xref py py-func docutils literal notranslate"><span class="pre">heappushpop()</span></code></a> en su lugar. Su combinación push/pop retorna el menor de los dos valores, dejando el mayor valor en el montículo.</p>
+</dd></dl>
+
+<p>El módulo también ofrece tres funciones de propósito general basadas en los montículos.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.merge">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">iterables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.merge" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Fusionar varias entradas ordenadas en una sola salida ordenada (por ejemplo, fusionar entradas con marca de tiempo de varios archivos de registro). Retorna un <a class="reference internal" href="../glossary.html#term-iterator"><span class="xref std std-term">iterator</span></a> sobre los valores ordenados.</p>
+<p>Similar a <code class="docutils literal notranslate"><span class="pre">sorted(itertools.chain(*iterables))</span></code> pero retorna un iterable, no hala los datos a la memoria de una sola vez, y asume que cada uno de los flujos de entrada ya están ordenado (de menor a mayor).</p>
+<p>Tiene dos argumentos opcionales que deben ser especificados como argumentos de palabras clave.</p>
+<p><em>key</em> especifica una <a class="reference internal" href="../glossary.html#term-key-function"><span class="xref std std-term">key function</span></a> de un argumento que se utiliza para extraer una clave de comparación de cada elemento de entrada. El valor por defecto es <code class="docutils literal notranslate"><span class="pre">None</span></code> (compara los elementos directamente).</p>
+<p><em>reverse</em> es un valor booleano. Si se establece en <code class="docutils literal notranslate"><span class="pre">True</span></code>, entonces los elementos de entrada se fusionan como si cada comparación se invirtiera. Para lograr un comportamiento similar a <code class="docutils literal notranslate"><span class="pre">sorted(itertools.chain(*iterables),</span> <span class="pre">reverse=True)</span></code>, todos los iterables deben ser ordenados de mayor a menor.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Añadió los parámetros opcionales de <em>key</em> y <em>reverse</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.nlargest">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">nlargest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.nlargest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una lista con los <em>n</em> elementos más grandes del conjunto de datos definidos por <em>iterable</em>. <em>key</em>, si se proporciona, especifica una función de un argumento que se utiliza para extraer una clave de comparación de cada elemento en <em>iterable</em> (por ejemplo, <code class="docutils literal notranslate"><span class="pre">key=str.lower</span></code>). Equivalente a:  <code class="docutils literal notranslate"><span class="pre">sorted(iterable,</span> <span class="pre">key=clave,</span> <span class="pre">reverse=True)[:n]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="heapq.nsmallest">
+<span class="sig-prename descclassname"><span class="pre">heapq.</span></span><span class="sig-name descname"><span class="pre">nsmallest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#heapq.nsmallest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una lista con los <em>n</em> elementos más pequeños del conjunto de datos definidos por <em>iterable</em>. <em>key</em>, si se proporciona, especifica una función de un argumento que se utiliza para extraer una clave de comparación de cada elemento en <em>iterable</em> (por ejemplo, <code class="docutils literal notranslate"><span class="pre">key=str.lower</span></code>). Equivalente a:  <code class="docutils literal notranslate"><span class="pre">sorted(iterable,</span> <span class="pre">key=clave)[:n]</span></code>.</p>
+</dd></dl>
+
+<p>Las dos últimas funciones funcionan mejor para valores más pequeños de <em>n</em>. Para valores más grandes, es más eficiente usar la función <a class="reference internal" href="functions.html#sorted" title="sorted"><code class="xref py py-func docutils literal notranslate"><span class="pre">sorted()</span></code></a>. Además, cuando <code class="docutils literal notranslate"><span class="pre">n==1</span></code>, es más eficiente usar las funciones incorporadas <a class="reference internal" href="functions.html#min" title="min"><code class="xref py py-func docutils literal notranslate"><span class="pre">min()</span></code></a> y <code class="xref py py-func docutils literal notranslate"><span class="pre">max`()</span></code>. Si se requiere el uso repetido de estas funciones, considere convertir lo iterable en un verdadero montículo.</p>
+<section id="basic-examples">
+<h2>Ejemplos Básicos<a class="headerlink" href="#basic-examples" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Un <a class="reference external" href="https://en.wikipedia.org/wiki/Heapsort">heapsort»</a> puede ser implementado empujando todos los valores en un montículo y luego desapilando los valores más pequeños uno a la vez:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">heapsort</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">h</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">heappush</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">[</span><span class="n">heappop</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">))]</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heapsort</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="go">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+</pre></div>
+</div>
+<p>Esto es similar a <code class="docutils literal notranslate"><span class="pre">sorted(iterable)</span></code>, pero a diferencia de <a class="reference internal" href="functions.html#sorted" title="sorted"><code class="xref py py-func docutils literal notranslate"><span class="pre">sorted()</span></code></a>, esta implementación no es estable.</p>
+<p>Los elementos del montículo pueden ser tuplas. Esto es útil para asignar valores de comparación (como las prioridades de las tareas) junto con el registro principal que se está rastreando:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heappush</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;write code&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heappush</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;release product&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heappush</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;write spec&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heappush</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;create tests&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heappop</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+<span class="go">(1, &#39;write spec&#39;)</span>
+</pre></div>
+</div>
+</section>
+<section id="priority-queue-implementation-notes">
+<h2>Notas de Aplicación de la Cola de Prioridades<a class="headerlink" href="#priority-queue-implementation-notes" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una <a class="reference external" href="https://en.wikipedia.org/wiki/Priority_queue">cola de prioridad</a> es de uso común para un montículo, y presenta varios desafíos de implementación:</p>
+<ul class="simple">
+<li><p>Estabilidad de la clasificación: ¿cómo se consigue que dos tareas con iguales prioridades sean retornadas en el orden en que fueron añadidas originalmente?</p></li>
+<li><p>Interrupciones de comparación en tupla para pares (prioridad, tarea) si las prioridades son iguales y las tareas no tienen un orden de comparación por defecto.</p></li>
+<li><p>¿Si la prioridad de una tarea cambia, cómo la mueves a una nueva posición en el montículo?</p></li>
+<li><p>¿O si una tarea pendiente necesita ser borrada, cómo la encuentras y la eliminas de la cola?</p></li>
+</ul>
+<p>Una solución a los dos primeros desafíos es almacenar las entradas como una lista de 3 elementos que incluya la prioridad, un recuento de entradas y la tarea. El recuento de entradas sirve como un desempate para que dos tareas con la misma prioridad sean retornadas en el orden en que fueron añadidas. Y como no hay dos recuentos de entradas iguales, la comparación tupla nunca intentará comparar directamente dos tareas.</p>
+<p>Otra solución al problema de las tareas no comparables es crear una clase envolvente que ignore el elemento de la tarea y sólo compare el campo de prioridad:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">PrioritizedItem</span><span class="p">:</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="o">=</span><span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Los desafíos restantes giran en torno a encontrar una tarea pendiente y hacer cambios en su prioridad o eliminarla por completo. Encontrar una tarea se puede hacer con un diccionario que apunta a una entrada en la cola.</p>
+<p>Eliminar la entrada o cambiar su prioridad es más difícil porque rompería las invariantes de la estructura del montículo. Por lo tanto, una posible solución es marcar la entrada como eliminada y añadir una nueva entrada con la prioridad revisada:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pq</span> <span class="o">=</span> <span class="p">[]</span>                         <span class="c1"># list of entries arranged in a heap</span>
+<span class="n">entry_finder</span> <span class="o">=</span> <span class="p">{}</span>               <span class="c1"># mapping of tasks to entries</span>
+<span class="n">REMOVED</span> <span class="o">=</span> <span class="s1">&#39;&lt;removed-task&gt;&#39;</span>      <span class="c1"># placeholder for a removed task</span>
+<span class="n">counter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>     <span class="c1"># unique sequence count</span>
+
+<span class="k">def</span> <span class="nf">add_task</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="s1">&#39;Add a new task or update the priority of an existing task&#39;</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">entry_finder</span><span class="p">:</span>
+        <span class="n">remove_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="p">[</span><span class="n">priority</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">task</span><span class="p">]</span>
+    <span class="n">entry_finder</span><span class="p">[</span><span class="n">task</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+    <span class="n">heappush</span><span class="p">(</span><span class="n">pq</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">remove_task</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+    <span class="s1">&#39;Mark an existing task as REMOVED.  Raise KeyError if not found.&#39;</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">entry_finder</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    <span class="n">entry</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">REMOVED</span>
+
+<span class="k">def</span> <span class="nf">pop_task</span><span class="p">():</span>
+    <span class="s1">&#39;Remove and return the lowest priority task. Raise KeyError if empty.&#39;</span>
+    <span class="k">while</span> <span class="n">pq</span><span class="p">:</span>
+        <span class="n">priority</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">task</span> <span class="o">=</span> <span class="n">heappop</span><span class="p">(</span><span class="n">pq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">REMOVED</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">entry_finder</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">task</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;pop from an empty priority queue&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="theory">
+<h2>Teoría<a class="headerlink" href="#theory" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los montículos son conjuntos para los cuales <code class="docutils literal notranslate"><span class="pre">a[k]</span> <span class="pre">&lt;=</span> <span class="pre">a[2*k+1]</span></code> y <code class="docutils literal notranslate"><span class="pre">a[k]</span> <span class="pre">&lt;=</span> <span class="pre">a[2*k+2]</span></code> para todos los <em>k</em>, contando los elementos desde 0. Para comparar, los elementos no existentes se consideran infinitos. La interesante propiedad de un montículo es que <code class="docutils literal notranslate"><span class="pre">a[0]</span></code> es siempre su elemento más pequeño.</p>
+<p>La extraña invariante de arriba intenta ser una representación eficiente de la memoria para un torneo. Los números de abajo son <em>k</em>, no <code class="docutils literal notranslate"><span class="pre">a[k]</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>                               <span class="mi">0</span>
+
+              <span class="mi">1</span>                                 <span class="mi">2</span>
+
+      <span class="mi">3</span>               <span class="mi">4</span>                <span class="mi">5</span>               <span class="mi">6</span>
+
+  <span class="mi">7</span>       <span class="mi">8</span>       <span class="mi">9</span>       <span class="mi">10</span>      <span class="mi">11</span>      <span class="mi">12</span>      <span class="mi">13</span>      <span class="mi">14</span>
+
+<span class="mi">15</span> <span class="mi">16</span>   <span class="mi">17</span> <span class="mi">18</span>   <span class="mi">19</span> <span class="mi">20</span>   <span class="mi">21</span> <span class="mi">22</span>   <span class="mi">23</span> <span class="mi">24</span>   <span class="mi">25</span> <span class="mi">26</span>   <span class="mi">27</span> <span class="mi">28</span>   <span class="mi">29</span> <span class="mi">30</span>
+</pre></div>
+</div>
+<p>En el árbol de arriba, cada celda <em>k</em> está coronada por <code class="docutils literal notranslate"><span class="pre">2*k+1</span></code> y <code class="docutils literal notranslate"><span class="pre">2*k+2</span></code>. En un torneo binario habitual que vemos en los deportes, cada celda es el ganador sobre las dos celdas que supera, y podemos rastrear al ganador hasta el árbol para ver todos los oponentes que tuvo. Sin embargo, en muchas aplicaciones informáticas de tales torneos, no necesitamos rastrear la historia de un ganador. Para ser más eficientes en la memoria, cuando un ganador es ascendido, tratamos de reemplazarlo por algo más en un nivel inferior, y la regla se convierte en que una celda y las dos celdas que supera contienen tres elementos diferentes, pero la celda superior «gana» sobre las dos celdas superiores.</p>
+<p>Si esta invariante del montículo está protegida en todo momento, el índice 0 es claramente el ganador general. La forma algorítmica más simple de eliminarlo y encontrar el «próximo» ganador es mover algún perdedor (digamos la celda 30 en el diagrama de arriba) a la posición 0, y luego filtrar este nuevo 0 por el árbol, intercambiando valores, hasta que la invariante se reestablezca. Esto es claramente logarítmico en el número total de elementos del árbol. Al iterar sobre todos los elementos, se obtiene una clasificación O(n log n).</p>
+<p>Una buena característica de este tipo es que puedes insertar nuevos elementos de manera eficiente mientras se realiza la clasificación, siempre y cuando los elementos insertados no sean «mejores» que el último 0’th elemento que has extraído. Esto es especialmente útil en contextos de simulación, donde el árbol contiene todos los eventos entrantes, y la condición de «ganar» significa el menor tiempo programado. Cuando un evento programa otros eventos para su ejecución, se programan en el futuro, para que puedan ir fácilmente al montículo. Por lo tanto, un montículo es una buena estructura para implementar planificadores o <em>schedulers</em> (esto es lo que usé para mi secuenciador MIDI :-).</p>
+<p>Se han estudiado extensamente varias estructuras para implementar los planificadores, y los montículos son buenos para ello, ya que son razonablemente rápidos, la velocidad es casi constante, y el peor de los casos no es muy diferente del caso promedio. Sin embargo, hay otras representaciones que son más eficientes en general, aunque los peores casos podrían ser terribles.</p>
+<p>Los montículos también son muy útiles en las grandes  ordenaciones de elementos en discos de memoria. Lo más probable es que todos sepan que un tipo grande implica la producción de «ejecuciones» (que son secuencias preclasificadas, cuyo tamaño suele estar relacionado con la cantidad de memoria de la CPU), seguidas de una fusión de pases para estas ejecuciones, cuya fusión suele estar muy inteligentemente organizada <a class="footnote-reference brackets" href="#id2" id="id1">1</a>. Es muy importante que la clasificación inicial produzca las ejecuciones posibles más largas. Los torneos son una buena manera de lograrlo. Si, utilizando toda la memoria disponible para celebrar un torneo, sustituyes y filtras los elementos que encajan en la carrera actual, producirás carreras que tienen el doble del tamaño de la memoria para la entrada aleatoria, y mucho mejor para la entrada ordenada de forma difusa.</p>
+<p>Además, si se da salida al <em>0’th item</em> en el disco y se obtiene una entrada que no puede caber en el torneo actual (porque el valor «gana» sobre el último valor de salida), no puede caber en el montículo, por lo que el tamaño del montículo disminuye. La memoria liberada podría ser ingeniosamente reutilizada inmediatamente para construir progresivamente un segundo montículo, que crece exactamente al mismo ritmo que el primer montículo se está fundiendo. Cuando el primer montículo se desvanece completamente, se cambia de montículo y se inicia una nueva carrera. ¡Ingenioso y muy efectivo!</p>
+<p>En una palabra, los montículos son estructuras de memoria útiles a conocer. Las uso en algunas aplicaciones, y creo que es bueno tener un módulo “heap” alrededor. :-)</p>
+<p class="rubric">Notas al pie de página</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Los algoritmos de balanceo de discos que están vigentes hoy en día, son más molestos que inteligentes, y esto es una consecuencia de las capacidades de búsqueda de los discos. En los dispositivos que no pueden buscar, como las grandes unidades de cinta, la historia era muy diferente, y había que ser muy inteligente para asegurarse (con mucha antelación) de que cada movimiento de la cinta fuera el más efectivo (es decir, que participara mejor en el «progreso» de la fusión). Algunas cintas eran incluso capaces de leer al revés, y esto también se utilizó para evitar el tiempo rebobinado. Créanme, ¡la ordenación de elementos en cinta realmente buenos fueron espectaculares de ver! ¡Desde todos los tiempos, la ordenación de elementos siempre ha sido un Gran Arte! :-)</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">heapq</span></code> — Algoritmo de colas montículos (<em>heap</em>)</a><ul>
+<li><a class="reference internal" href="#basic-examples">Ejemplos Básicos</a></li>
+<li><a class="reference internal" href="#priority-queue-implementation-notes">Notas de Aplicación de la Cola de Prioridades</a></li>
+<li><a class="reference internal" href="#theory">Teoría</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="collections.abc.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">collections.abc</span></code> — Clases Base Abstractas para Contenedores</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="bisect.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">bisect</span></code> — Algoritmo de bisección de arreglos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/heapq.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="bisect.html" title="bisect — Algoritmo de bisección de arreglos"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="collections.abc.html" title="collections.abc — Clases Base Abstractas para Contenedores"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="datatypes.html" >Tipos de datos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">heapq</span></code> — Algoritmo de colas montículos (<em>heap</em>)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

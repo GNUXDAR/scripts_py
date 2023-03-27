@@ -1,0 +1,854 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Gestión de la memoria" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/c-api/memory.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Visión general: La gestión de memoria en Python implica un montón privado que contiene todos los objetos de Python y estructuras de datos. El administrador de memoria de Python garantiza internamen..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Visión general: La gestión de memoria en Python implica un montón privado que contiene todos los objetos de Python y estructuras de datos. El administrador de memoria de Python garantiza internamen..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>Gestión de la memoria &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Soporte de implementación de objetos" href="objimpl.html" />
+    <link rel="prev" title="Configuración de inicialización de Python" href="init_config.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/memory.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Gestión de la memoria</a><ul>
+<li><a class="reference internal" href="#overview">Visión general</a></li>
+<li><a class="reference internal" href="#allocator-domains">Dominios del asignador</a></li>
+<li><a class="reference internal" href="#raw-memory-interface">Interfaz de memoria sin procesar</a></li>
+<li><a class="reference internal" href="#memory-interface">Interfaz de memoria</a></li>
+<li><a class="reference internal" href="#object-allocators">Asignadores de objetos</a></li>
+<li><a class="reference internal" href="#default-memory-allocators">Asignadores de memoria predeterminados</a></li>
+<li><a class="reference internal" href="#customize-memory-allocators">Personalizar asignadores de memoria</a></li>
+<li><a class="reference internal" href="#debug-hooks-on-the-python-memory-allocators">Configurar enlaces para detectar errores en las funciones del asignador de memoria de Python</a></li>
+<li><a class="reference internal" href="#the-pymalloc-allocator">El asignador pymalloc</a><ul>
+<li><a class="reference internal" href="#customize-pymalloc-arena-allocator">Personalizar asignador de arena de pymalloc</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tracemalloc-c-api">tracemalloc C API</a></li>
+<li><a class="reference internal" href="#examples">Ejemplos</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="init_config.html"
+                          title="capítulo anterior">Configuración de inicialización de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="objimpl.html"
+                          title="próximo capítulo">Soporte de implementación de objetos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/c-api/memory.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="objimpl.html" title="Soporte de implementación de objetos"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="init_config.html" title="Configuración de inicialización de Python"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Gestión de la memoria</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="memory-management">
+<span id="memory"></span><h1>Gestión de la memoria<a class="headerlink" href="#memory-management" title="Enlazar permanentemente con este título">¶</a></h1>
+<section id="overview">
+<span id="memoryoverview"></span><h2>Visión general<a class="headerlink" href="#overview" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La gestión de memoria en Python implica un montón privado que contiene todos los objetos de Python y estructuras de datos. El <em>administrador de memoria de Python</em> garantiza internamente la gestión de este montón privado. El administrador de memoria de Python tiene diferentes componentes que se ocupan de varios aspectos de la gestión dinámica del almacenamiento, como compartir, segmentación, asignación previa o almacenamiento en caché.</p>
+<p>En el nivel más bajo, un asignador de memoria sin procesar asegura que haya suficiente espacio en el montón privado para almacenar todos los datos relacionados con Python al interactuar con el administrador de memoria del sistema operativo. Además del asignador de memoria sin procesar, varios asignadores específicos de objeto operan en el mismo montón e implementan políticas de administración de memoria distintas adaptadas a las peculiaridades de cada tipo de objeto. Por ejemplo, los objetos enteros se administran de manera diferente dentro del montón que las cadenas, tuplas o diccionarios porque los enteros implican diferentes requisitos de almacenamiento y compensaciones de velocidad / espacio. El administrador de memoria de Python delega parte del trabajo a los asignadores específicos de objeto, pero asegura que este último opere dentro de los límites del montón privado.</p>
+<p>Es importante comprender que la gestión del montón de Python la realiza el propio intérprete y que el usuario no tiene control sobre él, incluso si manipulan regularmente punteros de objetos a bloques de memoria dentro de ese montón. El administrador de memoria de Python realiza la asignación de espacio de almacenamiento dinámico para los objetos de Python y otros búferes internos a pedido a través de las funciones de API de Python/C enumeradas en este documento.</p>
+<p id="index-0">Para evitar daños en la memoria, los escritores de extensiones nunca deberían intentar operar en objetos Python con las funciones exportadas por la biblioteca C: <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">calloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">realloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code>. Esto dará como resultado llamadas mixtas entre el asignador de C y el administrador de memoria de Python con consecuencias fatales, ya que implementan diferentes algoritmos y operan en diferentes montones. Sin embargo, uno puede asignar y liberar de forma segura bloques de memoria con el asignador de la biblioteca C para fines individuales, como se muestra en el siguiente ejemplo:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">malloc</span><span class="p">(</span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"> </span><span class="cm">/* for I/O */</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buf</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyErr_NoMemory</span><span class="p">();</span><span class="w"></span>
+<span class="p">...</span><span class="n">Do</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="w"> </span><span class="n">operation</span><span class="w"> </span><span class="n">involving</span><span class="w"> </span><span class="n">buf</span><span class="p">...</span><span class="w"></span>
+<span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyBytes_FromString</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"> </span><span class="cm">/* malloc&#39;ed */</span><span class="w"></span>
+<span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>En este ejemplo, la solicitud de memoria para el búfer de E/S es manejada por el asignador de la biblioteca C. El administrador de memoria de Python solo participa en la asignación del objeto de bytes retornado como resultado.</p>
+<p>Sin embargo, en la mayoría de las situaciones, se recomienda asignar memoria del montón de Python específicamente porque este último está bajo el control del administrador de memoria de Python. Por ejemplo, esto es necesario cuando el intérprete se amplía con nuevos tipos de objetos escritos en C. Otra razón para usar el montón de Python es el deseo de <em>informar</em> al administrador de memoria de Python sobre las necesidades de memoria del módulo de extensión. Incluso cuando la memoria solicitada se usa exclusivamente para fines internos y altamente específicos, delegar todas las solicitudes de memoria al administrador de memoria de Python hace que el intérprete tenga una imagen más precisa de su huella de memoria en su conjunto. En consecuencia, bajo ciertas circunstancias, el administrador de memoria de Python puede o no desencadenar acciones apropiadas, como recolección de basura, compactación de memoria u otros procedimientos preventivos. Tenga en cuenta que al usar el asignador de la biblioteca C como se muestra en el ejemplo anterior, la memoria asignada para el búfer de E/S escapa completamente al administrador de memoria Python.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>La variable de entorno <span class="target" id="index-11"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOC</span></code></a> puede usarse para configurar los asignadores de memoria utilizados por Python.</p>
+<p>La variable de entorno <span class="target" id="index-12"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOCSTATS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOCSTATS</span></code></a> se puede utilizar para imprimir estadísticas de <a class="reference internal" href="#pymalloc"><span class="std std-ref">asignador de memoria pymalloc</span></a> cada vez que se crea un nuevo escenario de objetos pymalloc, y en el apagado.</p>
+</div>
+</section>
+<section id="allocator-domains">
+<h2>Dominios del asignador<a class="headerlink" href="#allocator-domains" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="id1">Todas las funciones de asignación pertenecen a uno de los tres «dominios» diferentes (ver también <a class="reference internal" href="#c.PyMemAllocatorDomain" title="PyMemAllocatorDomain"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyMemAllocatorDomain</span></code></a>). Estos dominios representan diferentes estrategias de asignación y están optimizados para diferentes propósitos. Los detalles específicos sobre cómo cada dominio asigna memoria o qué funciones internas llama cada dominio se considera un detalle de implementación, pero para fines de depuración, se puede encontrar una tabla simplificada en <a class="reference internal" href="#default-memory-allocators"><span class="std std-ref">here</span></a>. No existe un requisito estricto para usar la memoria retornada por las funciones de asignación que pertenecen a un dominio dado solo para los propósitos sugeridos por ese dominio (aunque esta es la práctica recomendada). Por ejemplo, se podría usar la memoria retornada por <a class="reference internal" href="#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a> para asignar objetos Python o la memoria retornada por <a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a> para asignar memoria para búferes.</p>
+<p>Los tres dominios de asignación son:</p>
+<ul class="simple">
+<li><p>Dominio sin formato: destinado a asignar memoria para búferes de memoria de uso general donde la asignación <em>debe</em> ir al asignador del sistema o donde el asignador puede operar sin el <a class="reference internal" href="../glossary.html#term-GIL"><span class="xref std std-term">GIL</span></a>. La memoria se solicita directamente al sistema.</p></li>
+<li><p>Dominio «Mem»: destinado a asignar memoria para búferes de Python y búferes de memoria de propósito general donde la asignación debe realizarse con el <a class="reference internal" href="../glossary.html#term-GIL"><span class="xref std std-term">GIL</span></a> retenido. La memoria se toma del montículo privado de Python.</p></li>
+<li><p>Dominio de objeto: destinado a asignar memoria perteneciente a objetos de Python. La memoria se toma del montículo privado de Python.</p></li>
+</ul>
+<p>Cuando se libera memoria previamente asignada por las funciones de asignación que pertenecen a un dominio dado, se deben utilizar las funciones de desasignación específicas coincidentes. Por ejemplo, <a class="reference internal" href="#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a> debe usarse para liberar memoria asignada usando <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>.</p>
+</section>
+<section id="raw-memory-interface">
+<h2>Interfaz de memoria sin procesar<a class="headerlink" href="#raw-memory-interface" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los siguientes conjuntos de funciones son envoltorios para el asignador del sistema. Estas funciones son seguras para subprocesos, no es necesario mantener el <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">GIL</span></a>.</p>
+<p>El <a class="reference internal" href="#default-memory-allocators"><span class="std std-ref">asignador de memoria sin procesar predeterminado</span></a> usa las siguientes funciones: <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">calloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">realloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code>; llame a <code class="docutils literal notranslate"><span class="pre">malloc(1)</span></code> (o <code class="docutils literal notranslate"><span class="pre">calloc(1,</span> <span class="pre">1)</span></code>) cuando solicita cero bytes.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_RawMalloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_RawMalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_RawMalloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Asigna <em>n</em> bytes y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla.</p>
+<p>Solicitar cero bytes retorna un puntero distinto que no sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado a <code class="docutils literal notranslate"><span class="pre">PyMem_RawMalloc(1)</span></code>. La memoria no se habrá inicializado de ninguna manera.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_RawCalloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_RawCalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">nelem</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">elsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_RawCalloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Asigna <em>nelem</em> elementos cada uno cuyo tamaño en bytes es <em>elsize</em> y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla. La memoria se inicializa a ceros.</p>
+<p>Solicitar elementos cero o elementos de tamaño cero bytes retorna un puntero distinto <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado <code class="docutils literal notranslate"><span class="pre">PyMem_RawCalloc(1,</span> <span class="pre">1)</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_RawRealloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_RawRealloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_RawRealloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Cambia el tamaño del bloque de memoria señalado por <em>p</em> a <em>n</em> bytes. Los contenidos no se modificarán al mínimo de los tamaños antiguo y nuevo.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la llamada es equivalente a <code class="docutils literal notranslate"><span class="pre">PyMem_RawMalloc(n)</span></code>; de lo contrario, si <em>n</em> es igual a cero, el bloque de memoria cambia de tamaño pero no se libera, y el puntero retornado no es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>A menos que <em>p</em> sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, debe haber sido retornado por una llamada previa a <a class="reference internal" href="#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a>, <a class="reference internal" href="#c.PyMem_RawRealloc" title="PyMem_RawRealloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawRealloc()</span></code></a> o <a class="reference internal" href="#c.PyMem_RawCalloc" title="PyMem_RawCalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawCalloc()</span></code></a>.</p>
+<p>Si la solicitud falla, <a class="reference internal" href="#c.PyMem_RawRealloc" title="PyMem_RawRealloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawRealloc()</span></code></a> retorna <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y <em>p</em> sigue siendo un puntero válido al área de memoria anterior.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_RawFree">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_RawFree</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_RawFree" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Libera el bloque de memoria al que apunta <em>p</em>, que debe haber sido retornado por una llamada anterior a <a class="reference internal" href="#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a>, <a class="reference internal" href="#c.PyMem_RawRealloc" title="PyMem_RawRealloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawRealloc()</span></code></a> o <a class="reference internal" href="#c.PyMem_RawCalloc" title="PyMem_RawCalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawCalloc()</span></code></a>. De lo contrario, o si se ha llamado antes a <code class="docutils literal notranslate"><span class="pre">PyMem_RawFree(p)</span></code>, se produce un comportamiento indefinido.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, no se realiza ninguna operación.</p>
+</dd></dl>
+
+</section>
+<section id="memory-interface">
+<span id="memoryinterface"></span><h2>Interfaz de memoria<a class="headerlink" href="#memory-interface" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los siguientes conjuntos de funciones, modelados según el estándar ANSI C, pero que especifican el comportamiento cuando se solicitan cero bytes, están disponibles para asignar y liberar memoria del montón de Python.</p>
+<p>El <a class="reference internal" href="#default-memory-allocators"><span class="std std-ref">asignador de memoria predeterminado</span></a> usa el <a class="reference internal" href="#pymalloc"><span class="std std-ref">asignador de memorya pymalloc</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>El <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">GIL</span></a> debe mantenerse cuando se utilizan estas funciones.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>El asignador predeterminado ahora es pymalloc en lugar del <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code> del sistema.</p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Malloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Malloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Malloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Asigna <em>n</em> bytes y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla.</p>
+<p>Solicitar cero bytes retorna un puntero distinto que no sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado a <code class="docutils literal notranslate"><span class="pre">PyMem_Malloc(1)</span></code>. La memoria no se habrá inicializado de ninguna manera.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Calloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">nelem</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">elsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Calloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a> since version 3.7.</em><p>Asigna <em>nelem</em> elementos cada uno cuyo tamaño en bytes es <em>elsize</em> y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla. La memoria se inicializa a ceros.</p>
+<p>Solicitar elementos cero o elementos de tamaño cero bytes retorna un puntero distinto <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado <code class="docutils literal notranslate"><span class="pre">PyMem_Calloc(1,</span> <span class="pre">1)</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Realloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Realloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Realloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Cambia el tamaño del bloque de memoria señalado por <em>p</em> a <em>n</em> bytes. Los contenidos no se modificarán al mínimo de los tamaños antiguo y nuevo.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la llamada es equivalente a <code class="docutils literal notranslate"><span class="pre">PyMem_Malloc(n)</span></code>; de lo contrario, si <em>n</em> es igual a cero, el bloque de memoria cambia de tamaño pero no se libera, y el puntero retornado no es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>A menos que <em>p</em> sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, debe haber sido retornado por una llamada previa a <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>, <a class="reference internal" href="#c.PyMem_Realloc" title="PyMem_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Realloc()</span></code></a> o <a class="reference internal" href="#c.PyMem_Calloc" title="PyMem_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Calloc()</span></code></a>.</p>
+<p>Si la solicitud falla, <a class="reference internal" href="#c.PyMem_Realloc" title="PyMem_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Realloc()</span></code></a> retorna <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y <em>p</em> sigue siendo un puntero válido al área de memoria anterior.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Free">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Free" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Libera el bloque de memoria señalado por <em>p</em>, que debe haber sido retornado por una llamada anterior a <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>, <a class="reference internal" href="#c.PyMem_Realloc" title="PyMem_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Realloc()</span></code></a> o <a class="reference internal" href="#c.PyMem_Calloc" title="PyMem_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Calloc()</span></code></a>. De lo contrario, o si se ha llamado antes a <code class="docutils literal notranslate"><span class="pre">PyMem_Free(p)</span></code>, se produce un comportamiento indefinido.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, no se realiza ninguna operación.</p>
+</dd></dl>
+
+<p>Las siguientes macros orientadas a tipos se proporcionan por conveniencia. Tenga en cuenta que <em>TYPE</em> se refiere a cualquier tipo de C.</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_New">
+<span class="n"><span class="pre">TYPE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_New</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">TYPE</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_New" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Igual que <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>, pero asigna <code class="docutils literal notranslate"><span class="pre">(n</span> <span class="pre">*</span> <span class="pre">sizeof(TYPE))</span></code> bytes de memoria. Retorna una conversión de puntero a <span class="c-expr sig sig-inline c"><span class="n">TYPE</span><span class="p">*</span></span>. La memoria no se habrá inicializado de ninguna manera.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Resize">
+<span class="n"><span class="pre">TYPE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Resize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span>, <span class="n"><span class="pre">TYPE</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Resize" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Igual que <a class="reference internal" href="#c.PyMem_Realloc" title="PyMem_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Realloc()</span></code></a>, pero el bloque de memoria cambia de tamaño a <code class="docutils literal notranslate"><span class="pre">(n</span> <span class="pre">*</span> <span class="pre">sizeof(TYPE))</span></code> bytes. Retorna una conversión de puntero a <span class="c-expr sig sig-inline c"><span class="n">TYPE</span><span class="p">*</span></span>. Al retornar, <em>p</em> será un puntero a la nueva área de memoria, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> en caso de falla.</p>
+<p>Esta es una macro de preprocesador C; <em>p</em> siempre se reasigna. Guarde el valor original de <em>p</em> para evitar perder memoria al manejar errores.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_Del">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_Del</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_Del" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>La misma que <a class="reference internal" href="#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a>.</p>
+</dd></dl>
+
+<p>Además, se proporcionan los siguientes conjuntos de macros para llamar al asignador de memoria de Python directamente, sin involucrar las funciones de API de C mencionadas anteriormente. Sin embargo, tenga en cuenta que su uso no conserva la compatibilidad binaria entre las versiones de Python y, por lo tanto, está en desuso en los módulos de extensión.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_MALLOC(size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_NEW(type,</span> <span class="pre">size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_REALLOC(ptr,</span> <span class="pre">size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_RESIZE(ptr,</span> <span class="pre">type,</span> <span class="pre">size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_FREE(ptr)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PyMem_DEL(ptr)</span></code></p></li>
+</ul>
+</section>
+<section id="object-allocators">
+<h2>Asignadores de objetos<a class="headerlink" href="#object-allocators" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los siguientes conjuntos de funciones, modelados según el estándar ANSI C, pero que especifican el comportamiento cuando se solicitan cero bytes, están disponibles para asignar y liberar memoria del montón de Python.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>No hay garantía de que la memoria retornada por estos asignadores se pueda convertir con éxito en un objeto Python al interceptar las funciones de asignación en este dominio mediante los métodos descritos en la sección <a class="reference internal" href="#customize-memory-allocators"><span class="std std-ref">Personalizar Asignadores de Memoria</span></a>.</p>
+</div>
+<p>El <a class="reference internal" href="#default-memory-allocators"><span class="std std-ref">asignador predeterminado de objetos</span></a> usa el <a class="reference internal" href="#pymalloc"><span class="std std-ref">asignador de memoria pymalloc</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>El <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">GIL</span></a> debe mantenerse cuando se utilizan estas funciones.</p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_Malloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_Malloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Malloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Asigna <em>n</em> bytes y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla.</p>
+<p>Solicitar cero bytes retorna un puntero distinto que no sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado a <code class="docutils literal notranslate"><span class="pre">PyObject_Malloc(1)</span></code>. La memoria no se habrá inicializado de ninguna manera.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_Calloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_Calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">nelem</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">elsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Calloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a> since version 3.7.</em><p>Asigna <em>nelem</em> elementos cada uno cuyo tamaño en bytes es <em>elsize</em> y retorna un puntero de tipo <span class="c-expr sig sig-inline c"><span class="kt">void</span><span class="p">*</span></span> a la memoria asignada, o <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si la solicitud falla. La memoria se inicializa a ceros.</p>
+<p>Solicitar elementos cero o elementos de tamaño cero bytes retorna un puntero distinto <code class="docutils literal notranslate"><span class="pre">NULL</span></code> si es posible, como si en su lugar se hubiera llamado <code class="docutils literal notranslate"><span class="pre">PyObject_Calloc(1,</span> <span class="pre">1)</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_Realloc">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_Realloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Realloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Cambia el tamaño del bloque de memoria señalado por <em>p</em> a <em>n</em> bytes. Los contenidos no se modificarán al mínimo de los tamaños antiguo y nuevo.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la llamada es equivalente a <code class="docutils literal notranslate"><span class="pre">PyObject_Malloc(n)</span></code>; de lo contrario, si <em>n</em> es igual a cero, el bloque de memoria cambia de tamaño pero no se libera, y el puntero retornado no es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>A menos que <em>p</em> sea <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, debe haber sido retornado por una llamada previa a <a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a>, <a class="reference internal" href="#c.PyObject_Realloc" title="PyObject_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Realloc()</span></code></a> o <a class="reference internal" href="#c.PyObject_Calloc" title="PyObject_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Calloc()</span></code></a>.</p>
+<p>Si la solicitud falla, <a class="reference internal" href="#c.PyObject_Realloc" title="PyObject_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Realloc()</span></code></a> retorna <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y <em>p</em> sigue siendo un puntero válido al área de memoria anterior.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_Free">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_Free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Free" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Libera el bloque de memoria al que apunta <em>p</em>, que debe haber sido retornado por una llamada anterior a <a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a>, <a class="reference internal" href="#c.PyObject_Realloc" title="PyObject_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Realloc()</span></code></a> o <a class="reference internal" href="#c.PyObject_Calloc" title="PyObject_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Calloc()</span></code></a>. De lo contrario, o si se ha llamado antes a <code class="docutils literal notranslate"><span class="pre">PyObject_Free(p)</span></code>, se produce un comportamiento indefinido.</p>
+<p>Si <em>p</em> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, no se realiza ninguna operación.</p>
+</dd></dl>
+
+</section>
+<section id="default-memory-allocators">
+<span id="id2"></span><h2>Asignadores de memoria predeterminados<a class="headerlink" href="#default-memory-allocators" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Asignadores de memoria predeterminados:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+<col style="width: 19%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuración</p></th>
+<th class="head"><p>Nombre</p></th>
+<th class="head"><p>PyMem_RawMalloc</p></th>
+<th class="head"><p>PyMem_Malloc</p></th>
+<th class="head"><p>PyObject_Malloc</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Lanzamiento de compilación</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;pymalloc&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+</tr>
+<tr class="row-odd"><td><p>Compilación de depuración</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;pymalloc_debug&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pymalloc</span></code> + debug</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pymalloc</span></code> + debug</p></td>
+</tr>
+<tr class="row-even"><td><p>Lanzamiento de compilación, sin pymalloc</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;malloc&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Compilación de depuración, sin pymalloc</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;malloc_debug&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code> + debug</p></td>
+</tr>
+</tbody>
+</table>
+<p>Leyenda:</p>
+<ul class="simple">
+<li><p>Nombre: valor para variable de entorno <span class="target" id="index-13"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOC</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">malloc</span></code>: asignadores del sistema de la biblioteca C estándar, funciones C: <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">calloc()</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">realloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pymalloc</span></code>: <a class="reference internal" href="#pymalloc"><span class="std std-ref">asignador de memoria pymalloc</span></a>.</p></li>
+<li><p>«+ debug»: con <a class="reference internal" href="#pymem-debug-hooks"><span class="std std-ref">enlaces de depuración en los asignadores de memoria de Python</span></a>.</p></li>
+<li><p>«Debug build»: <a class="reference internal" href="../using/configure.html#debug-build"><span class="std std-ref">Compilación de Python en modo de depuración</span></a>.</p></li>
+</ul>
+</section>
+<section id="customize-memory-allocators">
+<span id="id3"></span><h2>Personalizar asignadores de memoria<a class="headerlink" href="#customize-memory-allocators" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.PyMemAllocatorEx">
+<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMemAllocatorEx</span></span></span><a class="headerlink" href="#c.PyMemAllocatorEx" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Estructura utilizada para describir un asignador de bloque de memoria. La estructura tiene cuatro campos:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 60%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Campo</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*ctx</span></code></p></td>
+<td><p>contexto de usuario pasado como primer argumento</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">void*</span> <span class="pre">malloc(void</span> <span class="pre">*ctx,</span> <span class="pre">size_t</span> <span class="pre">size)</span></code></p></td>
+<td><p>asignar un bloque de memoria</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">void*</span> <span class="pre">calloc(void</span> <span class="pre">*ctx,</span> <span class="pre">size_t</span> <span class="pre">nelem,</span> <span class="pre">size_t</span> <span class="pre">elsize)</span></code></p></td>
+<td><p>asignar un bloque de memoria inicializado con ceros</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">void*</span> <span class="pre">realloc(void</span> <span class="pre">*ctx,</span> <span class="pre">void</span> <span class="pre">*ptr,</span> <span class="pre">size_t</span> <span class="pre">new_size)</span></code></p></td>
+<td><p>asignar o cambiar el tamaño de un bloque de memoria</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">free(void</span> <span class="pre">*ctx,</span> <span class="pre">void</span> <span class="pre">*ptr)</span></code></p></td>
+<td><p>liberar un bloque de memoria</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>La estructura <code class="xref c c-type docutils literal notranslate"><span class="pre">PyMemAllocator</span></code> se renombró a <a class="reference internal" href="#c.PyMemAllocatorEx" title="PyMemAllocatorEx"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyMemAllocatorEx</span></code></a> y se agregó un nuevo campo <code class="docutils literal notranslate"><span class="pre">calloc</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="c type">
+<dt class="sig sig-object c" id="c.PyMemAllocatorDomain">
+<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMemAllocatorDomain</span></span></span><a class="headerlink" href="#c.PyMemAllocatorDomain" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Enum se utiliza para identificar un dominio asignador. Dominios:</p>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.PyMemAllocatorDomain.PYMEM_DOMAIN_RAW">
+<span class="sig-name descname"><span class="n"><span class="pre">PYMEM_DOMAIN_RAW</span></span></span><a class="headerlink" href="#c.PyMemAllocatorDomain.PYMEM_DOMAIN_RAW" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Funciones:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyMem_RawRealloc" title="PyMem_RawRealloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawRealloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyMem_RawCalloc" title="PyMem_RawCalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawCalloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyMem_RawFree" title="PyMem_RawFree"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawFree()</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.PyMemAllocatorDomain.PYMEM_DOMAIN_MEM">
+<span class="sig-name descname"><span class="n"><span class="pre">PYMEM_DOMAIN_MEM</span></span></span><a class="headerlink" href="#c.PyMemAllocatorDomain.PYMEM_DOMAIN_MEM" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Funciones:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>,</p></li>
+<li><p><a class="reference internal" href="#c.PyMem_Realloc" title="PyMem_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Realloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyMem_Calloc" title="PyMem_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Calloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.PyMemAllocatorDomain.PYMEM_DOMAIN_OBJ">
+<span class="sig-name descname"><span class="n"><span class="pre">PYMEM_DOMAIN_OBJ</span></span></span><a class="headerlink" href="#c.PyMemAllocatorDomain.PYMEM_DOMAIN_OBJ" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Funciones:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyObject_Realloc" title="PyObject_Realloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Realloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyObject_Calloc" title="PyObject_Calloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Calloc()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyObject_Free" title="PyObject_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Free()</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_GetAllocator">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_GetAllocator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.PyMemAllocatorDomain" title="PyMemAllocatorDomain"><span class="n"><span class="pre">PyMemAllocatorDomain</span></span></a><span class="w"> </span><span class="n"><span class="pre">domain</span></span>, <a class="reference internal" href="#c.PyMemAllocatorEx" title="PyMemAllocatorEx"><span class="n"><span class="pre">PyMemAllocatorEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">allocator</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_GetAllocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Obtenga el asignador de bloque de memoria del dominio especificado.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_SetAllocator">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_SetAllocator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.PyMemAllocatorDomain" title="PyMemAllocatorDomain"><span class="n"><span class="pre">PyMemAllocatorDomain</span></span></a><span class="w"> </span><span class="n"><span class="pre">domain</span></span>, <a class="reference internal" href="#c.PyMemAllocatorEx" title="PyMemAllocatorEx"><span class="n"><span class="pre">PyMemAllocatorEx</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">allocator</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_SetAllocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Establece el asignador de bloque de memoria del dominio especificado.</p>
+<p>El nuevo asignador debe retornar un puntero distinto <code class="docutils literal notranslate"><span class="pre">NULL</span></code> al solicitar cero bytes.</p>
+<p>Para el dominio <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_RAW</span></code>, el asignador debe ser seguro para subprocesos: el <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">GIL</span></a> no se mantiene cuando se llama al asignador.</p>
+<p>Si el nuevo asignador no es un enlace (no llama al asignador anterior), se debe llamar a la función <a class="reference internal" href="#c.PyMem_SetupDebugHooks" title="PyMem_SetupDebugHooks"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetupDebugHooks()</span></code></a> para reinstalar los enlaces de depuración en la parte superior del nuevo asignador.</p>
+<p>Vea también <a class="reference internal" href="init_config.html#c.PyPreConfig.allocator" title="PyPreConfig.allocator"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.allocator</span></code></a> y <a class="reference internal" href="init_config.html#c-preinit"><span class="std std-ref">Preinicialización de Python con PyPreConfig</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p><a class="reference internal" href="#c.PyMem_SetAllocator" title="PyMem_SetAllocator"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetAllocator()</span></code></a> does have the following contract:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>It can be called after <a class="reference internal" href="init_config.html#c.Py_PreInitialize" title="Py_PreInitialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitialize()</span></code></a> and before
+<a class="reference internal" href="init_config.html#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_InitializeFromConfig()</span></code></a> to install a custom memory
+allocator. There are no restrictions over the installed allocator
+other than the ones imposed by the domain (for instance, the Raw
+Domain allows the allocator to be called without the GIL held). See
+<a class="reference internal" href="#id1"><span class="std std-ref">the section on allocator domains</span></a> for more
+information.</p></li>
+<li><p>If called after Python has finish initializing (after
+<a class="reference internal" href="init_config.html#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_InitializeFromConfig()</span></code></a> has been called) the allocator
+<strong>must</strong> wrap the existing allocator. Substituting the current
+allocator for some other arbitrary one is <strong>not supported</strong>.</p></li>
+</ul>
+</div></blockquote>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyMem_SetupDebugHooks">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyMem_SetupDebugHooks</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyMem_SetupDebugHooks" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Configurar <a class="reference internal" href="#pymem-debug-hooks"><span class="std std-ref">enlaces de depuración en los asignadores de memoria de Python</span></a> para detectar errores de memoria.</p>
+</dd></dl>
+
+</section>
+<section id="debug-hooks-on-the-python-memory-allocators">
+<span id="pymem-debug-hooks"></span><h2>Configurar enlaces para detectar errores en las funciones del asignador de memoria de Python<a class="headerlink" href="#debug-hooks-on-the-python-memory-allocators" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Cuando <a class="reference internal" href="../using/configure.html#debug-build"><span class="std std-ref">Python está construido en modo de depuración</span></a>, la función <a class="reference internal" href="#c.PyMem_SetupDebugHooks" title="PyMem_SetupDebugHooks"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetupDebugHooks()</span></code></a> se llama en <a class="reference internal" href="init_config.html#c-preinit"><span class="std std-ref">Preinicialización de Python</span></a> para configurar los enlaces de depuración en Python asignadores de memoria para detectar errores de memoria.</p>
+<p>La variable de entorno <span class="target" id="index-14"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOC</span></code></a> se puede utilizar para instalar enlaces de depuración en un Python compilado en modo de lanzamiento (por ejemplo: <code class="docutils literal notranslate"><span class="pre">PYTHONMALLOC=debug</span></code>).</p>
+<p>La función <a class="reference internal" href="#c.PyMem_SetupDebugHooks" title="PyMem_SetupDebugHooks"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetupDebugHooks()</span></code></a> se puede utilizar para establecer enlaces de depuración después de llamar a <a class="reference internal" href="#c.PyMem_SetAllocator" title="PyMem_SetAllocator"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetAllocator()</span></code></a>.</p>
+<p>Estos enlaces de depuración llenan bloques de memoria asignados dinámicamente con patrones de bits especiales y reconocibles. La memoria recién asignada se llena con el byte <code class="docutils literal notranslate"><span class="pre">0xCD</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_CLEANBYTE</span></code>), la memoria liberada se llena con el byte <code class="docutils literal notranslate"><span class="pre">0xDD</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_DEADBYTE</span></code>). Los bloques de memoria están rodeados por «bytes prohibidos» rellenos con el byte <code class="docutils literal notranslate"><span class="pre">0xFD</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_FORBIDDENBYTE</span></code>). Es poco probable que las cadenas de estos bytes sean direcciones válidas, flotantes o cadenas ASCII.</p>
+<p>Verificaciones de tiempo de ejecución:</p>
+<ul class="simple">
+<li><p>Detecte violaciones de API, por ejemplo: <a class="reference internal" href="#c.PyObject_Free" title="PyObject_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Free()</span></code></a> llamado en un búfer asignado por <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>.</p></li>
+<li><p>Detectar escritura antes del inicio del búfer (desbordamiento del búfer)</p></li>
+<li><p>Detectar escritura después del final del búfer (desbordamiento del búfer)</p></li>
+<li><p>Comprueba que <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">GIL</span></a> se mantiene cuando las funciones del asignador de <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_OBJ</span></code> (ej: <a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a>) y dominios <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_MEM</span></code> (por ejemplo: <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>) se llaman.</p></li>
+</ul>
+<p>En caso de error, los enlaces de depuración usan el módulo <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a> para obtener el rastreo donde se asignó un bloque de memoria. El rastreo solo se muestra si <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a> rastrea las asignaciones de memoria de Python y se rastrea el bloque de memoria.</p>
+<p>Sea <em>S</em> = <code class="docutils literal notranslate"><span class="pre">sizeof(size_t)</span></code>. Se agregan <code class="docutils literal notranslate"><span class="pre">2*S</span></code> bytes en cada extremo de cada bloque de <em>N</em> bytes solicitados. El diseño de la memoria es así, donde p representa la dirección retornada por una función similar a malloc o realloc (<code class="docutils literal notranslate"><span class="pre">p[i:j]</span></code> significa el segmento de bytes de <code class="docutils literal notranslate"><span class="pre">*(p+i)</span></code> inclusive hasta <code class="docutils literal notranslate"><span class="pre">*(p+j)</span></code> exclusivo; tenga en cuenta que el tratamiento de los índices negativos difiere de un segmento de Python):</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">p[-2*S:-S]</span></code></dt><dd><p>Número de bytes solicitados originalmente. Este es un size_t, big-endian (más fácil de leer en un volcado de memoria).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p[-S]</span></code></dt><dd><p>Identificador de API (carácter ASCII):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'r'</span></code> para <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_RAW</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'m'</span></code> para <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_MEM</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'o'</span></code> para <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_OBJ</span></code>.</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p[-S+1:0]</span></code></dt><dd><p>Copias de PYMEM_FORBIDDENBYTE. Se utiliza para detectar suscripciones y lecturas.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p[0:N]</span></code></dt><dd><p>La memoria solicitada, llena de copias de PYMEM_CLEANBYTE, utilizada para capturar la referencia a la memoria no inicializada. Cuando se llama a una función similar a realloc solicitando un bloque de memoria más grande, los nuevos bytes en exceso también se llenan con PYMEM_CLEANBYTE. Cuando se llama a una función de tipo free, se sobrescriben con PYMEM_DEADBYTE, para captar la referencia a la memoria liberada. Cuando se llama a una función similar a la realloc solicitando un bloque de memoria más pequeño, los bytes antiguos sobrantes también se llenan con PYMEM_DEADBYTE.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p[N:N+S]</span></code></dt><dd><p>Copias de PYMEM_FORBIDDENBYTE. Se utiliza para detectar sobrescrituras y lecturas.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p[N+S:N+2*S]</span></code></dt><dd><p>Solo se utiliza si la macro <code class="docutils literal notranslate"><span class="pre">PYMEM_DEBUG_SERIALNO</span></code> está definida (no definida por defecto).</p>
+<p>Un número de serie, incrementado en 1 en cada llamada a una función similar a malloc o realloc. Big-endian <code class="docutils literal notranslate"><span class="pre">size_t</span></code>. Si se detecta «mala memoria» más tarde, el número de serie ofrece una excelente manera de establecer un punto de interrupción en la siguiente ejecución, para capturar el instante en el que se pasó este bloque. La función estática bumpserialno() en obmalloc.c es el único lugar donde se incrementa el número de serie, y existe para que pueda establecer un punto de interrupción fácilmente.</p>
+</dd>
+</dl>
+<p>Una función de tipo realloc o de tipo free primero verifica que los bytes PYMEM_FORBIDDENBYTE en cada extremo estén intactos. Si se han modificado, la salida de diagnóstico se escribe en stderr y el programa se aborta mediante Py_FatalError(). El otro modo de falla principal es provocar un error de memoria cuando un programa lee uno de los patrones de bits especiales e intenta usarlo como una dirección. Si ingresa a un depurador y observa el objeto, es probable que vea que está completamente lleno de PYMEM_DEADBYTE (lo que significa que se está usando la memoria liberada) o PYMEM_CLEANBYTE (que significa que se está usando la memoria no inicializada).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>La función <a class="reference internal" href="#c.PyMem_SetupDebugHooks" title="PyMem_SetupDebugHooks"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_SetupDebugHooks()</span></code></a> ahora también funciona en Python compilado en modo de lanzamiento. En caso de error, los enlaces de depuración ahora usan <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a> para obtener el rastreo donde se asignó un bloque de memoria. Los enlaces de depuración ahora también comprueban si el GIL se mantiene cuando se llaman las funciones de <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_OBJ</span></code> y <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_MEM</span></code> dominios.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Los patrones de bytes <code class="docutils literal notranslate"><span class="pre">0xCB</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_CLEANBYTE</span></code>), <code class="docutils literal notranslate"><span class="pre">0xDB</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_DEADBYTE</span></code>) y <code class="docutils literal notranslate"><span class="pre">0xFB</span></code> (<code class="docutils literal notranslate"><span class="pre">PYMEM_FORBIDDENBYTE</span></code>) se han reemplazado por <code class="docutils literal notranslate"><span class="pre">0xCD</span></code>, <code class="docutils literal notranslate"><span class="pre">0xDD</span></code> y <code class="docutils literal notranslate"><span class="pre">0xFD</span></code> para usar los mismos valores que la depuración de Windows CRT <code class="docutils literal notranslate"><span class="pre">malloc()</span></code> y <code class="docutils literal notranslate"><span class="pre">free()</span></code>.</p>
+</div>
+</section>
+<section id="the-pymalloc-allocator">
+<span id="pymalloc"></span><h2>El asignador pymalloc<a class="headerlink" href="#the-pymalloc-allocator" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Python tiene un asignador <em>pymalloc</em> optimizado para objetos pequeños (más pequeños o iguales a 512 bytes) con una vida útil corta. Utiliza asignaciones de memoria llamadas «arenas» con un tamaño fijo de 256 KiB. Vuelve a <a class="reference internal" href="#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a> y <a class="reference internal" href="#c.PyMem_RawRealloc" title="PyMem_RawRealloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawRealloc()</span></code></a> para asignaciones de más de 512 bytes.</p>
+<p><em>pymalloc</em> es el <a class="reference internal" href="#default-memory-allocators"><span class="std std-ref">asignador por defecto</span></a> de <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_MEM</span></code> (por ejemplo: <a class="reference internal" href="#c.PyMem_Malloc" title="PyMem_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Malloc()</span></code></a>) y <code class="xref c c-data docutils literal notranslate"><span class="pre">PYMEM_DOMAIN_OBJ</span></code> (por ejemplo: <a class="reference internal" href="#c.PyObject_Malloc" title="PyObject_Malloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Malloc()</span></code></a>) dominios.</p>
+<p>El asignador de arena utiliza las siguientes funciones:</p>
+<ul class="simple">
+<li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">VirtualAlloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">VirtualFree()</span></code> en Windows,</p></li>
+<li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">mmap()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">munmap()</span></code> si está disponible,</p></li>
+<li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code> en caso contrario.</p></li>
+</ul>
+<p>Este asignador está deshabilitado si Python está configurado con la opción <a class="reference internal" href="../using/configure.html#cmdoption-without-pymalloc"><code class="xref std std-option docutils literal notranslate"><span class="pre">--without-pymalloc</span></code></a>. También se puede deshabilitar en tiempo de ejecución usando la variable de entorno <span class="target" id="index-15"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOC</span></code></a> (por ejemplo: <code class="docutils literal notranslate"><span class="pre">PYTHONMALLOC=malloc</span></code>).</p>
+<section id="customize-pymalloc-arena-allocator">
+<h3>Personalizar asignador de arena de pymalloc<a class="headerlink" href="#customize-pymalloc-arena-allocator" title="Enlazar permanentemente con este título">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.PyObjectArenaAllocator">
+<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyObjectArenaAllocator</span></span></span><a class="headerlink" href="#c.PyObjectArenaAllocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Estructura utilizada para describir un asignador de arena. La estructura tiene tres campos:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Campo</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*ctx</span></code></p></td>
+<td><p>contexto de usuario pasado como primer argumento</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">void*</span> <span class="pre">alloc(void</span> <span class="pre">*ctx,</span> <span class="pre">size_t</span> <span class="pre">size)</span></code></p></td>
+<td><p>asignar una arena de bytes de tamaño</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">free(void</span> <span class="pre">*ctx,</span> <span class="pre">void</span> <span class="pre">*ptr,</span> <span class="pre">size_t</span> <span class="pre">size)</span></code></p></td>
+<td><p>liberar la arena</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_GetArenaAllocator">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_GetArenaAllocator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.PyObjectArenaAllocator" title="PyObjectArenaAllocator"><span class="n"><span class="pre">PyObjectArenaAllocator</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">allocator</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_GetArenaAllocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Consigue el asignador de arena.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyObject_SetArenaAllocator">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyObject_SetArenaAllocator</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.PyObjectArenaAllocator" title="PyObjectArenaAllocator"><span class="n"><span class="pre">PyObjectArenaAllocator</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">allocator</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_SetArenaAllocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Establecer el asignador de arena.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="tracemalloc-c-api">
+<h2>tracemalloc C API<a class="headerlink" href="#tracemalloc-c-api" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyTraceMalloc_Track">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyTraceMalloc_Track</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">domain</span></span>, <span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyTraceMalloc_Track" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Rastree un bloque de memoria asignado en el módulo <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a>.</p>
+<p>Retorna <code class="docutils literal notranslate"><span class="pre">0</span></code> en caso de éxito, retorna <code class="docutils literal notranslate"><span class="pre">-1</span></code> en caso de error (no se pudo asignar memoria para almacenar la traza). Retorna <code class="docutils literal notranslate"><span class="pre">-2</span></code> si tracemalloc está deshabilitado.</p>
+<p>Si el bloque de memoria ya está rastreado, actualice el rastreo existente.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyTraceMalloc_Untrack">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyTraceMalloc_Untrack</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">domain</span></span>, <span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyTraceMalloc_Untrack" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Descomprima un bloque de memoria asignado en el módulo <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a>. No haga nada si el bloque no fue rastreado.</p>
+<p>Retorna <code class="docutils literal notranslate"><span class="pre">-2</span></code> si tracemalloc está deshabilitado; de lo contrario, retorna <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="examples">
+<span id="memoryexamples"></span><h2>Ejemplos<a class="headerlink" href="#examples" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Aquí está el ejemplo de la sección <a class="reference internal" href="#memoryoverview"><span class="std std-ref">Visión general</span></a>, reescrito para que el búfer de E/S se asigne desde el montón de Python utilizando el primer conjunto de funciones:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">PyMem_Malloc</span><span class="p">(</span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"> </span><span class="cm">/* for I/O */</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buf</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyErr_NoMemory</span><span class="p">();</span><span class="w"></span>
+<span class="cm">/* ...Do some I/O operation involving buf... */</span><span class="w"></span>
+<span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyBytes_FromString</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="n">PyMem_Free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"> </span><span class="cm">/* allocated with PyMem_Malloc */</span><span class="w"></span>
+<span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>El mismo código que utiliza el conjunto de funciones orientado a tipos:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyMem_New</span><span class="p">(</span><span class="kt">char</span><span class="p">,</span><span class="w"> </span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"> </span><span class="cm">/* for I/O */</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buf</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyErr_NoMemory</span><span class="p">();</span><span class="w"></span>
+<span class="cm">/* ...Do some I/O operation involving buf... */</span><span class="w"></span>
+<span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyBytes_FromString</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="n">PyMem_Del</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"> </span><span class="cm">/* allocated with PyMem_New */</span><span class="w"></span>
+<span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Tenga en cuenta que en los dos ejemplos anteriores, el búfer siempre se manipula a través de funciones que pertenecen al mismo conjunto. De hecho, es necesario usar la misma familia de API de memoria para un bloque de memoria dado, de modo que el riesgo de mezclar diferentes asignadores se reduzca al mínimo. La siguiente secuencia de código contiene dos errores, uno de los cuales está etiquetado como <em>fatal</em> porque mezcla dos asignadores diferentes que operan en montones diferentes.:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyMem_New</span><span class="p">(</span><span class="kt">char</span><span class="p">,</span><span class="w"> </span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">malloc</span><span class="p">(</span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">PyMem_Malloc</span><span class="p">(</span><span class="n">BUFSIZ</span><span class="p">);</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
+<span class="n">PyMem_Del</span><span class="p">(</span><span class="n">buf3</span><span class="p">);</span><span class="w">  </span><span class="cm">/* Wrong -- should be PyMem_Free() */</span><span class="w"></span>
+<span class="n">free</span><span class="p">(</span><span class="n">buf2</span><span class="p">);</span><span class="w">       </span><span class="cm">/* Right -- allocated via malloc() */</span><span class="w"></span>
+<span class="n">free</span><span class="p">(</span><span class="n">buf1</span><span class="p">);</span><span class="w">       </span><span class="cm">/* Fatal -- should be PyMem_Del()  */</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Además de las funciones destinadas a manejar bloques de memoria sin procesar del montón de Python, los objetos en Python se asignan y liberan con <a class="reference internal" href="allocation.html#c.PyObject_New" title="PyObject_New"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_New()</span></code></a>, <a class="reference internal" href="allocation.html#c.PyObject_NewVar" title="PyObject_NewVar"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_NewVar()</span></code></a> y <a class="reference internal" href="allocation.html#c.PyObject_Del" title="PyObject_Del"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Del()</span></code></a> .</p>
+<p>Esto se explicará en el próximo capítulo sobre cómo definir e implementar nuevos tipos de objetos en C.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Gestión de la memoria</a><ul>
+<li><a class="reference internal" href="#overview">Visión general</a></li>
+<li><a class="reference internal" href="#allocator-domains">Dominios del asignador</a></li>
+<li><a class="reference internal" href="#raw-memory-interface">Interfaz de memoria sin procesar</a></li>
+<li><a class="reference internal" href="#memory-interface">Interfaz de memoria</a></li>
+<li><a class="reference internal" href="#object-allocators">Asignadores de objetos</a></li>
+<li><a class="reference internal" href="#default-memory-allocators">Asignadores de memoria predeterminados</a></li>
+<li><a class="reference internal" href="#customize-memory-allocators">Personalizar asignadores de memoria</a></li>
+<li><a class="reference internal" href="#debug-hooks-on-the-python-memory-allocators">Configurar enlaces para detectar errores en las funciones del asignador de memoria de Python</a></li>
+<li><a class="reference internal" href="#the-pymalloc-allocator">El asignador pymalloc</a><ul>
+<li><a class="reference internal" href="#customize-pymalloc-arena-allocator">Personalizar asignador de arena de pymalloc</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tracemalloc-c-api">tracemalloc C API</a></li>
+<li><a class="reference internal" href="#examples">Ejemplos</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="init_config.html"
+                          title="capítulo anterior">Configuración de inicialización de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="objimpl.html"
+                          title="próximo capítulo">Soporte de implementación de objetos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/c-api/memory.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="objimpl.html" title="Soporte de implementación de objetos"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="init_config.html" title="Configuración de inicialización de Python"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Gestión de la memoria</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

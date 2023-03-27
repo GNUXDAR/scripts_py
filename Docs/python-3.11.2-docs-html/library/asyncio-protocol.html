@@ -1,0 +1,1151 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Transportes y protocolos" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/asyncio-protocol.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Prefacio Los transportes y protocolos son utilizados por las APIs de bajo nivel de los bucles de eventos, como loop.create_connection(). Utilizan un estilo de programación basado en retrollamadas y..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Prefacio Los transportes y protocolos son utilizados por las APIs de bajo nivel de los bucles de eventos, como loop.create_connection(). Utilizan un estilo de programación basado en retrollamadas y..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>Transportes y protocolos &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Políticas" href="asyncio-policy.html" />
+    <link rel="prev" title="Futures" href="asyncio-future.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/asyncio-protocol.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Transportes y protocolos</a><ul>
+<li><a class="reference internal" href="#transports">Transportes</a><ul>
+<li><a class="reference internal" href="#transports-hierarchy">Jerarquía de transportes</a></li>
+<li><a class="reference internal" href="#base-transport">Transporte base</a></li>
+<li><a class="reference internal" href="#read-only-transports">Transportes de solo lectura</a></li>
+<li><a class="reference internal" href="#write-only-transports">Transportes de solo escritura</a></li>
+<li><a class="reference internal" href="#datagram-transports">Transportes de datagramas</a></li>
+<li><a class="reference internal" href="#subprocess-transports">Transportes de subprocesos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#protocols">Protocolos</a><ul>
+<li><a class="reference internal" href="#base-protocols">Protocolos base</a></li>
+<li><a class="reference internal" href="#base-protocol">Protocolo base</a></li>
+<li><a class="reference internal" href="#streaming-protocols">Protocolos de <em>streaming</em></a></li>
+<li><a class="reference internal" href="#buffered-streaming-protocols">Protocolos de <em>streaming</em> mediante búfer</a></li>
+<li><a class="reference internal" href="#datagram-protocols">Protocolos de datagramas</a></li>
+<li><a class="reference internal" href="#subprocess-protocols">Protocolos de subprocesos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Ejemplos</a><ul>
+<li><a class="reference internal" href="#tcp-echo-server">Servidor de eco TCP</a></li>
+<li><a class="reference internal" href="#tcp-echo-client">Cliente de eco TCP</a></li>
+<li><a class="reference internal" href="#udp-echo-server">Servidor de eco UDP</a></li>
+<li><a class="reference internal" href="#udp-echo-client">Cliente de eco UDP</a></li>
+<li><a class="reference internal" href="#connecting-existing-sockets">Conectando sockets existentes</a></li>
+<li><a class="reference internal" href="#loop-subprocess-exec-and-subprocessprotocol"><em>loop.subprocess_exec()</em> y <em>SubprocessProtocol</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="asyncio-future.html"
+                          title="capítulo anterior">Futures</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="asyncio-policy.html"
+                          title="próximo capítulo">Políticas</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/asyncio-protocol.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-policy.html" title="Políticas"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio-future.html" title="Futures"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Transportes y protocolos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="transports-and-protocols">
+<span id="asyncio-transports-protocols"></span><h1>Transportes y protocolos<a class="headerlink" href="#transports-and-protocols" title="Enlazar permanentemente con este título">¶</a></h1>
+<p class="rubric">Prefacio</p>
+<p>Los transportes y protocolos son utilizados por las APIs de <strong>bajo nivel</strong> de los bucles de eventos, como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a>. Utilizan un estilo de programación basado en retrollamadas y permiten implementaciones de alto rendimiento de protocolos de red o IPC (p. ej. HTTP).</p>
+<p>Esencialmente, los transportes y protocolos solo deben usarse en bibliotecas y frameworks, nunca en aplicaciones asyncio de alto nivel.</p>
+<p>Esta página de la documentación cubre tanto <a class="reference internal" href="#transports">Transports</a> como <a class="reference internal" href="#protocols">Protocols</a>.</p>
+<p class="rubric">Introducción</p>
+<p>En el nivel más alto, el transporte se ocupa de <em>cómo</em> se transmiten los bytes, mientras que el protocolo determina <em>qué</em> bytes transmitir (y hasta cierto punto cuándo).</p>
+<p>Una forma diferente de decir lo mismo: Un transporte es una abstracción para un socket (o un punto final de E/S similar) mientras que un protocolo es una abstracción para una aplicación, desde el punto de vista del transporte.</p>
+<p>Otro punto de vista más es que las interfaces de transporte y protocolo definen juntas una interfaz abstracta para usar E/S de red y E/S entre procesos.</p>
+<p>Siempre existe una relación 1:1 entre el transporte y los objetos protocolo: el protocolo llama a los métodos del transporte para enviar datos, mientras que el transporte llama a los métodos del protocolo para enviarle los datos que se han recibido.</p>
+<p>La mayoría de los métodos del bucle de eventos orientados a la conexión (como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a>) aceptan generalmente un argumento <em>protocol_factory</em> que es usado para crear un objeto <em>Protocol</em> para una conexión aceptada, representada por un objeto <em>Transport</em>. Estos métodos suelen retornar una tupla de la forma <code class="docutils literal notranslate"><span class="pre">(transporte,</span> <span class="pre">protocolo)</span></code>.</p>
+<p class="rubric">Contenidos</p>
+<p>Esta página de la documentación contiene las siguientes secciones:</p>
+<ul class="simple">
+<li><p>La sección <a class="reference internal" href="#transports">Transports</a> documenta las clases asyncio <a class="reference internal" href="#asyncio.BaseTransport" title="asyncio.BaseTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransport</span></code></a>, <a class="reference internal" href="#asyncio.ReadTransport" title="asyncio.ReadTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReadTransport</span></code></a>, <a class="reference internal" href="#asyncio.WriteTransport" title="asyncio.WriteTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">WriteTransport</span></code></a>, <a class="reference internal" href="#asyncio.Transport" title="asyncio.Transport"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transport</span></code></a>, <a class="reference internal" href="#asyncio.DatagramTransport" title="asyncio.DatagramTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatagramTransport</span></code></a> y <a class="reference internal" href="#asyncio.SubprocessTransport" title="asyncio.SubprocessTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubprocessTransport</span></code></a>.</p></li>
+<li><p>La sección <a class="reference internal" href="#protocols">Protocols</a> documenta las clases asyncio <a class="reference internal" href="#asyncio.BaseProtocol" title="asyncio.BaseProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseProtocol</span></code></a>, <a class="reference internal" href="#asyncio.Protocol" title="asyncio.Protocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a>, <a class="reference internal" href="#asyncio.BufferedProtocol" title="asyncio.BufferedProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedProtocol</span></code></a>, <a class="reference internal" href="#asyncio.DatagramProtocol" title="asyncio.DatagramProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatagramProtocol</span></code></a> y <a class="reference internal" href="#asyncio.SubprocessProtocol" title="asyncio.SubprocessProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubprocessProtocol</span></code></a>.</p></li>
+<li><p>La sección <a class="reference internal" href="#examples">Examples</a> muestra cómo trabajar con transportes, protocolos y las APIs de bajo nivel del bucle de eventos.</p></li>
+</ul>
+<section id="transports">
+<span id="asyncio-transport"></span><h2>Transportes<a class="headerlink" href="#transports" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/asyncio/transports.py">Lib/asyncio/transports.py</a></p>
+<hr class="docutils" />
+<p>Los transportes son clases proporcionadas por <a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a> para abstraer varios tipos de canales de comunicación.</p>
+<p>Los objetos transporte siempre son instanciados por un <a class="reference internal" href="asyncio-eventloop.html#asyncio-event-loop"><span class="std std-ref">bucle de eventos asyncio</span></a>.</p>
+<p>asyncio implementa transportes para TCP, UDP, SSL y pipes de subprocesos. Los métodos disponibles en un transporte dependen del tipo de transporte.</p>
+<p>Las clases transporte <a class="reference internal" href="asyncio-dev.html#asyncio-multithreading"><span class="std std-ref">no son seguras en hilos</span></a>.</p>
+<section id="transports-hierarchy">
+<h3>Jerarquía de transportes<a class="headerlink" href="#transports-hierarchy" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.BaseTransport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">BaseTransport</span></span><a class="headerlink" href="#asyncio.BaseTransport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase base para todos los transportes. Contiene métodos que todos los transportes asyncio comparten.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.WriteTransport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">WriteTransport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseTransport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un transporte base para conexiones de solo escritura.</p>
+<p>Las instancias de la clase <em>WriteTransport</em> se retornan desde el método del bucle de eventos <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.connect_write_pipe" title="asyncio.loop.connect_write_pipe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.connect_write_pipe()</span></code></a> y también se utilizan en métodos relacionados con subprocesos como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_exec" title="asyncio.loop.subprocess_exec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_exec()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.ReadTransport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">ReadTransport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseTransport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.ReadTransport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un transporte base para conexiones de solo lectura.</p>
+<p>Las instancias de la clase <em>ReadTransport</em> se retornan desde el método del bucle de eventos <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.connect_read_pipe" title="asyncio.loop.connect_read_pipe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.connect_read_pipe()</span></code></a> y también se utilizan en métodos relacionados con subprocesos como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_exec" title="asyncio.loop.subprocess_exec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_exec()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.Transport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">Transport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">WriteTransport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ReadTransport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Transport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Interfaz que representa un transporte bidireccional, como una conexión TCP.</p>
+<p>El usuario no crea una instancia de transporte directamente; en su lugar se llama a una función de utilidad, pasándole una fábrica de protocolos junto a otra información necesaria para crear el transporte y el protocolo.</p>
+<p>Las instancias de la clase <em>Transport</em> son retornadas o utilizadas por métodos del bucle de eventos como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_unix_connection" title="asyncio.loop.create_unix_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_unix_connection()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_server" title="asyncio.loop.create_server"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_server()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.sendfile" title="asyncio.loop.sendfile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.sendfile()</span></code></a>, etc.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.DatagramTransport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">DatagramTransport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseTransport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramTransport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un transporte para conexiones de datagramas (UDP).</p>
+<p>Las instancias de la clase <em>DatagramTransport</em> se retornan desde el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_datagram_endpoint" title="asyncio.loop.create_datagram_endpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_datagram_endpoint()</span></code></a> del bucle de eventos.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">SubprocessTransport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseTransport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una abstracción para representar una conexión entre un proceso padre y su proceso OS hijo.</p>
+<p>Las instancias de la clase <em>SubprocessTransport</em> se retornan desde los métodos del bucle de eventos <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_shell" title="asyncio.loop.subprocess_shell"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_shell()</span></code></a> y <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_exec" title="asyncio.loop.subprocess_exec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_exec()</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="base-transport">
+<h3>Transporte base<a class="headerlink" href="#base-transport" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseTransport.close">
+<span class="sig-prename descclassname"><span class="pre">BaseTransport.</span></span><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseTransport.close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el transporte.</p>
+<p>If the transport has a buffer for outgoing
+data, buffered data will be flushed asynchronously.  No more data
+will be received.  After all buffered data is flushed, the
+protocol’s <a class="reference internal" href="#asyncio.BaseProtocol.connection_lost" title="asyncio.BaseProtocol.connection_lost"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.connection_lost()</span></code></a> method will be called with
+<a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> as its argument. The transport should not be
+used once it is closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseTransport.is_closing">
+<span class="sig-prename descclassname"><span class="pre">BaseTransport.</span></span><span class="sig-name descname"><span class="pre">is_closing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseTransport.is_closing" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si el transporte se está cerrando o está ya cerrado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseTransport.get_extra_info">
+<span class="sig-prename descclassname"><span class="pre">BaseTransport.</span></span><span class="sig-name descname"><span class="pre">get_extra_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseTransport.get_extra_info" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna información sobre el transporte o los recursos subyacentes que utiliza.</p>
+<p><em>name</em> es una cadena de caracteres que representa la información específica del transporte que se va a obtener.</p>
+<p><em>default</em> es el valor que se retornará si la información no está disponible o si el transporte no admite la consulta con la implementación del bucle de eventos de terceros dada o en la plataforma actual.</p>
+<p>Por ejemplo, el siguiente código intenta obtener el objeto socket subyacente del transporte:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">sock</span> <span class="o">=</span> <span class="n">transport</span><span class="o">.</span><span class="n">get_extra_info</span><span class="p">(</span><span class="s1">&#39;socket&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sock</span><span class="o">.</span><span class="n">getsockopt</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Categorías de información que se pueden consultar sobre algunos transportes:</p>
+<ul class="simple">
+<li><p>socket:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'peername'</span></code>: la dirección remota a la que está conectado el socket, resultado de <a class="reference internal" href="socket.html#socket.socket.getpeername" title="socket.socket.getpeername"><code class="xref py py-meth docutils literal notranslate"><span class="pre">socket.socket.getpeername()</span></code></a> (<code class="docutils literal notranslate"><span class="pre">None</span></code> en caso de error)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'socket'</span></code>: instancia de <a class="reference internal" href="socket.html#socket.socket" title="socket.socket"><code class="xref py py-class docutils literal notranslate"><span class="pre">socket.socket</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'sockname'</span></code>: la dirección propia del socket, resultado de <a class="reference internal" href="socket.html#socket.socket.getsockname" title="socket.socket.getsockname"><code class="xref py py-meth docutils literal notranslate"><span class="pre">socket.socket.getsockname()</span></code></a></p></li>
+</ul>
+</li>
+<li><p>socket SSL:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'compression'</span></code>: el algoritmo de compresión que se está usando como una cadena de caracteres o <code class="docutils literal notranslate"><span class="pre">None</span></code> si la conexión no está comprimida; resultado de <a class="reference internal" href="ssl.html#ssl.SSLSocket.compression" title="ssl.SSLSocket.compression"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ssl.SSLSocket.compression()</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'cipher'</span></code>: una tupla de tres valores que contiene el nombre del cifrado que se está utilizando, la versión del protocolo SSL que define su uso y la cantidad de bits de la clave secreta que se utilizan; resultado de <a class="reference internal" href="ssl.html#ssl.SSLSocket.cipher" title="ssl.SSLSocket.cipher"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ssl.SSLSocket.cipher()</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'peercert'</span></code>: certificado de pares; resultado de <a class="reference internal" href="ssl.html#ssl.SSLSocket.getpeercert" title="ssl.SSLSocket.getpeercert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ssl.SSLSocket.getpeercert()</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'sslcontext'</span></code>: instancia de <a class="reference internal" href="ssl.html#ssl.SSLContext" title="ssl.SSLContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">ssl.SSLContext</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'ssl_object'</span></code>: instancia de <a class="reference internal" href="ssl.html#ssl.SSLObject" title="ssl.SSLObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ssl.SSLObject</span></code></a> o <a class="reference internal" href="ssl.html#ssl.SSLSocket" title="ssl.SSLSocket"><code class="xref py py-class docutils literal notranslate"><span class="pre">ssl.SSLSocket</span></code></a></p></li>
+</ul>
+</li>
+<li><p>pipe:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'pipe'</span></code>: objeto pipe</p></li>
+</ul>
+</li>
+<li><p>subproceso:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'subprocess'</span></code>: instancia de <a class="reference internal" href="subprocess.html#subprocess.Popen" title="subprocess.Popen"><code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code></a></p></li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseTransport.set_protocol">
+<span class="sig-prename descclassname"><span class="pre">BaseTransport.</span></span><span class="sig-name descname"><span class="pre">set_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseTransport.set_protocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece un nuevo protocolo.</p>
+<p>El cambio de protocolo solo debe realizarse cuando esté documentado que ambos protocolos admiten el cambio.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseTransport.get_protocol">
+<span class="sig-prename descclassname"><span class="pre">BaseTransport.</span></span><span class="sig-name descname"><span class="pre">get_protocol</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseTransport.get_protocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el protocolo actual.</p>
+</dd></dl>
+
+</section>
+<section id="read-only-transports">
+<h3>Transportes de solo lectura<a class="headerlink" href="#read-only-transports" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.ReadTransport.is_reading">
+<span class="sig-prename descclassname"><span class="pre">ReadTransport.</span></span><span class="sig-name descname"><span class="pre">is_reading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.ReadTransport.is_reading" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si el transporte está recibiendo nuevos datos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.ReadTransport.pause_reading">
+<span class="sig-prename descclassname"><span class="pre">ReadTransport.</span></span><span class="sig-name descname"><span class="pre">pause_reading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.ReadTransport.pause_reading" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Pausa el extremo receptor del transporte. No se pasarán datos al método <a class="reference internal" href="#asyncio.Protocol.data_received" title="asyncio.Protocol.data_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.data_received()</span></code></a> del protocolo hasta que se llame a <a class="reference internal" href="#asyncio.ReadTransport.resume_reading" title="asyncio.ReadTransport.resume_reading"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resume_reading()</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>El método es idempotente, es decir, se puede llamar cuando el transporte ya está en pausa o cerrado.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.ReadTransport.resume_reading">
+<span class="sig-prename descclassname"><span class="pre">ReadTransport.</span></span><span class="sig-name descname"><span class="pre">resume_reading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.ReadTransport.resume_reading" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Reanuda el extremo receptor. El método <a class="reference internal" href="#asyncio.Protocol.data_received" title="asyncio.Protocol.data_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.data_received()</span></code></a> del protocolo se llamará una vez más si hay algunos datos disponibles para su lectura.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>El método es idempotente, es decir, se puede llamar cuando el transporte está leyendo.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="write-only-transports">
+<h3>Transportes de solo escritura<a class="headerlink" href="#write-only-transports" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.abort">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.abort" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el transporte inmediatamente, sin esperar a que finalicen las operaciones pendientes. Se perderán los datos almacenados en el búfer. No se recibirán más datos. El método <a class="reference internal" href="#asyncio.BaseProtocol.connection_lost" title="asyncio.BaseProtocol.connection_lost"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.connection_lost()</span></code></a> del protocolo será llamado eventualmente con <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> como argumento.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.can_write_eof">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">can_write_eof</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.can_write_eof" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <a class="reference internal" href="constants.html#True" title="True"><code class="xref py py-const docutils literal notranslate"><span class="pre">True</span></code></a> si el transporte admite <a class="reference internal" href="#asyncio.WriteTransport.write_eof" title="asyncio.WriteTransport.write_eof"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_eof()</span></code></a>, en caso contrario <a class="reference internal" href="constants.html#False" title="False"><code class="xref py py-const docutils literal notranslate"><span class="pre">False</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.get_write_buffer_size">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">get_write_buffer_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.get_write_buffer_size" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el tamaño actual del búfer de salida utilizado por el transporte.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.get_write_buffer_limits">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">get_write_buffer_limits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.get_write_buffer_limits" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Obtiene los límites superior e inferior para el control del flujo de escritura. Retorna una tupla <code class="docutils literal notranslate"><span class="pre">(low,</span> <span class="pre">high)</span></code> donde <em>low</em> (“inferior”) y <em>high</em> (“superior”) son un número de bytes positivo.</p>
+<p>Usa <a class="reference internal" href="#asyncio.WriteTransport.set_write_buffer_limits" title="asyncio.WriteTransport.set_write_buffer_limits"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_write_buffer_limits()</span></code></a> para establecer los límites.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.set_write_buffer_limits">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">set_write_buffer_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.set_write_buffer_limits" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece los límites <em>high</em> (“superior”) y <em>low</em> (“inferior”) para el control del flujo de escritura.</p>
+<p>Estos dos valores (medidos en número de bytes) controlan cuándo se llaman los métodos <a class="reference internal" href="#asyncio.BaseProtocol.pause_writing" title="asyncio.BaseProtocol.pause_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.pause_writing()</span></code></a> y <a class="reference internal" href="#asyncio.BaseProtocol.resume_writing" title="asyncio.BaseProtocol.resume_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.resume_writing()</span></code></a> del protocolo . Si se especifica, el límite inferior debe ser menor o igual que el límite superior. Ni <em>high</em> ni <em>low</em> pueden ser negativos.</p>
+<p><a class="reference internal" href="#asyncio.BaseProtocol.pause_writing" title="asyncio.BaseProtocol.pause_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pause_writing()</span></code></a> se llama cuando el tamaño del búfer es mayor o igual que el valor <em>high</em> (“superior”). Si se ha pausado la escritura, se llama a <a class="reference internal" href="#asyncio.BaseProtocol.resume_writing" title="asyncio.BaseProtocol.resume_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resume_writing()</span></code></a> cuando el tamaño del búfer es menor o igual que el valor <em>low</em> (“inferior”).</p>
+<p>Los valores por defecto son específicos de la implementación. Si solo se proporciona el límite superior, el inferior toma de forma predeterminada un valor específico, dependiente de la implementación, menor o igual que el límite superior. Establecer <em>high</em> (“superior”) en cero fuerza <em>low</em> (“inferior”) a cero también y hace que <a class="reference internal" href="#asyncio.BaseProtocol.pause_writing" title="asyncio.BaseProtocol.pause_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pause_writing()</span></code></a> sea llamado siempre que el búfer no esté vacío. Establecer <em>low</em> (“inferior”) en cero hace que <a class="reference internal" href="#asyncio.BaseProtocol.resume_writing" title="asyncio.BaseProtocol.resume_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resume_writing()</span></code></a> sea llamado únicamente cuando el búfer esté vacío. El uso de cero para cualquiera de los límites es generalmente subóptimo, ya que reduce las oportunidades para realizar E/S y cálculos simultáneamente.</p>
+<p>Usa <a class="reference internal" href="#asyncio.WriteTransport.get_write_buffer_limits" title="asyncio.WriteTransport.get_write_buffer_limits"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_write_buffer_limits()</span></code></a> para obtener los límites.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.write">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe los bytes de <em>data</em> en el transporte.</p>
+<p>Este método no bloquea; almacena los datos en el búfer y organiza que se envíen de forma asincrónica.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.writelines">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">writelines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.writelines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe una lista (o cualquier iterable) de bytes de datos en el transporte. Esto es funcionalmente equivalente a llamar a <a class="reference internal" href="#asyncio.WriteTransport.write" title="asyncio.WriteTransport.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> en cada elemento generado por el iterable, pero puede ser implementado de manera más eficiente.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.WriteTransport.write_eof">
+<span class="sig-prename descclassname"><span class="pre">WriteTransport.</span></span><span class="sig-name descname"><span class="pre">write_eof</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.WriteTransport.write_eof" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el extremo de escritura del transporte después de vaciar todos los datos almacenados en el búfer. Aún es posible recibir datos.</p>
+<p>Este método puede lanzar una excepción <a class="reference internal" href="exceptions.html#NotImplementedError" title="NotImplementedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotImplementedError</span></code></a> si el transporte (p. ej. SSL) no soporta conexiones semicerradas (<em>half-closed</em>).</p>
+</dd></dl>
+
+</section>
+<section id="datagram-transports">
+<h3>Transportes de datagramas<a class="headerlink" href="#datagram-transports" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.DatagramTransport.sendto">
+<span class="sig-prename descclassname"><span class="pre">DatagramTransport.</span></span><span class="sig-name descname"><span class="pre">sendto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramTransport.sendto" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía los bytes <em>data</em> al par remoto proporcionado por <em>addr</em> (una dirección de destino dependiente del transporte). Si <em>addr</em> es <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a>, los datos se envían a la dirección de destino proporcionada en la creación del transporte.</p>
+<p>Este método no bloquea; almacena los datos en el búfer y organiza que se envíen de forma asincrónica.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.DatagramTransport.abort">
+<span class="sig-prename descclassname"><span class="pre">DatagramTransport.</span></span><span class="sig-name descname"><span class="pre">abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramTransport.abort" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el transporte inmediatamente, sin esperar a que finalicen las operaciones pendientes. Se perderán los datos almacenados en el búfer. No se recibirán más datos. El método <a class="reference internal" href="#asyncio.BaseProtocol.connection_lost" title="asyncio.BaseProtocol.connection_lost"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.connection_lost()</span></code></a> del protocolo será llamado eventualmente con <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> como argumento.</p>
+</dd></dl>
+
+</section>
+<section id="subprocess-transports">
+<span id="asyncio-subprocess-transports"></span><h3>Transportes de subprocesos<a class="headerlink" href="#subprocess-transports" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.get_pid">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">get_pid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.get_pid" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la id del subproceso como un número entero.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.get_pipe_transport">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">get_pipe_transport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.get_pipe_transport" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el transporte para la pipe de comunicación correspondiente al descriptor de archivo entero <em>fd</em>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: transporte de <em>streaming</em> para lectura de la entrada estándar (<em>stdin</em>) o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> si el subproceso no se creó con <code class="docutils literal notranslate"><span class="pre">stdin</span> <span class="pre">=</span> <span class="pre">PIPE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: transporte de <em>streaming</em> para escritura de la salida estándar (<em>stdout</em>) o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> si el subproceso no se creó con <code class="docutils literal notranslate"><span class="pre">stdout</span> <span class="pre">=</span> <span class="pre">PIPE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code>: transporte de <em>streaming</em> para escritura del error estándar (<em>stderr</em>) o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> si el subproceso no se creó con <code class="docutils literal notranslate"><span class="pre">stderr</span> <span class="pre">=</span> <span class="pre">PIPE</span></code></p></li>
+<li><p>otro <em>fd</em>: <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.get_returncode">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">get_returncode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.get_returncode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el código de retorno del subproceso como un entero o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a> si no ha retornado aún, lo que es similar al atributo <a class="reference internal" href="subprocess.html#subprocess.Popen.returncode" title="subprocess.Popen.returncode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">subprocess.Popen.returncode</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.kill">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.kill" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Mata al subproceso.</p>
+<p>En los sistemas POSIX, la función envía SIGKILL al subproceso. En Windows, este método es un alias para <a class="reference internal" href="#asyncio.SubprocessTransport.terminate" title="asyncio.SubprocessTransport.terminate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">terminate()</span></code></a>.</p>
+<p>Ver también <a class="reference internal" href="subprocess.html#subprocess.Popen.kill" title="subprocess.Popen.kill"><code class="xref py py-meth docutils literal notranslate"><span class="pre">subprocess.Popen.kill()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.send_signal">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">send_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.send_signal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía el número de <em>señal</em> al subproceso, como en <a class="reference internal" href="subprocess.html#subprocess.Popen.send_signal" title="subprocess.Popen.send_signal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">subprocess.Popen.send_signal()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.terminate">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.terminate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Detiene el subproceso.</p>
+<p>En los sistemas POSIX, este método envía SIGTERM al subproceso. En Windows, se llama a la función de la API de Windows <em>TerminateProcess()</em> para detener el subproceso.</p>
+<p>Ver también <a class="reference internal" href="subprocess.html#subprocess.Popen.terminate" title="subprocess.Popen.terminate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">subprocess.Popen.terminate()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessTransport.close">
+<span class="sig-prename descclassname"><span class="pre">SubprocessTransport.</span></span><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessTransport.close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Mata al subproceso llamando al método <a class="reference internal" href="#asyncio.SubprocessTransport.kill" title="asyncio.SubprocessTransport.kill"><code class="xref py py-meth docutils literal notranslate"><span class="pre">kill()</span></code></a>.</p>
+<p>Si el subproceso aún no ha retornado, cierra los transportes de las pipes <em>stdin</em>, <em>stdout</em> y <em>stderr</em>.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="protocols">
+<span id="asyncio-protocol"></span><h2>Protocolos<a class="headerlink" href="#protocols" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/asyncio/protocols.py">Lib/asyncio/protocols.py</a></p>
+<hr class="docutils" />
+<p>asyncio proporciona un conjunto de clases base abstractas que pueden usarse para implementar protocolos de red. Estas clases están destinadas a ser utilizadas junto con los <a class="reference internal" href="#asyncio-transport"><span class="std std-ref">transportes</span></a>.</p>
+<p>Las subclases de las clases abstractas de protocolos base pueden implementar algunos o todos los métodos. Todos estos métodos son retrollamadas: son llamados por los transportes en ciertos eventos, por ejemplo, cuando se reciben algunos datos. Un método del protocolo base debe ser llamado por el transporte correspondiente.</p>
+<section id="base-protocols">
+<h3>Protocolos base<a class="headerlink" href="#base-protocols" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.BaseProtocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">BaseProtocol</span></span><a class="headerlink" href="#asyncio.BaseProtocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Protocolo base con métodos que comparten todos los demás protocolos.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.Protocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">Protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseProtocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Protocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase base para implementar protocolos de <em>streaming</em> (TCP, sockets Unix, etc).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.BufferedProtocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">BufferedProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseProtocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BufferedProtocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una clase base para implementar protocolos de <em>streaming</em> con control manual del búfer de recepción.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.DatagramProtocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">DatagramProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseProtocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramProtocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase base para implementar protocolos de datagramas (UDP).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.SubprocessProtocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">SubprocessProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BaseProtocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessProtocol" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase base para implementar protocolos que se comunican con procesos secundarios (pipes unidireccionales).</p>
+</dd></dl>
+
+</section>
+<section id="base-protocol">
+<h3>Protocolo base<a class="headerlink" href="#base-protocol" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Todos los protocolos asyncio pueden implementar las retrollamadas del protocolo base.</p>
+<p class="rubric">Retrollamadas de conexión</p>
+<p>Las retrollamadas de conexión son llamadas exactamente una vez por conexión establecida en todos los protocolos. Todas las demás retrollamadas del protocolo solo pueden ser llamadas entre estos dos métodos.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseProtocol.connection_made">
+<span class="sig-prename descclassname"><span class="pre">BaseProtocol.</span></span><span class="sig-name descname"><span class="pre">connection_made</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transport</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseProtocol.connection_made" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando se establece una conexión.</p>
+<p>El argumento <em>transport</em> es el transporte que representa la conexión. El protocolo se encarga de almacenar la referencia a su propio transporte.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseProtocol.connection_lost">
+<span class="sig-prename descclassname"><span class="pre">BaseProtocol.</span></span><span class="sig-name descname"><span class="pre">connection_lost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseProtocol.connection_lost" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando la conexión se pierde o se cierra.</p>
+<p>El argumento es un objeto excepción o <a class="reference internal" href="constants.html#None" title="None"><code class="xref py py-const docutils literal notranslate"><span class="pre">None</span></code></a>. Esto último significa que se recibió un EOF regular o que la conexión fue cancelada o cerrada por este lado de la conexión.</p>
+</dd></dl>
+
+<p class="rubric">Retrollamadas de control de flujo</p>
+<p>Los transportes pueden llamar a las retrollamadas de control de flujo para pausar o reanudar la escritura llevada a cabo por el protocolo.</p>
+<p>Consulta la documentación del método <a class="reference internal" href="#asyncio.WriteTransport.set_write_buffer_limits" title="asyncio.WriteTransport.set_write_buffer_limits"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_write_buffer_limits()</span></code></a> para obtener más detalles.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseProtocol.pause_writing">
+<span class="sig-prename descclassname"><span class="pre">BaseProtocol.</span></span><span class="sig-name descname"><span class="pre">pause_writing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseProtocol.pause_writing" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el búfer del transporte supera el límite superior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BaseProtocol.resume_writing">
+<span class="sig-prename descclassname"><span class="pre">BaseProtocol.</span></span><span class="sig-name descname"><span class="pre">resume_writing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BaseProtocol.resume_writing" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el búfer del transporte se vacía por debajo del límite inferior.</p>
+</dd></dl>
+
+<p>Si el tamaño del búfer es igual al límite superior, <a class="reference internal" href="#asyncio.BaseProtocol.pause_writing" title="asyncio.BaseProtocol.pause_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pause_writing()</span></code></a> no será llamado: el tamaño del búfer debe superarse estrictamente.</p>
+<p>Por el contrario, se llama a <a class="reference internal" href="#asyncio.BaseProtocol.resume_writing" title="asyncio.BaseProtocol.resume_writing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resume_writing()</span></code></a> cuando el tamaño del búfer es igual o menor que el límite inferior. Estas condiciones finales son importantes para garantizar que todo salga como se espera cuando cualquiera de los dos límites sea cero.</p>
+</section>
+<section id="streaming-protocols">
+<h3>Protocolos de <em>streaming</em><a class="headerlink" href="#streaming-protocols" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los métodos de eventos, como <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_server" title="asyncio.loop.create_server"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_server()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_unix_server" title="asyncio.loop.create_unix_server"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_unix_server()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_unix_connection" title="asyncio.loop.create_unix_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_unix_connection()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.connect_accepted_socket" title="asyncio.loop.connect_accepted_socket"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.connect_accepted_socket()</span></code></a>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.connect_read_pipe" title="asyncio.loop.connect_read_pipe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.connect_read_pipe()</span></code></a>, y <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.connect_write_pipe" title="asyncio.loop.connect_write_pipe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.connect_write_pipe()</span></code></a> aceptan fábricas que retornan protocolos de <em>streaming</em>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.Protocol.data_received">
+<span class="sig-prename descclassname"><span class="pre">Protocol.</span></span><span class="sig-name descname"><span class="pre">data_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Protocol.data_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando se reciben algunos datos. <em>data</em> es un objeto bytes no vacío que contiene los datos entrantes.</p>
+<p>Que los datos se almacenen en un búfer, que se fragmenten o se vuelvan a ensamblar depende del transporte. En general, no debe confiar en semánticas específicas y, en cambio, hacer que su análisis sea genérico y flexible. Sin embargo, los datos siempre se reciben en el orden correcto.</p>
+<p>El método se puede llamar un número arbitrario de veces mientras una conexión esté abierta.</p>
+<p>However, <a class="reference internal" href="#asyncio.Protocol.eof_received" title="asyncio.Protocol.eof_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.eof_received()</span></code></a>
+is called at most once.  Once <code class="docutils literal notranslate"><span class="pre">eof_received()</span></code> is called,
+<code class="docutils literal notranslate"><span class="pre">data_received()</span></code> is not called anymore.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.Protocol.eof_received">
+<span class="sig-prename descclassname"><span class="pre">Protocol.</span></span><span class="sig-name descname"><span class="pre">eof_received</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Protocol.eof_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el otro extremo indica que no enviará más datos (por ejemplo, llamando a <a class="reference internal" href="#asyncio.WriteTransport.write_eof" title="asyncio.WriteTransport.write_eof"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transport.write_eof()</span></code></a> si el otro extremo también usa asyncio).</p>
+<p>Este método puede retornar un valor falso (incluido <code class="docutils literal notranslate"><span class="pre">None</span></code>), en cuyo caso el transporte se cerrará solo. Por el contrario, si este método retorna un valor verdadero, el protocolo utilizado determina si se debe cerrar el transporte. Dado que la implementación por defecto retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>, en éste caso, se cierra implícitamente la conexión.</p>
+<p>Algunos transportes, incluido SSL, no admiten conexiones semicerradas (<em>half-closed</em>), en cuyo caso retornar verdadero desde este método resultará en el cierre de la conexión.</p>
+</dd></dl>
+
+<p>Máquina de estado:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>start -&gt; connection_made
+    [-&gt; data_received]*
+    [-&gt; eof_received]?
+-&gt; connection_lost -&gt; end
+</pre></div>
+</div>
+</section>
+<section id="buffered-streaming-protocols">
+<h3>Protocolos de <em>streaming</em> mediante búfer<a class="headerlink" href="#buffered-streaming-protocols" title="Enlazar permanentemente con este título">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<p>Los protocolos que hacen uso de un búfer se pueden utilizar con cualquier método del bucle de eventos que admita <a class="reference internal" href="#streaming-protocols">Streaming Protocols</a>.</p>
+<p>Las implementaciones de <code class="docutils literal notranslate"><span class="pre">BufferedProtocol</span></code> permiten la asignación manual explícita y el control del búfer de recepción. Los bucles de eventos pueden utilizar el búfer proporcionado por el protocolo para evitar copias de datos innecesarias. Esto puede resultar en una mejora notable del rendimiento de los protocolos que reciben grandes cantidades de datos. Las implementaciones de protocolos sofisticados pueden reducir significativamente la cantidad de asignaciones de búfer.</p>
+<p>Las siguientes retrollamadas son llamadas en instancias <a class="reference internal" href="#asyncio.BufferedProtocol" title="asyncio.BufferedProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedProtocol</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BufferedProtocol.get_buffer">
+<span class="sig-prename descclassname"><span class="pre">BufferedProtocol.</span></span><span class="sig-name descname"><span class="pre">get_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sizehint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BufferedProtocol.get_buffer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama para asignar un nuevo búfer de recepción.</p>
+<p><em>sizehint</em> es el tamaño mínimo recomendado para el búfer retornado. Es aceptable retornar búferes más pequeños o más grandes de lo que sugiere <em>sizehint</em>. Cuando se establece en -1, el tamaño del búfer puede ser arbitrario. Es un error retornar un búfer con tamaño cero.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_buffer()</span></code> debe retornar un objeto que implemente el <a class="reference internal" href="../c-api/buffer.html#bufferobjects"><span class="std std-ref">protocolo de búfer</span></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BufferedProtocol.buffer_updated">
+<span class="sig-prename descclassname"><span class="pre">BufferedProtocol.</span></span><span class="sig-name descname"><span class="pre">buffer_updated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BufferedProtocol.buffer_updated" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el búfer se ha actualizado con los datos recibidos.</p>
+<p><em>nbytes</em> es el número total de bytes que se escribieron en el búfer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.BufferedProtocol.eof_received">
+<span class="sig-prename descclassname"><span class="pre">BufferedProtocol.</span></span><span class="sig-name descname"><span class="pre">eof_received</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.BufferedProtocol.eof_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Consulte la documentación del método <a class="reference internal" href="#asyncio.Protocol.eof_received" title="asyncio.Protocol.eof_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.eof_received()</span></code></a>.</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#asyncio.BufferedProtocol.get_buffer" title="asyncio.BufferedProtocol.get_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_buffer()</span></code></a> se puede llamar un número arbitrario de veces durante una conexión. Sin embargo, <a class="reference internal" href="#asyncio.Protocol.eof_received" title="asyncio.Protocol.eof_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">protocol.eof_received</span> <span class="pre">()</span></code></a> se llama como máximo una vez y, si se llama, <a class="reference internal" href="#asyncio.BufferedProtocol.get_buffer" title="asyncio.BufferedProtocol.get_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_buffer()</span></code></a> y <a class="reference internal" href="#asyncio.BufferedProtocol.buffer_updated" title="asyncio.BufferedProtocol.buffer_updated"><code class="xref py py-meth docutils literal notranslate"><span class="pre">buffer_updated()</span></code></a> no serán llamados después de eso.</p>
+<p>Máquina de estado:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>start -&gt; connection_made
+    [-&gt; get_buffer
+        [-&gt; buffer_updated]?
+    ]*
+    [-&gt; eof_received]?
+-&gt; connection_lost -&gt; end
+</pre></div>
+</div>
+</section>
+<section id="datagram-protocols">
+<h3>Protocolos de datagramas<a class="headerlink" href="#datagram-protocols" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las instancias del protocolo de datagramas deben ser construidas por fábricas de protocolos pasadas al método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_datagram_endpoint" title="asyncio.loop.create_datagram_endpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_datagram_endpoint()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.DatagramProtocol.datagram_received">
+<span class="sig-prename descclassname"><span class="pre">DatagramProtocol.</span></span><span class="sig-name descname"><span class="pre">datagram_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramProtocol.datagram_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando se recibe un datagrama. <em>data</em> es un objeto bytes que contiene los datos entrantes. <em>addr</em> es la dirección del par que envía los datos; el formato exacto depende del transporte.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.DatagramProtocol.error_received">
+<span class="sig-prename descclassname"><span class="pre">DatagramProtocol.</span></span><span class="sig-name descname"><span class="pre">error_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.DatagramProtocol.error_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando una operación de envío o recepción anterior genera una <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OSError</span></code></a>. <em>exc</em> es la instancia <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+<p>Este método se llama en condiciones excepcionales, cuando el transporte (por ejemplo, UDP) detecta que un datagrama no se pudo entregar a su destinatario. Sin embargo, en la mayoría de casos, los datagramas que no se puedan entregar se eliminarán silenciosamente.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En los sistemas BSD (macOS, FreeBSD, etc.) el control de flujo no es compatible con los protocolos de datagramas, esto se debe a que no hay una forma confiable de detectar fallos de envío causados por escribir demasiados paquetes.</p>
+<p>El socket siempre aparece como disponible (“ready”) y se eliminan los paquetes sobrantes. Un error <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OSError</span></code></a> con <code class="docutils literal notranslate"><span class="pre">errno</span></code> establecido en <a class="reference internal" href="errno.html#errno.ENOBUFS" title="errno.ENOBUFS"><code class="xref py py-const docutils literal notranslate"><span class="pre">errno.ENOBUFS</span></code></a> puede o no ser generado; si se genera, se informará a <a class="reference internal" href="#asyncio.DatagramProtocol.error_received" title="asyncio.DatagramProtocol.error_received"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DatagramProtocol.error_received()</span></code></a> pero en caso contrario se ignorará.</p>
+</div>
+</section>
+<section id="subprocess-protocols">
+<span id="asyncio-subprocess-protocols"></span><h3>Protocolos de subprocesos<a class="headerlink" href="#subprocess-protocols" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las instancias de protocolo de subproceso deben ser construidas por fábricas de protocolos pasadas a los métodos <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_exec" title="asyncio.loop.subprocess_exec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_exec()</span></code></a> y <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_shell" title="asyncio.loop.subprocess_shell"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_shell()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessProtocol.pipe_data_received">
+<span class="sig-prename descclassname"><span class="pre">SubprocessProtocol.</span></span><span class="sig-name descname"><span class="pre">pipe_data_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessProtocol.pipe_data_received" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el proceso hijo escribe datos en su pipe stdout o stderr.</p>
+<p><em>fd</em> es el descriptor de archivo entero de la pipe.</p>
+<p><em>data</em> es un objeto bytes no vacío que contiene los datos recibidos.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessProtocol.pipe_connection_lost">
+<span class="sig-prename descclassname"><span class="pre">SubprocessProtocol.</span></span><span class="sig-name descname"><span class="pre">pipe_connection_lost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessProtocol.pipe_connection_lost" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando se cierra una de las pipes que se comunican con el proceso hijo.</p>
+<p><em>fd</em> es el descriptor de archivo entero que se cerró.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.SubprocessProtocol.process_exited">
+<span class="sig-prename descclassname"><span class="pre">SubprocessProtocol.</span></span><span class="sig-name descname"><span class="pre">process_exited</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.SubprocessProtocol.process_exited" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el proceso hijo ha finalizado.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="examples">
+<h2>Ejemplos<a class="headerlink" href="#examples" title="Enlazar permanentemente con este título">¶</a></h2>
+<section id="tcp-echo-server">
+<span id="asyncio-example-tcp-echo-server-protocol"></span><h3>Servidor de eco TCP<a class="headerlink" href="#tcp-echo-server" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Crear un servidor de eco TCP usando el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_server" title="asyncio.loop.create_server"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_server()</span></code></a>, enviar de vuelta los datos recibidos y cerrar la conexión:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+
+<span class="k">class</span> <span class="nc">EchoServerProtocol</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">connection_made</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">):</span>
+        <span class="n">peername</span> <span class="o">=</span> <span class="n">transport</span><span class="o">.</span><span class="n">get_extra_info</span><span class="p">(</span><span class="s1">&#39;peername&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Connection from </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">peername</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+
+    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data received: </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Send: </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Close the client socket&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+
+    <span class="n">server</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_server</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">EchoServerProtocol</span><span class="p">(),</span>
+        <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">8888</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">with</span> <span class="n">server</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El ejemplo <a class="reference internal" href="asyncio-stream.html#asyncio-tcp-echo-server-streams"><span class="std std-ref">Servidor de eco TCP usando streams</span></a> usa la función de alto nivel <a class="reference internal" href="asyncio-stream.html#asyncio.start_server" title="asyncio.start_server"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.start_server()</span></code></a>.</p>
+</div>
+</section>
+<section id="tcp-echo-client">
+<span id="asyncio-example-tcp-echo-client-protocol"></span><h3>Cliente de eco TCP<a class="headerlink" href="#tcp-echo-client" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Un cliente de eco TCP usando el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a>, envía datos y espera hasta que la conexión se cierre:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+
+<span class="k">class</span> <span class="nc">EchoClientProtocol</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">on_con_lost</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">on_con_lost</span>
+
+    <span class="k">def</span> <span class="nf">connection_made</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">):</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data sent: </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data received: </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">connection_lost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The server closed the connection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+
+    <span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Hello World!&#39;</span>
+
+    <span class="n">transport</span><span class="p">,</span> <span class="n">protocol</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_connection</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">EchoClientProtocol</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">on_con_lost</span><span class="p">),</span>
+        <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">8888</span><span class="p">)</span>
+
+    <span class="c1"># Wait until the protocol signals that the connection</span>
+    <span class="c1"># is lost and close the transport.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">on_con_lost</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El ejemplo <a class="reference internal" href="asyncio-stream.html#asyncio-tcp-echo-client-streams"><span class="std std-ref">Cliente de eco TCP usando streams</span></a> usa la función de alto nivel <a class="reference internal" href="asyncio-stream.html#asyncio.open_connection" title="asyncio.open_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.open_connection()</span></code></a>.</p>
+</div>
+</section>
+<section id="udp-echo-server">
+<span id="asyncio-udp-echo-server-protocol"></span><h3>Servidor de eco UDP<a class="headerlink" href="#udp-echo-server" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Un servidor de eco UDP, usando el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_datagram_endpoint" title="asyncio.loop.create_datagram_endpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_datagram_endpoint()</span></code></a>, envía de vuelta los datos recibidos:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+
+<span class="k">class</span> <span class="nc">EchoServerProtocol</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">connection_made</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+
+    <span class="k">def</span> <span class="nf">datagram_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Received </span><span class="si">%r</span><span class="s1"> from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">addr</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Send </span><span class="si">%r</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">addr</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting UDP server&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+
+    <span class="c1"># One protocol instance will be created to serve all</span>
+    <span class="c1"># client requests.</span>
+    <span class="n">transport</span><span class="p">,</span> <span class="n">protocol</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_datagram_endpoint</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">EchoServerProtocol</span><span class="p">(),</span>
+        <span class="n">local_addr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">9999</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>  <span class="c1"># Serve for 1 hour.</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="udp-echo-client">
+<span id="asyncio-udp-echo-client-protocol"></span><h3>Cliente de eco UDP<a class="headerlink" href="#udp-echo-client" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Un cliente de eco UDP, usando el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_datagram_endpoint" title="asyncio.loop.create_datagram_endpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_datagram_endpoint()</span></code></a>, envía datos y cierra el transporte cuando recibe la respuesta:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+
+<span class="k">class</span> <span class="nc">EchoClientProtocol</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">on_con_lost</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">on_con_lost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">connection_made</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Send:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">datagram_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Received:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Close the socket&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">error_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error received:&#39;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">connection_lost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connection closed&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+
+    <span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Hello World!&quot;</span>
+
+    <span class="n">transport</span><span class="p">,</span> <span class="n">protocol</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_datagram_endpoint</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">EchoClientProtocol</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">on_con_lost</span><span class="p">),</span>
+        <span class="n">remote_addr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">9999</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">on_con_lost</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="connecting-existing-sockets">
+<span id="asyncio-example-create-connection"></span><h3>Conectando sockets existentes<a class="headerlink" href="#connecting-existing-sockets" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Espera hasta que un socket reciba datos usando el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_connection" title="asyncio.loop.create_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_connection()</span></code></a> mediante un protocolo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+
+<span class="k">class</span> <span class="nc">MyProtocol</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Protocol</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_con_lost</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">on_con_lost</span>
+
+    <span class="k">def</span> <span class="nf">connection_made</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+
+    <span class="k">def</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Received:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
+        <span class="c1"># We are done: close the transport;</span>
+        <span class="c1"># connection_lost() will be called automatically.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">connection_lost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="c1"># The socket has been closed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_con_lost</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+    <span class="n">on_con_lost</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
+
+    <span class="c1"># Create a pair of connected sockets</span>
+    <span class="n">rsock</span><span class="p">,</span> <span class="n">wsock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socketpair</span><span class="p">()</span>
+
+    <span class="c1"># Register the socket to wait for data.</span>
+    <span class="n">transport</span><span class="p">,</span> <span class="n">protocol</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_connection</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">MyProtocol</span><span class="p">(</span><span class="n">on_con_lost</span><span class="p">),</span> <span class="n">sock</span><span class="o">=</span><span class="n">rsock</span><span class="p">)</span>
+
+    <span class="c1"># Simulate the reception of data from the network.</span>
+    <span class="n">loop</span><span class="o">.</span><span class="n">call_soon</span><span class="p">(</span><span class="n">wsock</span><span class="o">.</span><span class="n">send</span><span class="p">,</span> <span class="s1">&#39;abc&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">protocol</span><span class="o">.</span><span class="n">on_con_lost</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">wsock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>El ejemplo <a class="reference internal" href="asyncio-eventloop.html#asyncio-example-watch-fd"><span class="std std-ref">monitorizar eventos de lectura en un descriptor de archivo</span></a> utiliza el método de bajo nivel <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.add_reader" title="asyncio.loop.add_reader"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.add_reader()</span></code></a> para registrar un descriptor de archivo.</p>
+<p>El ejemplo <a class="reference internal" href="asyncio-stream.html#asyncio-example-create-connection-streams"><span class="std std-ref">registrar un socket abierto a la espera de datos usando streams</span></a> usa <em>streams</em> de alto nivel creados por la función <a class="reference internal" href="asyncio-stream.html#asyncio.open_connection" title="asyncio.open_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">open_connection()</span></code></a> en una corrutina.</p>
+</div>
+</section>
+<section id="loop-subprocess-exec-and-subprocessprotocol">
+<span id="asyncio-example-subprocess-proto"></span><h3><em>loop.subprocess_exec()</em> y <em>SubprocessProtocol</em><a class="headerlink" href="#loop-subprocess-exec-and-subprocessprotocol" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Un ejemplo de un protocolo de subproceso que se utiliza para obtener la salida de un subproceso y esperar su terminación.</p>
+<p>El subproceso es creado por el método <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.subprocess_exec" title="asyncio.loop.subprocess_exec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.subprocess_exec()</span></code></a></p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">class</span> <span class="nc">DateProtocol</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">SubprocessProtocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_future</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit_future</span> <span class="o">=</span> <span class="n">exit_future</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">pipe_data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_exited</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit_future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_date</span><span class="p">():</span>
+    <span class="c1"># Get a reference to the event loop as we plan to use</span>
+    <span class="c1"># low-level APIs.</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;import datetime; print(datetime.datetime.now())&#39;</span>
+    <span class="n">exit_future</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+
+    <span class="c1"># Create the subprocess controlled by DateProtocol;</span>
+    <span class="c1"># redirect the standard output into a pipe.</span>
+    <span class="n">transport</span><span class="p">,</span> <span class="n">protocol</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">subprocess_exec</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="n">DateProtocol</span><span class="p">(</span><span class="n">exit_future</span><span class="p">),</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span>
+        <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Wait for the subprocess exit using the process_exited()</span>
+    <span class="c1"># method of the protocol.</span>
+    <span class="k">await</span> <span class="n">exit_future</span>
+
+    <span class="c1"># Close the stdout pipe.</span>
+    <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Read the output which was collected by the</span>
+    <span class="c1"># pipe_data_received() method of the protocol.</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+<span class="n">date</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">get_date</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current date: </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Consulte también el <a class="reference internal" href="asyncio-subprocess.html#asyncio-example-create-subprocess-exec"><span class="std std-ref">mismo ejemplo</span></a> escrito utilizando la API de alto nivel.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Transportes y protocolos</a><ul>
+<li><a class="reference internal" href="#transports">Transportes</a><ul>
+<li><a class="reference internal" href="#transports-hierarchy">Jerarquía de transportes</a></li>
+<li><a class="reference internal" href="#base-transport">Transporte base</a></li>
+<li><a class="reference internal" href="#read-only-transports">Transportes de solo lectura</a></li>
+<li><a class="reference internal" href="#write-only-transports">Transportes de solo escritura</a></li>
+<li><a class="reference internal" href="#datagram-transports">Transportes de datagramas</a></li>
+<li><a class="reference internal" href="#subprocess-transports">Transportes de subprocesos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#protocols">Protocolos</a><ul>
+<li><a class="reference internal" href="#base-protocols">Protocolos base</a></li>
+<li><a class="reference internal" href="#base-protocol">Protocolo base</a></li>
+<li><a class="reference internal" href="#streaming-protocols">Protocolos de <em>streaming</em></a></li>
+<li><a class="reference internal" href="#buffered-streaming-protocols">Protocolos de <em>streaming</em> mediante búfer</a></li>
+<li><a class="reference internal" href="#datagram-protocols">Protocolos de datagramas</a></li>
+<li><a class="reference internal" href="#subprocess-protocols">Protocolos de subprocesos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Ejemplos</a><ul>
+<li><a class="reference internal" href="#tcp-echo-server">Servidor de eco TCP</a></li>
+<li><a class="reference internal" href="#tcp-echo-client">Cliente de eco TCP</a></li>
+<li><a class="reference internal" href="#udp-echo-server">Servidor de eco UDP</a></li>
+<li><a class="reference internal" href="#udp-echo-client">Cliente de eco UDP</a></li>
+<li><a class="reference internal" href="#connecting-existing-sockets">Conectando sockets existentes</a></li>
+<li><a class="reference internal" href="#loop-subprocess-exec-and-subprocessprotocol"><em>loop.subprocess_exec()</em> y <em>SubprocessProtocol</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="asyncio-future.html"
+                          title="capítulo anterior">Futures</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="asyncio-policy.html"
+                          title="próximo capítulo">Políticas</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/asyncio-protocol.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-policy.html" title="Políticas"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio-future.html" title="Futures"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Transportes y protocolos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

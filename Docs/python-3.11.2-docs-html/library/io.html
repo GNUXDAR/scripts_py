@@ -1,0 +1,1168 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="io — Herramientas principales para trabajar con streams" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/io.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/io.py Resumen: El módulo io provee las facilidades principales de Python para manejar diferentes tipos de E/S. Hay tres diferentes tipos de E/S: texto E/S, binario E/S e E/S sin ..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/io.py Resumen: El módulo io provee las facilidades principales de Python para manejar diferentes tipos de E/S. Hay tres diferentes tipos de E/S: texto E/S, binario E/S e E/S sin ..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>io — Herramientas principales para trabajar con streams &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="time — Acceso a tiempo y conversiones" href="time.html" />
+    <link rel="prev" title="os — Interfaces misceláneas del sistema operativo" href="os.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/io.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code> — Herramientas principales para trabajar con <em>streams</em></a><ul>
+<li><a class="reference internal" href="#overview">Resumen</a><ul>
+<li><a class="reference internal" href="#text-i-o">E/S Texto</a></li>
+<li><a class="reference internal" href="#binary-i-o">E/S Binaria</a></li>
+<li><a class="reference internal" href="#raw-i-o">E/S sin formato</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#text-encoding">Codificación de texto</a><ul>
+<li><a class="reference internal" href="#opt-in-encodingwarning">EncodingWarning opcional</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#high-level-module-interface">Interfaz de módulo de alto nivel</a></li>
+<li><a class="reference internal" href="#class-hierarchy">Jerarquía de clases</a><ul>
+<li><a class="reference internal" href="#i-o-base-classes">Clases base E/S</a></li>
+<li><a class="reference internal" href="#raw-file-i-o">Archivo sin formato E/S</a></li>
+<li><a class="reference internal" href="#buffered-streams"><em>Streams</em> almacenados (búfer)</a></li>
+<li><a class="reference internal" href="#id1">E/S Texto</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance">Rendimiento</a><ul>
+<li><a class="reference internal" href="#id2">E/S Binaria</a></li>
+<li><a class="reference internal" href="#id3">E/S Texto</a></li>
+<li><a class="reference internal" href="#multi-threading">Multihilo</a></li>
+<li><a class="reference internal" href="#reentrancy">Reentrada</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="os.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">os</span></code> — Interfaces misceláneas del sistema operativo</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="time.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">time</span></code> — Acceso a tiempo y conversiones</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/io.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="time.html" title="time — Acceso a tiempo y conversiones"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="os.html" title="os — Interfaces misceláneas del sistema operativo"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="allos.html" accesskey="U">Servicios genéricos del sistema operativo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code> — Herramientas principales para trabajar con <em>streams</em></a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-io">
+<span id="io-core-tools-for-working-with-streams"></span><h1><a class="reference internal" href="#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> — Herramientas principales para trabajar con <em>streams</em><a class="headerlink" href="#module-io" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/io.py">Lib/io.py</a></p>
+<hr class="docutils" />
+<section id="overview">
+<span id="io-overview"></span><h2>Resumen<a class="headerlink" href="#overview" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="index-0">El módulo <a class="reference internal" href="#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> provee las facilidades principales de Python para manejar diferentes tipos de E/S. Hay tres diferentes tipos de E/S: <em>texto E/S</em>, <em>binario E/S</em> e <em>E/S sin formato</em>. Estas son categorías generales y varios respaldos de almacenamiento se pueden usar para cada una de ellas. Un objeto concreto perteneciendo a cualquiera de estas categorías se llama un <a class="reference internal" href="../glossary.html#term-file-object"><span class="xref std std-term">file object</span></a>. Otros términos comunes son <em>stream</em> y <em>file-like object</em>.</p>
+<p>Independiente de su categoría, cada objeto <em>stream</em> también tendrá varias capacidades: puede ser solamente para lectura, solo escritura, or lectura y escritura. También permite arbitrariamente acceso aleatorio (buscando adelante o hacia atrás en cualquier lugar) o solamente acceso secuencial (por ejemplo en el caso de un <em>socket</em> o <em>pipe</em>).</p>
+<p>Todas los <em>streams</em> son cuidadosas del tipo de datos que se les provee. Por ejemplo dando un objeto de clase <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> al método <code class="docutils literal notranslate"><span class="pre">write()</span></code> de un <em>stream</em> binaria lanzará un <a class="reference internal" href="exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a>. También dándole un objeto de tipo <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> al método <code class="docutils literal notranslate"><span class="pre">write()</span></code> de un <em>stream</em> de tipo texto.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Operaciones que lanzarán un <a class="reference internal" href="exceptions.html#IOError" title="IOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IOError</span></code></a> ahora lanzan <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>, ya que <a class="reference internal" href="exceptions.html#IOError" title="IOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IOError</span></code></a> es un alias de <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+</div>
+<section id="text-i-o">
+<h3>E/S Texto<a class="headerlink" href="#text-i-o" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>E/S de tipo texto espera y produce objetos de clase <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>. Esto significa que cuando el respaldo de almacenamiento está compuesto de forma nativa de <em>bytes</em> (como en el caso de un archivo), la codificación y descodificación de datos está hecho de forma transparente tanto como traducción opcional de caracteres de nueva línea específicos de la plataforma.</p>
+<p>La manera más fácil de crear un <em>stream</em> de tipo texto es con el método <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open()</span></code></a>, con la opción de especificar una codificación:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;myfile.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>Streams</em> de texto en memoria también están disponibles como objetos de tipo <a class="reference internal" href="#io.StringIO" title="io.StringIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="s2">&quot;some initial text data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El <em>API</em> (interfaz de programación de aplicaciones) de <em>streams</em> tipo texto está descrito con detalle en la documentación de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>.</p>
+</section>
+<section id="binary-i-o">
+<h3>E/S Binaria<a class="headerlink" href="#binary-i-o" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>E/S binaria (también conocido como <em>buffered E/S</em>) espera <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">objetos tipo bytes</span></a> y produce objetos tipo <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. No se hace codificación, descodificación, o traducciones de nueva línea. Esta categoría de <em>streams</em> puede ser usada para todos tipos de datos sin texto, y también cuando se desea control manual sobre el manejo de dato textual.</p>
+<p>La manera más fácil para crear un <em>stream</em> binario es con el método <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-meth docutils literal notranslate"><span class="pre">open()</span></code></a> con <code class="docutils literal notranslate"><span class="pre">'b'</span></code> en el modo de la cadena de caracteres:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;myfile.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Los <em>streams</em> binarios en memoria también están disponibles como objetos tipo <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;some initial binary data: </span><span class="se">\x00\x01</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El <em>API</em> de <em>stream</em> binario está descrito con detalle en la documentación de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>.</p>
+<p>Otros módulos bibliotecarios pueden proveer maneras alternativas para crear <em>streams</em> de tipo texto o binario. Ver <a class="reference internal" href="socket.html#socket.socket.makefile" title="socket.socket.makefile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">socket.socket.makefile()</span></code></a> como ejemplo.</p>
+</section>
+<section id="raw-i-o">
+<h3>E/S sin formato<a class="headerlink" href="#raw-i-o" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>E/S sin formato (también conocido como <em>unbuffered E/S</em>) es generalmente usado como un fundamento de nivel bajo para <em>streams</em> binario y tipo texto; es raramente útil para manipular directamente <em>streams</em> sin formatos del código de usuario. Sin embargo puedes crear un <em>stream</em> sin formato abriendo un archivo en modo binario con el búfer apagado:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;myfile.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El <em>API</em> de <em>streams</em> sin formato está descrito con detalle en la documentación de <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>.</p>
+</section>
+</section>
+<section id="text-encoding">
+<span id="io-text-encoding"></span><h2>Codificación de texto<a class="headerlink" href="#text-encoding" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>The default encoding of <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> and <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> is
+locale-specific (<a class="reference internal" href="locale.html#locale.getencoding" title="locale.getencoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">locale.getencoding()</span></code></a>).</p>
+<p>Sin embargo, muchos desarrolladores olvidan especificar la codificación al abrir archivos de texto codificados en UTF-8 (por ejemplo, JSON, TOML, Markdown, etc.) ya que la mayoría de las plataformas Unix usan la configuración regional UTF-8 de forma predeterminada. Esto causa errores porque la codificación local no es UTF-8 para la mayoría de los usuarios de Windows. Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># May not work on Windows when non-ASCII characters in the file.</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;README.md&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">long_description</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Accordingly, it is highly recommended that you specify the encoding
+explicitly when opening text files. If you want to use UTF-8, pass
+<code class="docutils literal notranslate"><span class="pre">encoding=&quot;utf-8&quot;</span></code>. To use the current locale encoding,
+<code class="docutils literal notranslate"><span class="pre">encoding=&quot;locale&quot;</span></code> is supported since Python 3.10.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<dl class="simple">
+<dt><a class="reference internal" href="os.html#utf8-mode"><span class="std std-ref">Modo Python UTF-8</span></a></dt><dd><p>El modo UTF-8 de Python se puede utilizar para cambiar la codificación predeterminada a UTF-8 desde la codificación específica de la configuración regional.</p>
+</dd>
+<dt><span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0686/"><strong>PEP 686</strong></a></dt><dd><p>Python 3.15 hará que <a class="reference internal" href="os.html#utf8-mode"><span class="std std-ref">Modo Python UTF-8</span></a> sea el valor predeterminado.</p>
+</dd>
+</dl>
+</div>
+<section id="opt-in-encodingwarning">
+<span id="io-encoding-warning"></span><h3>EncodingWarning opcional<a class="headerlink" href="#opt-in-encodingwarning" title="Enlazar permanentemente con este título">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10: </span>Consulte <span class="target" id="index-8"></span><a class="pep reference external" href="https://peps.python.org/pep-0597/"><strong>PEP 597</strong></a> para más detalles.</p>
+</div>
+<p>Para encontrar dónde se usa la codificación de configuración regional predeterminada, puede habilitar la opción de línea de comando <code class="docutils literal notranslate"><span class="pre">-X</span> <span class="pre">warn_default_encoding</span></code> o establecer la variable de entorno <span class="target" id="index-9"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONWARNDEFAULTENCODING"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONWARNDEFAULTENCODING</span></code></a>, que emitirá un <a class="reference internal" href="exceptions.html#EncodingWarning" title="EncodingWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EncodingWarning</span></code></a> cuando se use la codificación predeterminada.</p>
+<p>Si está proporcionando una API que usa <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> o <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> y pasa <code class="docutils literal notranslate"><span class="pre">encoding=None</span></code> como parámetro, puede usar <a class="reference internal" href="#io.text_encoding" title="io.text_encoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">text_encoding()</span></code></a> para que las personas que llaman a la API emitan un <a class="reference internal" href="exceptions.html#EncodingWarning" title="EncodingWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EncodingWarning</span></code></a> si no pasan un <code class="docutils literal notranslate"><span class="pre">encoding</span></code>. Sin embargo, considere usar UTF-8 de forma predeterminada (es decir, <code class="docutils literal notranslate"><span class="pre">encoding=&quot;utf-8&quot;</span></code>) para las nuevas API.</p>
+</section>
+</section>
+<section id="high-level-module-interface">
+<h2>Interfaz de módulo de alto nivel<a class="headerlink" href="#high-level-module-interface" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="io.DEFAULT_BUFFER_SIZE">
+<span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_BUFFER_SIZE</span></span><a class="headerlink" href="#io.DEFAULT_BUFFER_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un <em>int</em> que contiene el búfer de tamaño predeterminado usado por las clases de tipo E/S. <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> utiliza el <em>blksize</em> del archivo (obtenido por <a class="reference internal" href="os.html#os.stat" title="os.stat"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.stat()</span></code></a>) si es posible.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="io.open">
+<span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closefd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.open" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esto es un alias para la función incorporada <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a>.</p>
+<p class="audit-hook">Lanza un <a class="reference internal" href="sys.html#auditing"><span class="std std-ref">auditing event</span></a> <code class="docutils literal notranslate"><span class="pre">open</span></code> con los argumentos <code class="docutils literal notranslate"><span class="pre">path</span></code>, <code class="docutils literal notranslate"><span class="pre">mode</span></code>, <code class="docutils literal notranslate"><span class="pre">flags</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="io.open_code">
+<span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">open_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.open_code" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Abre el archivo dado con el modo <code class="docutils literal notranslate"><span class="pre">'rb'</span></code>. Esta función debe ser usado cuando la intención es tratar el contenido como código ejecutable.</p>
+<p><code class="docutils literal notranslate"><span class="pre">path</span></code> debe ser un <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> y una ruta absoluta.</p>
+<p>Se puede anular el comportamiento de esta función haciendo un pedido anterior a <a class="reference internal" href="../c-api/file.html#c.PyFile_SetOpenCodeHook" title="PyFile_SetOpenCodeHook"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyFile_SetOpenCodeHook()</span></code></a>. Sin embargo, asumiendo que <code class="docutils literal notranslate"><span class="pre">path</span></code> es un <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> y una ruta absoluta, <code class="docutils literal notranslate"><span class="pre">open_code(path)</span></code> debería manejarse al igual que <code class="docutils literal notranslate"><span class="pre">open(path,</span> <span class="pre">‘rb')</span></code>. El propósito de anular el comportamiento existe para validación adicional o para el preprocesamiento del archivo.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="io.text_encoding">
+<span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">text_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.text_encoding" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta es una función auxiliar para personas que llaman que usan <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> o <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> y tienen un parámetro <code class="docutils literal notranslate"><span class="pre">encoding=None</span></code>.</p>
+<p>This function returns <em>encoding</em> if it is not <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+Otherwise, it returns <code class="docutils literal notranslate"><span class="pre">&quot;locale&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;utf-8&quot;</span></code> depending on
+<a class="reference internal" href="os.html#utf8-mode"><span class="std std-ref">UTF-8 Mode</span></a>.</p>
+<p>This function emits an <a class="reference internal" href="exceptions.html#EncodingWarning" title="EncodingWarning"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncodingWarning</span></code></a> if
+<a class="reference internal" href="sys.html#sys.flags" title="sys.flags"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.flags.warn_default_encoding</span></code></a> is true and <em>encoding</em>
+is <code class="docutils literal notranslate"><span class="pre">None</span></code>. <em>stacklevel</em> specifies where the warning is emitted.
+For example:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">read_text</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>  <span class="c1"># stacklevel=2</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>En este ejemplo, se emite un <a class="reference internal" href="exceptions.html#EncodingWarning" title="EncodingWarning"><code class="xref py py-class docutils literal notranslate"><span class="pre">EncodingWarning</span></code></a> para el llamador de <code class="docutils literal notranslate"><span class="pre">read_text()</span></code>.</p>
+<p>Consulte <a class="reference internal" href="#io-text-encoding"><span class="std std-ref">Codificación de texto</span></a> para obtener más información.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><a class="reference internal" href="#io.text_encoding" title="io.text_encoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">text_encoding()</span></code></a> retornará «utf-8» cuando esté habilitado el modo UTF-8 y el <em>encoding</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="io.BlockingIOError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BlockingIOError</span></span><a class="headerlink" href="#io.BlockingIOError" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esto es un alias de compatibilidad para la incorporada excepción <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="io.UnsupportedOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">UnsupportedOperation</span></span><a class="headerlink" href="#io.UnsupportedOperation" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una excepción heredando <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a> y <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> que es generado cuando se llama a una operación no admitida en un <em>stream</em>.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<dl class="simple">
+<dt><a class="reference internal" href="sys.html#module-sys" title="sys: Access system-specific parameters and functions."><code class="xref py py-mod docutils literal notranslate"><span class="pre">sys</span></code></a></dt><dd><p>contiene los <em>streams</em> estándar de IO <a class="reference internal" href="sys.html#sys.stdin" title="sys.stdin"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdin</span></code></a>, <a class="reference internal" href="sys.html#sys.stdout" title="sys.stdout"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdout</span></code></a>, y <a class="reference internal" href="sys.html#sys.stderr" title="sys.stderr"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stderr</span></code></a>.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="class-hierarchy">
+<h2>Jerarquía de clases<a class="headerlink" href="#class-hierarchy" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La implementación de <em>streams</em> E/S está organizada como una jerarquía de clases. Primero <a class="reference internal" href="../glossary.html#term-abstract-base-class"><span class="xref std std-term">abstract base classes</span></a> (ABC), que son usados para especificar las varias categorías de <em>streams</em>, luego las clases concretas proveen un <em>stream</em> estándar de implementaciones.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Las clases abstractas base también proveen implementaciones predeterminadas de algunos métodos para ayudar implementar clases de <em>streams</em> concretos. Por ejemplo, <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> proporciona implementaciones no optimizadas de <code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code> y <a class="reference internal" href="#io.IOBase.readline" title="io.IOBase.readline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readline()</span></code></a>.</p>
+</div>
+</div></blockquote>
+<p>En la parte superior de la jerarquía E/S está la clase abstracta base <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>. Define la interfaz básica del <em>stream</em>. Tenga en cuenta que no hay separación entre <em>streams</em> de lectura y escritura; implementaciones están permitidos lanzar <a class="reference internal" href="#io.UnsupportedOperation" title="io.UnsupportedOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnsupportedOperation</span></code></a> si no apoyan la operación.</p>
+<p>La clase <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> extiende <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>. Maneja la lectura y escritura de bytes a un <em>stream</em>. <a class="reference internal" href="#io.FileIO" title="io.FileIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileIO</span></code></a> subclasifica <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> para proveer una interfaz a los archivos en el sistema de archivos de la máquina.</p>
+<p>The <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> ABC extends <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>.  It deals with
+buffering on a raw binary stream (<a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>).  Its subclasses,
+<a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a>, <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a>, and <a class="reference internal" href="#io.BufferedRWPair" title="io.BufferedRWPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRWPair</span></code></a>
+buffer raw binary streams that are writable, readable, and both readable and writable,
+respectively. <a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a> provides a buffered interface to seekable streams.
+Another <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> subclass, <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a>, is a stream of
+in-memory bytes.</p>
+<p>El <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> ABC, otra subclasificación de <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>, trata con los streams cuyos bytes representan texto, y maneja la codificación y decodificación para cadenas de caracteres y de estos mismos. <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a>, que extiende <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>, es un interfaz textual almacenado un <em>stream</em> sin formato amortiguado (<a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>). Finalmente, <a class="reference internal" href="#io.StringIO" title="io.StringIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></a>  es una stream en memoria para texto.</p>
+<p>Los nombres de los argumentos no son parte de la especificación, y solo los argumentos de <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> están destinados a ser utilizados como argumentos de palabras clave.</p>
+<p>La siguiente tabla resume los ABC proporcionado por el módulo <a class="reference internal" href="#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> module:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 15%" />
+<col style="width: 21%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ABC</p></th>
+<th class="head"><p>Hereda</p></th>
+<th class="head"><p>Métodos de trozos (<em>Stub</em>)</p></th>
+<th class="head"><p>Métodos mixin y propiedades</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a></p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fileno</span></code>, <code class="docutils literal notranslate"><span class="pre">seek</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">truncate</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">close</span></code>, <code class="docutils literal notranslate"><span class="pre">closed</span></code>, <code class="docutils literal notranslate"><span class="pre">__enter__</span></code>,
+<code class="docutils literal notranslate"><span class="pre">__exit__</span></code>, <code class="docutils literal notranslate"><span class="pre">flush</span></code>, <code class="docutils literal notranslate"><span class="pre">isatty</span></code>, <code class="docutils literal notranslate"><span class="pre">__iter__</span></code>,
+<code class="docutils literal notranslate"><span class="pre">__next__</span></code>, <code class="docutils literal notranslate"><span class="pre">readable</span></code>, <code class="docutils literal notranslate"><span class="pre">readline</span></code>,
+<code class="docutils literal notranslate"><span class="pre">readlines</span></code>, <code class="docutils literal notranslate"><span class="pre">seekable</span></code>, <code class="docutils literal notranslate"><span class="pre">tell</span></code>,
+<code class="docutils literal notranslate"><span class="pre">writable</span></code>, and <code class="docutils literal notranslate"><span class="pre">writelines</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a></p></td>
+<td><p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">readinto</span></code> and
+<code class="docutils literal notranslate"><span class="pre">write</span></code></p></td>
+<td><p>Métodos <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> heredados, <code class="docutils literal notranslate"><span class="pre">read</span></code>, and <code class="docutils literal notranslate"><span class="pre">readall</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a></p></td>
+<td><p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">detach</span></code>, <code class="docutils literal notranslate"><span class="pre">read</span></code>,
+<code class="docutils literal notranslate"><span class="pre">read1</span></code>, and <code class="docutils literal notranslate"><span class="pre">write</span></code></p></td>
+<td><p>Métodos <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> heredados, <code class="docutils literal notranslate"><span class="pre">readinto</span></code>, and <code class="docutils literal notranslate"><span class="pre">readinto1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a></p></td>
+<td><p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">detach</span></code>, <code class="docutils literal notranslate"><span class="pre">read</span></code>,
+<code class="docutils literal notranslate"><span class="pre">readline</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">write</span></code></p></td>
+<td><p>Métodos <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> heredados, <code class="docutils literal notranslate"><span class="pre">encoding</span></code>, <code class="docutils literal notranslate"><span class="pre">errors</span></code>, and <code class="docutils literal notranslate"><span class="pre">newlines</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<section id="i-o-base-classes">
+<h3>Clases base E/S<a class="headerlink" href="#i-o-base-classes" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="io.IOBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">IOBase</span></span><a class="headerlink" href="#io.IOBase" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase base abstracta para todas las clases de E/S.</p>
+<p>Esta clase provee implementaciones abstractas vacías para muchos métodos que clases que derivadas pueden anular selectivamente; la implementación predeterminada representa un archivo que no se puede leer, grabar o ser buscado.</p>
+<p>Aunque <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> no declara el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code> o <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> porque sus firmas varían, implementaciones y clientes deberían considerar usar métodos como parte de la interfaz. Las implementaciones también podrían lanzar un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> (o <a class="reference internal" href="#io.UnsupportedOperation" title="io.UnsupportedOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnsupportedOperation</span></code></a>) cuando operaciones que estos no apoyan son usados.</p>
+<p>El tipo básico usado para leer datos binarios o grabar un archivo es <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. Otros <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like objects</span></a> son aceptados como argumentos para métodos también. Clases de tipo E/S funcionan usando datos de tipo <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
+<p>Tenga en cuenta que llamando cualquier método (incluso indagaciones) en un <em>stream</em> cerrada es indefinido. En este caso implementaciones podrían lanzar un error <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> (y sus subclasificaciones) apoyan el protocolo iterador, significando que un objeto de clase <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> puede ser iterado sobre el rendimiento de las líneas en un <em>stream</em> de datos. Líneas son definidas un poco diferente dependiendo si el <em>stream</em> es de tipo binario (produciendo <em>bytes</em>), o un <em>stream</em> de texto (produciendo cadenas de caracteres). Ver <a class="reference internal" href="#io.IOBase.readline" title="io.IOBase.readline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readline()</span></code></a> abajo.</p>
+<p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> es también un gestor de contexto y por ende apoya la declaración <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a>. En este ejemplo, <em>file</em> es cerrado después de que la declaración <code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code> termina–incluso si alguna excepción ocurre:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;spam.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Spam and eggs!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> provee los siguientes atributos y métodos:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el <em>stream</em>. Este método no tiene efecto si el archivo ya está cerrado. Cuándo está cerrado, cualquier operación que se le haga al archivo (ej. leer or grabar) lanzará el error <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<p>Como conveniencia, se permite llamar este método más que una vez. Sin embargo, solamente el primer llamado tenderá efecto.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.IOBase.closed">
+<span class="sig-name descname"><span class="pre">closed</span></span><a class="headerlink" href="#io.IOBase.closed" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> si está cerrada el <em>stream</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.fileno">
+<span class="sig-name descname"><span class="pre">fileno</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.fileno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el descriptor de archivo subyacente (un número de tipo entero) de el <em>stream</em> si existe. Un <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a> se lanza si el objeto IO no tiene un archivo descriptor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.flush" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Vacía los buffers de grabación del <em>stream</em> si corresponde. Esto no hace nada para <em>streams</em> que son solamente de lectura o <em>streams</em> sin bloqueo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.isatty">
+<span class="sig-name descname"><span class="pre">isatty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.isatty" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>  si el <em>stream</em> es interactiva (ej., si está conectado a un terminal o dispositivo tty).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.readable">
+<span class="sig-name descname"><span class="pre">readable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.readable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si el <em>stream</em> puede ser leída. Si es <code class="docutils literal notranslate"><span class="pre">False</span></code>, el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code>  lanzará un <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.readline">
+<span class="sig-name descname"><span class="pre">readline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.readline" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna una línea del <em>stream</em>. Si <em>size</em> (tamaño) es especificado, se capturará un máximo de ése mismo tamaño especificado en <em>bytes</em>.</p>
+<p>El terminador de la línea siempre es <code class="docutils literal notranslate"><span class="pre">b'\n'</span></code> para archivos de tipo binario; para archivos de tipo texto el argumento <em>newline</em> para la función <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> pueden ser usados para seleccionar las líneas terminadoras reconocidas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.readlines">
+<span class="sig-name descname"><span class="pre">readlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.readlines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna una lista de líneas del <em>stream</em>. <em>hint</em> puede ser especificado para controlar el número de líneas que se lee: no se leerán más líneas si el tamaño total (en <em>bytes</em> / caracteres) de todas las líneas excede <em>hint</em>.</p>
+<p>Los valores <em>hint</em> de <code class="docutils literal notranslate"><span class="pre">0</span></code> o menos, así como <code class="docutils literal notranslate"><span class="pre">None</span></code>, se tratan como sin pista.</p>
+<p>Tenga en cuenta que ya es posible iterar sobre objetos de archivo usando <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">line</span> <span class="pre">in</span> <span class="pre">file:</span> <span class="pre">…</span></code> sin llamar <code class="docutils literal notranslate"><span class="pre">file.readlines()</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.seek">
+<span class="sig-name descname"><span class="pre">seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SEEK_SET</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.seek" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cambiar la posición del <em>stream</em> al dado <em>byte</em> <em>offset</em>. <em>offset</em> se interpreta en relación con la posición indicada por <em>whence</em>. El valor dado para <em>whence</em> es <code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_SET</span></code>. Valores para <em>whence</em> son:</p>
+<ul class="simple">
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_SET</span></code> o <code class="docutils literal notranslate"><span class="pre">0</span></code> – inicio del <em>stream</em> (el dado); <em>offset</em> debería ser cero o positivo</p></li>
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_CUR</span></code> o <code class="docutils literal notranslate"><span class="pre">1</span></code> – posición actual del <em>stream</em>; <em>offset</em> puede ser negativo</p></li>
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_END</span></code> o <code class="docutils literal notranslate"><span class="pre">2</span></code> – fin del <em>stream</em>; <em>offset</em> is usualmente negativo</p></li>
+</ul>
+<p>Retorna la nueva posición absoluta.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1: </span>Los constantes <code class="docutils literal notranslate"><span class="pre">SEEK_*</span></code>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3: </span>Algunos sistemas operativos pueden apoyar valores adicionales, como <code class="xref py py-data docutils literal notranslate"><span class="pre">os.SEEK_HOLE</span></code> o <code class="xref py py-data docutils literal notranslate"><span class="pre">os.SEEK_DATA</span></code>. Los valores válidos para un archivo podrían depender de que esté abierto en modo texto o binario.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.seekable">
+<span class="sig-name descname"><span class="pre">seekable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.seekable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si el <em>stream</em> apoya acceso aleatorio. Si retorna <code class="docutils literal notranslate"><span class="pre">False</span></code>, <a class="reference internal" href="#io.IOBase.seek" title="io.IOBase.seek"><code class="xref py py-meth docutils literal notranslate"><span class="pre">seek()</span></code></a>, <a class="reference internal" href="#io.IOBase.tell" title="io.IOBase.tell"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tell()</span></code></a> y <a class="reference internal" href="#io.IOBase.truncate" title="io.IOBase.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">truncate()</span></code></a>  lanzarán <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.tell">
+<span class="sig-name descname"><span class="pre">tell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.tell" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la posición actual del <em>stream</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.truncate">
+<span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.truncate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cambia el tamaño del <em>stream</em> al <em>size</em> dado en <em>bytes</em> (o la posición actual si no se especifica <em>size</em>). La posición actual del <em>stream</em> no se cambia. Este cambio de tamaño puede incrementar o reducir el tamaño actual del archivo. En caso de extensión, los contenidos del área del nuevo archivo depende de la plataforma (en la mayoría de los sistemas <em>bytes</em> adicionales son llenos de cero). Se retorna el nuevo tamaño del archivo.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span><em>Windows</em> llenará los archivos con cero cuando extienda.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.writable">
+<span class="sig-name descname"><span class="pre">writable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.writable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si el <em>stream</em> apoya grabación.  Si retorna <code class="docutils literal notranslate"><span class="pre">False</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> y <a class="reference internal" href="#io.IOBase.truncate" title="io.IOBase.truncate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">truncate()</span></code></a> lanzarán <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.writelines">
+<span class="sig-name descname"><span class="pre">writelines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.writelines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribir una lista de líneas al <em>stream</em>. No se agrega separadores de líneas, así que es usual que las líneas tengan separador al final.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.IOBase.__del__">
+<span class="sig-name descname"><span class="pre">__del__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.IOBase.__del__" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Prepara para la destrucción de un objeto. <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a> proporciona una implementación dada de este método que ejecuta las instancias del método <a class="reference internal" href="#io.IOBase.close" title="io.IOBase.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">close()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.RawIOBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">RawIOBase</span></span><a class="headerlink" href="#io.RawIOBase" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Base class for raw binary streams.  It inherits <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>.</p>
+<p>Los flujos binarios sin procesar generalmente brindan acceso de bajo nivel a un dispositivo OS subyacente o API, y no intentan encapsularlos en primitivas de alto nivel (esta funcionalidad se realiza en un nivel superior en flujos binarios almacenados en búfer y flujos de texto, que se describen más adelante en esta página).</p>
+<p><a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> proporciona estos métodos además de los de <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.RawIOBase.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.RawIOBase.read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee hasta el <em>size</em> de los <em>bytes</em> del objeto y los retorna. Como conveniencia si no se especifica <em>size</em> o es -1, se retornan todos los <em>bytes</em> hasta que se retorne el fin del archivo. Sino, se hace solo un llamado al sistema. Se pueden retornar menos de <em>size</em> <em>bytes</em> si la llamada del sistema operativo retorna menos de <em>size</em> <em>bytes</em>.</p>
+<p>Si se retorna 0 <em>bytes</em> y el <em>size</em> no era 0, esto indica que es el fin del archivo. Si el objeto está en modo sin bloqueo y no hay <em>bytes</em> disponibles, se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>La implementación dada difiera al método <a class="reference internal" href="#io.RawIOBase.readall" title="io.RawIOBase.readall"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readall()</span></code></a> y <a class="reference internal" href="#io.RawIOBase.readinto" title="io.RawIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.RawIOBase.readall">
+<span class="sig-name descname"><span class="pre">readall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.RawIOBase.readall" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna todos los <em>bytes</em> del <em>stream</em> hasta llegar al fin del archivo, usando, si es necesario, varias llamadas al <em>stream</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.RawIOBase.readinto">
+<span class="sig-name descname"><span class="pre">readinto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.RawIOBase.readinto" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee <em>bytes</em> en objeto pre-asignado y grabable <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> <em>b</em>, y retorna el número de <em>bytes</em> leído. Por ejemplo, <em>b</em> puede ser una clase de tipo <a class="reference internal" href="stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>. Si el objeto está en modo sin bloquear y no hay <em>bytes</em> disponibles, se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.RawIOBase.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.RawIOBase.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> dado, <em>b</em>, al <em>stream</em> subyacente y retorna la cantidad de <em>bytes</em> grabadas. Esto puede ser menos que la longitud de <em>b</em> en <em>bytes</em>, dependiendo de la especificaciones del <em>stream</em> subyacente, especialmente si no está en modo no-bloqueo. <code class="docutils literal notranslate"><span class="pre">None</span></code> se retorna si el <em>stream</em> sin formato está configurado para no bloquear y ningún <em>byte</em> puede ser rápidamente grabada. El llamador puede deshacer o mutar <em>b</em> después que retorne este método, así que la implementación solo debería acceder <em>b</em> durante la ejecución al método.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BufferedIOBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BufferedIOBase</span></span><a class="headerlink" href="#io.BufferedIOBase" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Base class for binary streams that support some kind of buffering.
+It inherits <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>.</p>
+<p>La diferencia principal de <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> es que los métodos <a class="reference internal" href="#io.BufferedIOBase.read" title="io.BufferedIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a>, <a class="reference internal" href="#io.BufferedIOBase.readinto" title="io.BufferedIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a> y <a class="reference internal" href="#io.BufferedIOBase.write" title="io.BufferedIOBase.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> intentarán (respectivamente) leer la cantidad de información solicitada o consumir toda la salida dada, a expensas de hacer más de una llamada al sistema.</p>
+<p>Adicionalmente, esos métodos pueden lanzar un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> si el <em>stream</em> sin formato subyacente está en modo no bloqueo y no puede obtener or dar más datos; a diferencia de sus contrapartes <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>, estos nunca retornarán <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Además, el método <a class="reference internal" href="#io.BufferedIOBase.read" title="io.BufferedIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> no tiene una implementación dada que difiere al método <a class="reference internal" href="#io.BufferedIOBase.readinto" title="io.BufferedIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a>.</p>
+<p>Una implementación típica de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> no debería heredar una implementación de <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>, es más, debería envolver como uno, así como hacen las clases <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a> y <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a>.</p>
+<p><a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> proporciona o anula estos atributos y métodos de datos además de los de <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.BufferedIOBase.raw">
+<span class="sig-name descname"><span class="pre">raw</span></span><a class="headerlink" href="#io.BufferedIOBase.raw" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El <em>stream</em> sin formato subyacente ( una instancia <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>) que <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> maneja. Esto no es parte de la API <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> y posiblemente no exista en algunas implementaciones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.detach">
+<span class="sig-name descname"><span class="pre">detach</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.detach" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Separa el <em>stream</em> subyacente del búfer y lo retorna.</p>
+<p>Luego que el <em>stream</em> sin formato ha sido separado, el búfer está en un estado inutilizable.</p>
+<p>Algunos búfer, como <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a>, no tienen el concepto de un <em>stream</em> sin formato singular para retornar de este método. Lanza un <a class="reference internal" href="#io.UnsupportedOperation" title="io.UnsupportedOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnsupportedOperation</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna hasta <em>size</em> en <em>bytes</em>. Si el argumento está omitido, <code class="docutils literal notranslate"><span class="pre">None</span></code>, o es negativo, los datos son leídos y retornados hasta que se alcance el fin del archivo. Un objeto <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> vacío se retorna si el <em>stream</em> está al final del archivo.</p>
+<p>Si el argumento es positivo, y el <em>stream</em> subyacente no es interactiva, varias lecturas sin formato pueden ser otorgadas para satisfacer la cantidad de <em>byte</em> (al menos que primero se llegue al fin del archivo). Pero para los <em>streams</em> sin formato interactivas, a lo sumo una lectura sin formato será  emitida y un resultado corto no implica que se haya llegado al fin del archivo.</p>
+<p>Un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> se lanza si el <em>stream</em> subyacente está en modo no bloqueo y no tiene datos al momento.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.read1">
+<span class="sig-name descname"><span class="pre">read1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.read1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna hasta <em>size</em> en <em>bytes</em> con al menos una llamada al método <a class="reference internal" href="#io.RawIOBase.read" title="io.RawIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> (o <a class="reference internal" href="#io.RawIOBase.readinto" title="io.RawIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a>) del <em>stream</em> subyacente. Esto puede ser útil si estás implementando tu propio búfer por encima de un objeto <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>.</p>
+<p>Si <em>size</em> es <code class="docutils literal notranslate"><span class="pre">-1</span></code> (el valor dado) se retorna un monto arbitrario de <em>bytes</em> (más que cero al menos que se haya llegado al fin del archivo).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.readinto">
+<span class="sig-name descname"><span class="pre">readinto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.readinto" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee <em>bytes</em> a un objeto predeterminado y grabable <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> <em>b</em> y retorna el número de <em>bytes</em> leídos. Por ejemplo, <em>b</em> puede ser un <a class="reference internal" href="stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
+<p>Como <a class="reference internal" href="#io.BufferedIOBase.read" title="io.BufferedIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a>, varias lecturas pueden ser otorgadas al <em>stream</em> sin formato subyacente al menos que esto último sea interactivo.</p>
+<p>Un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> se lanza si el <em>stream</em> subyacente está en modo no bloqueo y no tiene datos al momento.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.readinto1">
+<span class="sig-name descname"><span class="pre">readinto1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.readinto1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Leer <em>bytes</em> a un objeto predeterminado y grabable <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> <em>b</em> usando por lo menos una llamada al método <a class="reference internal" href="#io.RawIOBase.read" title="io.RawIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> (o <a class="reference internal" href="#io.RawIOBase.readinto" title="io.RawIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a>) del <em>stream</em> subyacente. Retorna la cantidad de <em>bytes</em> leídas.</p>
+<p>Un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> se lanza si el <em>stream</em> subyacente está en modo no bloqueo y no tiene datos al momento.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedIOBase.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedIOBase.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe el <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> dado, <em>b</em>, y retorna el número de bytes grabados (siempre el equivalente en longitud de <em>b</em> en bytes, ya que si falla la grabación se lanza un <a class="reference internal" href="exceptions.html#OSError" title="OSError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a>). Dependiendo en la implementación actual estos bytes pueden ser grabados rápidamente al <em>stream</em> subyacente o mantenido en un búfer por razones de rendimiento y latencia.</p>
+<p>Cuando estás en modo no bloqueo, se lanza un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> si los datos tenían que ser grabadas al <em>stream</em> sin formato pero no pudo aceptar todos los datos sin bloquear.</p>
+<p>El llamador puede otorgar o mutar <em>b</em> después que este método retorne algo, entonces la implementación debería acceder solamente a <em>b</em> durante la llamada al método.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="raw-file-i-o">
+<h3>Archivo sin formato E/S<a class="headerlink" href="#raw-file-i-o" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="io.FileIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">FileIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closefd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.FileIO" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una secuencia binaria sin procesar que representa un archivo de nivel de sistema operativo que contiene datos en bytes. Hereda <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a>.</p>
+<p>El <em>name</em> puede ser una de dos cosas:</p>
+<ul class="simple">
+<li><p>una cadena de caracteres u objeto de tipo <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> representando la ruta del archivo en la que fue abierto. En este caso <em>closefd</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code> (el valor dado) de otra manera un error será dada.</p></li>
+<li><p>un <em>integer</em> representando el número de descriptores de archivos de nivel OS que resultan dando acceso a través del objeto <a class="reference internal" href="#io.FileIO" title="io.FileIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileIO</span></code></a>. Cuando el objeto <em>FileIO</em> está cerrado este fd cerrará también a no ser que <em>closefd</em> esté configurado a <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+<p>El <em>mode</em> puede ser <code class="docutils literal notranslate"><span class="pre">'r'</span></code>, <code class="docutils literal notranslate"><span class="pre">'w'</span></code>, <code class="docutils literal notranslate"><span class="pre">'x'</span></code> o <code class="docutils literal notranslate"><span class="pre">'a'</span></code> para lectura (el valor dado), grabación, creación exclusiva o anexando. Si no existe el archivo se creará cuando se abra para grabar o anexar; se truncará cuando se abra para grabar. Se lanzará un error <a class="reference internal" href="exceptions.html#FileExistsError" title="FileExistsError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FileExistsError</span></code></a>   si ya existe cuando se abra para crear. Abriendo un archivo para crear implica grabar entonces este modo se comporta similarmente a <code class="docutils literal notranslate"><span class="pre">'w'</span></code>. Agrega un <code class="docutils literal notranslate"><span class="pre">'+'</span></code>  al modo para permitir lectura y grabación simultáneas.</p>
+<p>Los métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code> (cuando se llama con un argumento positivo), <code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> en esta clase harán solo una llamada al sistema.</p>
+<p>Un abridor personalizado puede ser usado pasando un llamador como <em>opener</em>. El descriptor de archivo subyacente es obtenido llamando <em>opener</em> con (<em>name</em>, <em>flags</em>). <em>opener</em> debe retornar un descriptor de archivo abierto (pasando <a class="reference internal" href="os.html#os.open" title="os.open"><code class="xref py py-mod docutils literal notranslate"><span class="pre">os.open</span></code></a> como <em>opener</em> resulta con funcionamiento similar a pasando <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p>
+<p>El archivo recién creado es <a class="reference internal" href="os.html#fd-inheritance"><span class="std std-ref">non-inheritable</span></a>.</p>
+<p>Ver la función incorporada <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> para ejemplos usando el parámetro <em>opener</em>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>El parámetro <em>opener</em> fue agregado. El modo <code class="docutils literal notranslate"><span class="pre">'x'</span></code> fue agregado.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>El archivo ahora no es heredable.</p>
+</div>
+<p><a class="reference internal" href="#io.FileIO" title="io.FileIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileIO</span></code></a> proporciona estos atributos de datos además de los de <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.FileIO.mode">
+<span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#io.FileIO.mode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El modo dado en el constructor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.FileIO.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#io.FileIO.name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El nombre del archivo. Este es el descriptor del archivo cuando no se proporciona ningún nombre en el constructor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="buffered-streams">
+<h3><em>Streams</em> almacenados (búfer)<a class="headerlink" href="#buffered-streams" title="Enlazar permanentemente con este título">¶</a></h3>
+<p><em>Streams</em> E/S almacenadas (búfer) proveen una interfaz de más alto nivel a un dispositivo E/S que a un E/S sin formato.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BytesIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BytesIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BytesIO" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una secuencia binaria que utiliza un búfer de bytes en memoria. Hereda <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>. El búfer se descarta cuando se llama al método <a class="reference internal" href="#io.IOBase.close" title="io.IOBase.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">close()</span></code></a>.</p>
+<p>El argumento opcional <em>initial_bytes</em> es un <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> que contiene datos iniciales.</p>
+<p><a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a> provee o anula estos métodos además de los de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BytesIO.getbuffer">
+<span class="sig-name descname"><span class="pre">getbuffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.BytesIO.getbuffer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una vista legible y grabable acerca de los contenidos del búfer sin copiarlos. Además mutando la vista actualizará de forma transparente los contenidos del búfer:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;abcdef&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">view</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">view</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;56&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+<span class="go">b&#39;ab56ef&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Mientras exista la vista el objeto <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a> no se le puede cambiar el tamaño o cerrado.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BytesIO.getvalue">
+<span class="sig-name descname"><span class="pre">getvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.BytesIO.getvalue" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> que contiene los contenidos enteros del búfer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BytesIO.read1">
+<span class="sig-name descname"><span class="pre">read1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BytesIO.read1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>En la clase <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a> esto es lo mismo que <a class="reference internal" href="#io.BufferedIOBase.read" title="io.BufferedIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Ahora es opcional el argumento <em>size</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BytesIO.readinto1">
+<span class="sig-name descname"><span class="pre">readinto1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BytesIO.readinto1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>En la clase <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a> esto es lo mismo que <a class="reference internal" href="#io.BufferedIOBase.readinto" title="io.BufferedIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BufferedReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BufferedReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DEFAULT_BUFFER_SIZE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedReader" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una secuencia binaria almacenada en búfer que proporciona acceso de nivel superior a una secuencia binaria sin procesar <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> legible y no buscable. Hereda <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>.</p>
+<p>Al leer datos de este objeto, es posible que se solicite una mayor cantidad de datos del flujo sin procesar subyacente y se mantenga en un búfer interno. Los datos almacenados en búfer se pueden retornar directamente en lecturas posteriores.</p>
+<p>El constructor crea un <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> para el <em>stream</em> legible sin formato <em>raw</em> y <em>buffer_size</em>. Si se omite <em>buffer_size</em> se usa <a class="reference internal" href="#io.DEFAULT_BUFFER_SIZE" title="io.DEFAULT_BUFFER_SIZE"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_BUFFER_SIZE</span></code></a>.</p>
+<p><a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> provee o anula los métodos en adición a los de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedReader.peek">
+<span class="sig-name descname"><span class="pre">peek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedReader.peek" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <em>bytes</em> del <em>stream</em> sin avanzar la posición. Al menos una lectura se hace al <em>stream</em> sin formato para satisfacer el llamado. El número de bytes retornados puede ser menor o mayor al solicitado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedReader.read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna <em>size</em> <em>bytes</em> o si no se da <em>size</em>, o es negativo, hasta el fin del archivo o si la llamada leída podría bloquear in modo no bloquear.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedReader.read1">
+<span class="sig-name descname"><span class="pre">read1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedReader.read1" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna hasta el tamaño <em>size</em> en <em>bytes</em> con solo un llamado al <em>stream</em>. Si al menos un <em>byte</em> pasa por el proceso de búfer, solo se retornan <em>buffered bytes</em>. De lo contrario se realiza un llamado de lectura de un <em>stream</em> sin formato.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Ahora es opcional el argumento <em>size</em>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BufferedWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BufferedWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DEFAULT_BUFFER_SIZE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedWriter" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un flujo binario almacenado en búfer que proporciona acceso de nivel superior a un flujo binario sin formato <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> que se puede escribir y no se puede buscar. Hereda <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>.</p>
+<p>Al escribir en este objeto, los datos normalmente se colocan en un búfer interno. El búfer se escribirá en el objeto <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> subyacente en varias condiciones, que incluyen:</p>
+<ul class="simple">
+<li><p>cuando el búfer se vuelve demasiado pequeño para todos los datos pendientes;</p></li>
+<li><p>cuando se llama <a class="reference internal" href="#io.BufferedWriter.flush" title="io.BufferedWriter.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code></a>;</p></li>
+<li><p>cuando se pide un método <code class="xref py py-meth docutils literal notranslate"><span class="pre">seek()</span></code> (para objetos <a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a>);</p></li>
+<li><p>cuando el objeto <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a> is cerrado o anulado.</p></li>
+</ul>
+<p>El constructor crea un <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a> para el <em>stream</em> grabable <em>raw</em>. Si no es dado el <em>buffer_size</em>, recurre el valor <a class="reference internal" href="#io.DEFAULT_BUFFER_SIZE" title="io.DEFAULT_BUFFER_SIZE"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_BUFFER_SIZE</span></code></a>.</p>
+<p><a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a> provee o anula estos métodos además de los de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedWriter.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedWriter.flush" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Forzar bytes retenidos en el búfer al <em>stream</em> sin formato. Un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> debería ser lanzado si el <em>stream</em> sin formato bloquea.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.BufferedWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedWriter.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe el <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>, <em>b</em>, y retorna el número de bytes grabados. Cuando estás en modo no-bloqueo, se lanza un <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a> si el búfer tiene que ser escrito pero el <em>stream</em> sin formato bloquea.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BufferedRandom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BufferedRandom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DEFAULT_BUFFER_SIZE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedRandom" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un flujo binario almacenado en búfer que proporciona acceso de nivel superior a un flujo binario sin formato <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> que se puede buscar. Hereda <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> y <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a>.</p>
+<p>El constructor crea un lector y una grabación para un <em>stream</em> sin formato buscable, dado en el primer argumento. Si se omite el <em>buffer_size</em> este recae sobre el valor predeterminado <a class="reference internal" href="#io.DEFAULT_BUFFER_SIZE" title="io.DEFAULT_BUFFER_SIZE"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_BUFFER_SIZE</span></code></a>.</p>
+<p><a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a> es capaz de todo lo que puede hacer <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a> o <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a>. Adicionalmente, se garantiza implementar <code class="xref py py-meth docutils literal notranslate"><span class="pre">seek()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">tell()</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.BufferedRWPair">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">BufferedRWPair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DEFAULT_BUFFER_SIZE</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.BufferedRWPair" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un flujo binario almacenado en búfer que proporciona acceso de nivel superior a dos flujos binarios sin procesar <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> no buscables, uno legible y el otro escribible. Hereda <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>.</p>
+<p><em>reader</em> y <em>writer</em> son objetos <a class="reference internal" href="#io.RawIOBase" title="io.RawIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawIOBase</span></code></a> que son respectivamente legibles y escribibles. Si se omite <em>buffer_size</em> este se recae sobre el valor predeterminado <a class="reference internal" href="#io.DEFAULT_BUFFER_SIZE" title="io.DEFAULT_BUFFER_SIZE"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_BUFFER_SIZE</span></code></a>.</p>
+<p><a class="reference internal" href="#io.BufferedRWPair" title="io.BufferedRWPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRWPair</span></code></a> implementa todos los métodos de <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a> excepto por <a class="reference internal" href="#io.BufferedIOBase.detach" title="io.BufferedIOBase.detach"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detach()</span></code></a>, que lanza un <a class="reference internal" href="#io.UnsupportedOperation" title="io.UnsupportedOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnsupportedOperation</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p><a class="reference internal" href="#io.BufferedRWPair" title="io.BufferedRWPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRWPair</span></code></a> no intenta sincronizar accesos al <em>stream</em> sin formato subyacente. No debes pasar el mismo objeto como legible y escribible; usa <a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a> en su lugar.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="id1">
+<h3>E/S Texto<a class="headerlink" href="#id1" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="io.TextIOBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">TextIOBase</span></span><a class="headerlink" href="#io.TextIOBase" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Base class for text streams.  This class provides a character and line based
+interface to stream I/O.  It inherits <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>.</p>
+<p><a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> provee o anula estos atributos y métodos de datos además de los de <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOBase.encoding">
+<span class="sig-name descname"><span class="pre">encoding</span></span><a class="headerlink" href="#io.TextIOBase.encoding" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El nombre de la codificación utilizada para decodificar los <em>bytes</em> del <em>stream</em> a cadenas de caracteres y para codificar cadenas de caracteres en bytes.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOBase.errors">
+<span class="sig-name descname"><span class="pre">errors</span></span><a class="headerlink" href="#io.TextIOBase.errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La configuración de error del decodificador o codificador.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOBase.newlines">
+<span class="sig-name descname"><span class="pre">newlines</span></span><a class="headerlink" href="#io.TextIOBase.newlines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una cadena de caracteres, una tupla de cadena de caracteres, o <code class="docutils literal notranslate"><span class="pre">None</span></code>, indicando las nuevas líneas traducidas hasta ese momento. Dependiendo de la implementación y los indicadores iniciales del constructor, esto puede no estar disponible.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOBase.buffer">
+<span class="sig-name descname"><span class="pre">buffer</span></span><a class="headerlink" href="#io.TextIOBase.buffer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El búfer binario subyacente (una instancia <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>) que maneja <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>. Esto no es parte del API de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> y puede no existir en algunas implementaciones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.detach">
+<span class="sig-name descname"><span class="pre">detach</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.detach" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Separa el búfer binario subyacente de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> y lo retorna.</p>
+<p>Una vez que se ha separado el búfer subyacente, la <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> está en un estado inutilizable.</p>
+<p>Algunas implementaciones de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>, como <a class="reference internal" href="#io.StringIO" title="io.StringIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></a>, puede no tener el concepto de un búfer subyacente y llamar a este método se lanzará <a class="reference internal" href="#io.UnsupportedOperation" title="io.UnsupportedOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnsupportedOperation</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee y retorna como máximo <em>size</em> caracteres del <em>stream</em> como un <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> singular. Si <em>size</em> es negativo o <code class="docutils literal notranslate"><span class="pre">None</span></code>, lee hasta llegar al fin del archivo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.readline">
+<span class="sig-name descname"><span class="pre">readline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.readline" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Leer hasta la nueva línea o fin del archivo y retorna un <code class="docutils literal notranslate"><span class="pre">str</span></code> singular. Si el <em>stream</em> está al fin del archivo una cadena de caracteres se retorna.</p>
+<p>Si se especifica <em>size</em> como máximo <em>size</em> de caracteres será leído.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.seek">
+<span class="sig-name descname"><span class="pre">seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SEEK_SET</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.seek" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cambia la posición del <em>stream</em> dada <em>offset</em>. El comportamiento depende del parámetro <em>whence</em>. El valor dado de <em>whence</em> es <code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_SET</span></code>.</p>
+<ul class="simple">
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_SET</span></code> o <code class="docutils literal notranslate"><span class="pre">0</span></code>: buscar el inicio del <em>stream</em> (el dado); <em>offset</em> debería ser un número dado por <a class="reference internal" href="#io.TextIOBase.tell" title="io.TextIOBase.tell"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TextIOBase.tell()</span></code></a>, o cero. Cualquier otro valor <em>offset</em> produce comportamiento indefinido.</p></li>
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_CUR</span></code> o <code class="docutils literal notranslate"><span class="pre">1</span></code>: buscar la posición actual; <em>offset</em> debería ser cero, que es una operación no (no se apoya ningún otro valor).</p></li>
+<li><p><code class="xref py py-data docutils literal notranslate"><span class="pre">SEEK_END</span></code> o <code class="docutils literal notranslate"><span class="pre">2</span></code>: buscar el fin del <em>stream</em>; <em>offset</em> debería ser cero (cualquier otro valor no es apoyado).</p></li>
+</ul>
+<p>Retorna la nueva posición absoluta como un número opaco.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1: </span>Los constantes <code class="docutils literal notranslate"><span class="pre">SEEK_*</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.tell">
+<span class="sig-name descname"><span class="pre">tell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.tell" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la posición actual de la secuencia como un número opaco. El número no suele representar una cantidad de bytes en el almacenamiento binario subyacente.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOBase.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOBase.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe la cadena de caracteres <em>s</em> al <em>stream</em> y retorna el número de caracteres grabadas.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.TextIOWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">TextIOWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_buffering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_through</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOWrapper" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un flujo de texto almacenado en búfer que proporciona acceso de nivel superior a un flujo binario almacenado en búfer <a class="reference internal" href="#io.BufferedIOBase" title="io.BufferedIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedIOBase</span></code></a>. Hereda <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>.</p>
+<p><em>encoding</em> gives the name of the encoding that the stream will be decoded or
+encoded with.  It defaults to <a class="reference internal" href="locale.html#locale.getencoding" title="locale.getencoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">locale.getencoding()</span></code></a>.
+<code class="docutils literal notranslate"><span class="pre">encoding=&quot;locale&quot;</span></code> can be used to specify the current locale’s encoding
+explicitly. See <a class="reference internal" href="#io-text-encoding"><span class="std std-ref">Codificación de texto</span></a> for more information.</p>
+<p><em>errors</em> es una cadena de caracteres opcional que especifica cómo se manejan los errores codificados y descodificados. Pasa <code class="docutils literal notranslate"><span class="pre">'strict'</span></code> para lanzar una excepción <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> si hay un error codificado (el valor predeterminado <code class="docutils literal notranslate"><span class="pre">None</span></code> tiene el mismo efecto), o pasa <code class="docutils literal notranslate"><span class="pre">'ignore'</span></code> para ignorar errores. (Tenga en cuenta que ignorar errores puede llevar a perder datos). <code class="docutils literal notranslate"><span class="pre">'replace'</span></code> causa un marcador de reemplazo (como <code class="docutils literal notranslate"><span class="pre">'?'</span></code>) para ser insertado donde haya datos mal formados. <code class="docutils literal notranslate"><span class="pre">'backslashreplace'</span></code> reemplaza datos mal formados con una secuencia de escape de tipo barra invertida. Cuando se escribe, <code class="docutils literal notranslate"><span class="pre">'xmlcharrefreplace'</span></code>  (reemplazar con la referencia apropiada de XML) o <code class="docutils literal notranslate"><span class="pre">'namereplace'</span></code> (reemplazar con secuencias de caracteres <code class="docutils literal notranslate"><span class="pre">\N{…}</span></code>) pueden ser usadas. Cualquier otro nombre de manejador de errores que hayan sido registrados con <a class="reference internal" href="codecs.html#codecs.register_error" title="codecs.register_error"><code class="xref py py-func docutils literal notranslate"><span class="pre">codecs.register_error()</span></code></a> también son validas.</p>
+<p id="index-4"><em>newline</em> controla cómo finalizar las terminaciones de líneas. Pueden ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">''</span></code>, <code class="docutils literal notranslate"><span class="pre">'\n'</span></code>, <code class="docutils literal notranslate"><span class="pre">'\r'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'\r\n'</span></code>. Funciona de la siguiente manera:</p>
+<ul class="simple">
+<li><p>Al leer la entrada de la secuencia, si <em>newline</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>, el modo <a class="reference internal" href="../glossary.html#term-universal-newlines"><span class="xref std std-term">universal newlines</span></a> está habilitado. Las líneas de la entrada pueden terminar en <code class="docutils literal notranslate"><span class="pre">'\n'</span></code>, <code class="docutils literal notranslate"><span class="pre">'\r'</span></code> o <code class="docutils literal notranslate"><span class="pre">'\r\n'</span></code>, y se traducen a <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> antes de retornarse al llamador. Si <em>newline</em> es <code class="docutils literal notranslate"><span class="pre">''</span></code>, el modo de salto de línea universal está habilitado, pero los finales de línea se retornan a la persona que llama sin traducir. Si <em>newline</em> tiene alguno de los otros valores legales, las líneas de entrada solo terminan con la cadena dada y la línea final se retorna al llamador sin traducir.</p></li>
+<li><p>Al escribir la salida al <em>stream</em>, si <em>newline</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>, cualquier carácter <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> escrito son traducidos a la línea separador <em>default</em> del sistema, <a class="reference internal" href="os.html#os.linesep" title="os.linesep"><code class="xref py py-data docutils literal notranslate"><span class="pre">os.linesep</span></code></a>. Si <em>newline</em> es <code class="docutils literal notranslate"><span class="pre">''</span></code> o <code class="docutils literal notranslate"><span class="pre">'\n'</span></code>, la traducción no ocurre. Si <em>newline</em> es de cualquier de los otros valores legales, cualquier carácter <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> escrito es traducido a la cadena de caracteres dada.</p></li>
+</ul>
+<p>Si <em>line_buffering</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, se implica <code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code> cuando una llamada a grabar contiene un carácter de nueva línea o un retorno.</p>
+<p>Si <em>write_through</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, llamadas a <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> no garantizan ser pasados por el proceso de búfer: cualquier dato grabado en el objeto <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> es inmediatamente manejado por el <em>buffer</em> binario subyacente.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Se ha agregado el argumento <em>write_through</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>La codificación (<em>encoding</em>) por defecto es ahora <code class="docutils literal notranslate"><span class="pre">locale.getpreferredencoding(False)</span></code> en vez de <code class="docutils literal notranslate"><span class="pre">locale.getpreferredencoding()</span></code>. No cambie temporalmente la codificación local usando <a class="reference internal" href="locale.html#locale.setlocale" title="locale.setlocale"><code class="xref py py-func docutils literal notranslate"><span class="pre">locale.setlocale()</span></code></a>, use la codificación local actual en vez del preferido del usuario.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>El argumento <em>encoding</em> ahora admite el nombre de codificación ficticia <code class="docutils literal notranslate"><span class="pre">&quot;locale&quot;</span></code>.</p>
+</div>
+<p><a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> proporciona estos atributos y métodos de datos además de los de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOWrapper.line_buffering">
+<span class="sig-name descname"><span class="pre">line_buffering</span></span><a class="headerlink" href="#io.TextIOWrapper.line_buffering" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el almacenamiento en línea está habilitado.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="io.TextIOWrapper.write_through">
+<span class="sig-name descname"><span class="pre">write_through</span></span><a class="headerlink" href="#io.TextIOWrapper.write_through" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si grabaciones son pasadas inmediatamente al búfer binario subyacente.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="io.TextIOWrapper.reconfigure">
+<span class="sig-name descname"><span class="pre">reconfigure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_buffering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_through</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.TextIOWrapper.reconfigure" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Reconfigura este <em>stream</em> textual usando las nuevas configuraciones de <em>encoding</em>, <em>errors</em>, <em>newline</em>, <em>line_buffering</em> y <em>write_through</em>.</p>
+<p>Los parámetros que no son especificados mantienen las configuraciones actuales, excepto por <code class="docutils literal notranslate"><span class="pre">errors='strict'</span></code> cuando <em>encoding</em> se especifica pero <em>errors</em> no está especificado.</p>
+<p>No es posible cambiar la codificación o nueva línea si algunos datos han sido captados por el <em>stream</em>. Sin embargo, cambiando la codificación después de grabar es posible.</p>
+<p>Este método hace una nivelación implícita del <em>stream</em> antes de configurar los nuevos parámetros.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>El método admite la opción <code class="docutils literal notranslate"><span class="pre">encoding=&quot;locale&quot;</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="io.StringIO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">StringIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\n'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#io.StringIO" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una secuencia de texto que utiliza un búfer de texto en memoria. Hereda <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>.</p>
+<p>El búfer de texto se descarta cuando se llama al método <a class="reference internal" href="#io.IOBase.close" title="io.IOBase.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">close()</span></code></a>.</p>
+<p>El valor inicial del búfer se puede establecer proporcionando <em>initial_value</em>. Si la traducción de nuevas líneas está habilitada, las nuevas líneas se codificarán como si fueran <a class="reference internal" href="#io.TextIOBase.write" title="io.TextIOBase.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>. La secuencia se coloca al comienzo del búfer que emula la apertura de un archivo existente en un modo <code class="docutils literal notranslate"><span class="pre">w+</span></code> , preparándolo para una escritura inmediata desde el principio o para una escritura que sobrescribiría el valor inicial. Para emular la apertura de un archivo en un modo <code class="docutils literal notranslate"><span class="pre">a+</span></code> listo para anexar, use <code class="docutils literal notranslate"><span class="pre">f.seek(0,</span> <span class="pre">io.SEEK_END)</span></code> para reponer la secuencia al final del búfer.</p>
+<p>El argumento <em>newline</em> funciona como el de la clase <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a>, excepto que cuando escribe al flujo de salida, si <em>newline</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>, se escriben líneas nuevas como <code class="docutils literal notranslate"><span class="pre">\n</span></code> en todas las plataformas</p>
+<p><a class="reference internal" href="#io.StringIO" title="io.StringIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></a> proporciona este método además de los de <a class="reference internal" href="#io.TextIOBase" title="io.TextIOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a> y <a class="reference internal" href="#io.IOBase" title="io.IOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">IOBase</span></code></a>:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="io.StringIO.getvalue">
+<span class="sig-name descname"><span class="pre">getvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#io.StringIO.getvalue" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna un <code class="docutils literal notranslate"><span class="pre">str</span></code> que contiene el contenido entero de los búfer. Nuevas lineas son descodificados como si fuera <a class="reference internal" href="#io.TextIOBase.read" title="io.TextIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a>, aunque la posición de la transmisión no haya cambiado.</p>
+</dd></dl>
+
+<p>Ejemplos de uso:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+<span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;First line.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Second line.&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1"># Retrieve file contents -- this will be</span>
+<span class="c1"># &#39;First line.\nSecond line.\n&#39;</span>
+<span class="n">contents</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+<span class="c1"># Close object and discard memory buffer --</span>
+<span class="c1"># .getvalue() will now raise an exception.</span>
+<span class="n">output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="index-5"></span><dl class="py class">
+<dt class="sig sig-object py" id="io.IncrementalNewlineDecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">io.</span></span><span class="sig-name descname"><span class="pre">IncrementalNewlineDecoder</span></span><a class="headerlink" href="#io.IncrementalNewlineDecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un códec auxiliar que descodifica nuevas líneas para el modo <a class="reference internal" href="../glossary.html#term-universal-newlines"><span class="xref std std-term">universal newlines</span></a>. Hereda <a class="reference internal" href="codecs.html#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">codecs.IncrementalDecoder</span></code></a>.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="performance">
+<h2>Rendimiento<a class="headerlink" href="#performance" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Esta sección discute el rendimiento de las implementaciones concretas de E/S proporcionadas.</p>
+<section id="id2">
+<h3>E/S Binaria<a class="headerlink" href="#id2" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Leyendo y grabando solamente grandes porciones de datos incluso cuando el usuario pide para solo un byte, E/S de tipo búfer esconde toda ineficiencia llamando y ejecutando las rutinas E/S del sistema operativo que no ha pasado por el proceso de búfer. La ganancia depende en el OS y el tipo de E/S que se ejecuta. Por ejemplo, en algunos sistemas operativos modernos como Linux, un disco E/S sin búfer puede ser rápido como un E/S búfer. Al final, sin embargo, es que el E/S búfer ofrece rendimiento predecible independientemente de la plataforma y el dispositivo de respaldo. Entonces es siempre preferible user E/S búfer que E/S sin búfer para datos binarios.</p>
+</section>
+<section id="id3">
+<h3>E/S Texto<a class="headerlink" href="#id3" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>E/S de tipo texto por sobre un almacenamiento binario (como un archivo) es más lento que un E/S binario sobre el mismo almacenamiento porque requiere conversiones entre unicode y datos binarios usando un códec de caracteres. Esto puede ser notable al manejar datos enormes de texto como archivos de registro. También <code class="xref py py-meth docutils literal notranslate"><span class="pre">TextIOWrapper.tell()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">TextIOWrapper.seek()</span></code> son bastante lentos debido al uso del algoritmo de reconstrucción.</p>
+<p><a class="reference internal" href="#io.StringIO" title="io.StringIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></a>, sin embargo, es un contenedor unicode nativo en memoria y exhibirá una velocidad similar a <a class="reference internal" href="#io.BytesIO" title="io.BytesIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">BytesIO</span></code></a>.</p>
+</section>
+<section id="multi-threading">
+<h3>Multihilo<a class="headerlink" href="#multi-threading" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>objetos <a class="reference internal" href="#io.FileIO" title="io.FileIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileIO</span></code></a> son seguros para subprocesos en la medida en que las llamadas al sistema operativo(como <code class="docutils literal notranslate"><span class="pre">read(2)</span></code> en Unix) que envuelven también son seguros para subprocesos.</p>
+<p>Objetos binarios búfer (instancias de <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a>, <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a>, <a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a> y <a class="reference internal" href="#io.BufferedRWPair" title="io.BufferedRWPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRWPair</span></code></a>) protegen sus estructuras internas usando un bloqueo; es seguro, entonces, llamarlos de varios hilos a la vez.</p>
+<p>objetos <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a> no son seguros para subprocesos.</p>
+</section>
+<section id="reentrancy">
+<h3>Reentrada<a class="headerlink" href="#reentrancy" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Objetos binarios búfer (instancias de <a class="reference internal" href="#io.BufferedReader" title="io.BufferedReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code></a>, <a class="reference internal" href="#io.BufferedWriter" title="io.BufferedWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedWriter</span></code></a>, <a class="reference internal" href="#io.BufferedRandom" title="io.BufferedRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRandom</span></code></a> y <a class="reference internal" href="#io.BufferedRWPair" title="io.BufferedRWPair"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedRWPair</span></code></a>) no son reentrante. Mientras llamadas reentrantes no ocurren en situaciones normales pueden surgir haciendo E/S en un manejador <a class="reference internal" href="signal.html#module-signal" title="signal: Set handlers for asynchronous events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">signal</span></code></a>. Si un hilo trata de entrar de nuevo a un objeto búfer que se está accediendo actualmente, se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>. Tenga en cuenta que esto no prohíbe un hilo diferente entrando un objeto búfer.</p>
+<p>Lo anterior se extiende implícitamente a los archivos de texto, ya que la función <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> envolverá un objeto almacenado en búfer dentro de un <a class="reference internal" href="#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOWrapper</span></code></a>. Esto incluye transmisiones estándar y, por lo tanto, también afecta a la función <a class="reference internal" href="functions.html#print" title="print"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a> incorporada.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code> — Herramientas principales para trabajar con <em>streams</em></a><ul>
+<li><a class="reference internal" href="#overview">Resumen</a><ul>
+<li><a class="reference internal" href="#text-i-o">E/S Texto</a></li>
+<li><a class="reference internal" href="#binary-i-o">E/S Binaria</a></li>
+<li><a class="reference internal" href="#raw-i-o">E/S sin formato</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#text-encoding">Codificación de texto</a><ul>
+<li><a class="reference internal" href="#opt-in-encodingwarning">EncodingWarning opcional</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#high-level-module-interface">Interfaz de módulo de alto nivel</a></li>
+<li><a class="reference internal" href="#class-hierarchy">Jerarquía de clases</a><ul>
+<li><a class="reference internal" href="#i-o-base-classes">Clases base E/S</a></li>
+<li><a class="reference internal" href="#raw-file-i-o">Archivo sin formato E/S</a></li>
+<li><a class="reference internal" href="#buffered-streams"><em>Streams</em> almacenados (búfer)</a></li>
+<li><a class="reference internal" href="#id1">E/S Texto</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance">Rendimiento</a><ul>
+<li><a class="reference internal" href="#id2">E/S Binaria</a></li>
+<li><a class="reference internal" href="#id3">E/S Texto</a></li>
+<li><a class="reference internal" href="#multi-threading">Multihilo</a></li>
+<li><a class="reference internal" href="#reentrancy">Reentrada</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="os.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">os</span></code> — Interfaces misceláneas del sistema operativo</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="time.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">time</span></code> — Acceso a tiempo y conversiones</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/io.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="time.html" title="time — Acceso a tiempo y conversiones"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="os.html" title="os — Interfaces misceláneas del sistema operativo"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="allos.html" >Servicios genéricos del sistema operativo</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code> — Herramientas principales para trabajar con <em>streams</em></a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

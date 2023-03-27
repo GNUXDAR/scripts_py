@@ -1,0 +1,1625 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="codecs — Registro de códec y clases base" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/codecs.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/codecs.py Este módulo define las clases base para los códecs estándar de Python (codificadores y decodificadores) y proporciona acceso al registro interno de códecs de Python, qu..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/codecs.py Este módulo define las clases base para los códecs estándar de Python (codificadores y decodificadores) y proporciona acceso al registro interno de códecs de Python, qu..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>codecs — Registro de códec y clases base &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Tipos de datos" href="datatypes.html" />
+    <link rel="prev" title="struct — Interpreta bytes como paquetes de datos binarios" href="struct.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/codecs.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code> — Registro de códec y clases base</a><ul>
+<li><a class="reference internal" href="#codec-base-classes">Clases Base de Códec</a><ul>
+<li><a class="reference internal" href="#error-handlers">Manejadores de errores</a></li>
+<li><a class="reference internal" href="#stateless-encoding-and-decoding">Codificación y decodificación sin estado</a></li>
+<li><a class="reference internal" href="#incremental-encoding-and-decoding">Codificación y decodificación incrementales</a><ul>
+<li><a class="reference internal" href="#incrementalencoder-objects">Objetos IncrementalEncoder</a></li>
+<li><a class="reference internal" href="#incrementaldecoder-objects">Objetos IncrementalDecoder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stream-encoding-and-decoding">Codificación y decodificación de flujos</a><ul>
+<li><a class="reference internal" href="#streamwriter-objects">Objetos StreamWriter</a></li>
+<li><a class="reference internal" href="#streamreader-objects">Objetos StreamReader</a></li>
+<li><a class="reference internal" href="#streamreaderwriter-objects">Objetos StreamReaderWriter</a></li>
+<li><a class="reference internal" href="#streamrecoder-objects">Objetos StreamRecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#encodings-and-unicode">Codificaciones y Unicode</a></li>
+<li><a class="reference internal" href="#standard-encodings">Codificaciones estándar</a></li>
+<li><a class="reference internal" href="#python-specific-encodings">Codificaciones específicas de Python</a><ul>
+<li><a class="reference internal" href="#text-encodings">Codificaciones de texto</a></li>
+<li><a class="reference internal" href="#binary-transforms">Transformaciones Binarias</a></li>
+<li><a class="reference internal" href="#text-transforms">Transformaciones de texto</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-encodings.idna"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.idna</span></code> — Nombres de dominio internacionalizados en aplicaciones</a></li>
+<li><a class="reference internal" href="#module-encodings.mbcs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.mbcs</span></code> — Página de códigos ANSI de Windows</a></li>
+<li><a class="reference internal" href="#module-encodings.utf_8_sig"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.utf_8_sig</span></code> — Códec UTF-8 con firma BOM</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="struct.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">struct</span></code> — Interpreta bytes como paquetes de datos binarios</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="datatypes.html"
+                          title="próximo capítulo">Tipos de datos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/codecs.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="datatypes.html" title="Tipos de datos"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="struct.html" title="struct — Interpreta bytes como paquetes de datos binarios"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="binary.html" accesskey="U">Servicios de datos binarios</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code> — Registro de códec y clases base</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-codecs">
+<span id="codecs-codec-registry-and-base-classes"></span><h1><a class="reference internal" href="#module-codecs" title="codecs: Encode and decode data and streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code></a> — Registro de códec y clases base<a class="headerlink" href="#module-codecs" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/codecs.py">Lib/codecs.py</a></p>
+<hr class="docutils" id="index-0" />
+<p>Este módulo define las clases base para los códecs estándar de Python (codificadores y decodificadores) y proporciona acceso al registro interno de códecs de Python, que administra el códec y el proceso de búsqueda del manejo de errores. La mayoría de los códecs estándar son <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encodings</span></a>, que codifican texto a bytes (y decodifican bytes a texto), pero también se proporcionan códecs que codifican texto a texto y bytes a bytes. Los códecs personalizados pueden codificar y decodificar entre tipos arbitrarios, pero algunas características del módulo están restringidas para usarse específicamente con <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encodings</span></a> o con códecs que codifican a <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p>
+<p>El módulo define las siguientes funciones para codificar y decodificar con cualquier códec:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.encode">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.encode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Codifica <em>obj</em> utilizando el códec registrado para <em>encoding</em>.</p>
+<p>Se pueden dar <em>errors</em> para establecer el esquema de manejo de errores deseado. El manejador de errores predeterminado es <code class="docutils literal notranslate"><span class="pre">'estricto'</span></code>, lo que significa que los errores de codificación provocan <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> (o una subclase más específica del códec, como <a class="reference internal" href="exceptions.html#UnicodeEncodeError" title="UnicodeEncodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code></a>). Consulte <a class="reference internal" href="#codec-base-classes"><span class="std std-ref">Clases Base de Códec</span></a> para obtener más información sobre el manejo de errores de códec.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.decode">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.decode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decodifica <em>obj</em> utilizando el códec registrado para <em>encoding</em>.</p>
+<p>Se pueden dar <em>errors</em> para establecer el esquema de manejo de errores deseado. El manejador de errores predeterminado es <code class="docutils literal notranslate"><span class="pre">'estricto'</span></code>, lo que significa que los errores de decodificación generan <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> (o una subclase más específica de códec, como <a class="reference internal" href="exceptions.html#UnicodeDecodeError" title="UnicodeDecodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeDecodeError</span></code></a>). Consulte <a class="reference internal" href="#codec-base-classes"><span class="std std-ref">Clases Base de Códec</span></a> para obtener más información sobre el manejo de errores de códec.</p>
+</dd></dl>
+
+<p>Los detalles completos de cada códec también se pueden consultar directamente:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.lookup">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.lookup" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca la información de códec en el registro de códec de Python y retorna un objeto <a class="reference internal" href="#codecs.CodecInfo" title="codecs.CodecInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodecInfo</span></code></a> como se define a continuación.</p>
+<p>Las codificaciones se buscan primero en la memoria caché del registro. Si no se encuentran, se explora la lista de funciones de búsqueda registradas. Si no se encuentran objetos <a class="reference internal" href="#codecs.CodecInfo" title="codecs.CodecInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodecInfo</span></code></a>, se lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a>. De lo contrario, el objeto <a class="reference internal" href="#codecs.CodecInfo" title="codecs.CodecInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodecInfo</span></code></a> se almacena en la memoria caché y se retorna a quien llama.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.CodecInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">CodecInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streamreader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streamwriter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incrementalencoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incrementaldecoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.CodecInfo" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Detalles de códec al buscar el registro de códec. Los argumentos del constructor se almacenan en atributos del mismo nombre:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codecs.CodecInfo.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#codecs.CodecInfo.name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El nombre de la codificación.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codecs.CodecInfo.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><a class="headerlink" href="#codecs.CodecInfo.encode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.CodecInfo.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><a class="headerlink" href="#codecs.CodecInfo.decode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Las funciones de codificación y decodificación sin estado. Deben ser funciones o métodos que tengan la misma interfaz que los métodos <a class="reference internal" href="#codecs.Codec.encode" title="codecs.Codec.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encode()</span></code></a> y <a class="reference internal" href="#codecs.Codec.decode" title="codecs.Codec.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> de instancias de <em>Codec</em> (ver <a class="reference internal" href="#codec-objects"><span class="std std-ref">Codec Interface</span></a>). Se espera que las funciones o métodos funcionen en modo sin estado.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codecs.CodecInfo.incrementalencoder">
+<span class="sig-name descname"><span class="pre">incrementalencoder</span></span><a class="headerlink" href="#codecs.CodecInfo.incrementalencoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.CodecInfo.incrementaldecoder">
+<span class="sig-name descname"><span class="pre">incrementaldecoder</span></span><a class="headerlink" href="#codecs.CodecInfo.incrementaldecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clases de codificación y decodificación incremental o funciones de fábrica. Deben proporcionar la interfaz definida por las clases base <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a> y <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a>, respectivamente. Los códecs incrementales pueden mantener el estado.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codecs.CodecInfo.streamwriter">
+<span class="sig-name descname"><span class="pre">streamwriter</span></span><a class="headerlink" href="#codecs.CodecInfo.streamwriter" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.CodecInfo.streamreader">
+<span class="sig-name descname"><span class="pre">streamreader</span></span><a class="headerlink" href="#codecs.CodecInfo.streamreader" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Las clases <em>stream</em>, tanto <em>writer</em> como <em>reader</em> o funciones de fábrica. Estos tienen que proporcionar la interfaz definida por las clases base <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> y <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a>, respectivamente. Los códecs de flujo pueden mantener el estado.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Para simplificar el acceso a los diversos componentes de códec, el módulo proporciona estas funciones adicionales que utilizan <a class="reference internal" href="#codecs.lookup" title="codecs.lookup"><code class="xref py py-func docutils literal notranslate"><span class="pre">lookup()</span></code></a> para la búsqueda de códec:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getencoder">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getencoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getencoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su función de codificador.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getdecoder">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getdecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getdecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su función de decodificador.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getincrementalencoder">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getincrementalencoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getincrementalencoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su clase de codificador incremental o función de fábrica.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación o el códec no admita un codificador incremental.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getincrementaldecoder">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getincrementaldecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getincrementaldecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su clase de decodificador incremental o función de fábrica.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación o el códec no admita un decodificador incremental.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getreader">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getreader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getreader" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su clase <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> o función de fábrica.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.getwriter">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">getwriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.getwriter" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Busca el códec para la codificación dada y retorna su clase <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> o función de fábrica.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se encuentre la codificación.</p>
+</dd></dl>
+
+<p>Los códecs personalizados se ponen a disposición registrando una función de búsqueda de códecs adecuada:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.register">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.register" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registra una función de búsqueda de códec. Se espera que las funciones de búsqueda tomen un argumento, que sea el nombre de codificación en minúsculas con guiones y espacios convertidos a guiones bajos, y que retorne un objeto <a class="reference internal" href="#codecs.CodecInfo" title="codecs.CodecInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodecInfo</span></code></a>. En caso de que una función de búsqueda no pueda encontrar una codificación dada, debería retornar <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Guiones y espacios se convierten a guiones bajos.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.unregister">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">unregister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.unregister" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Anula el registro de una función de búsqueda de códecs y elimina el caché del registro. Si la función de búsqueda no está registrada, no hace nada.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<p>Mientras que la función incorporada <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> y el módulo asociado <a class="reference internal" href="io.html#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> son el enfoque recomendado para trabajar con archivos de texto codificados, este módulo proporciona funciones y clases de utilidad adicionales que permiten el uso de una gama más amplia de códecs cuando se trabaja con archivos binarios:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.open">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.open" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Abre un archivo codificado utilizando el modo dado y retorna una instancia de <a class="reference internal" href="#codecs.StreamReaderWriter" title="codecs.StreamReaderWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReaderWriter</span></code></a>, proporcionando codificación/decodificación transparente. El modo de archivo predeterminado es <code class="docutils literal notranslate"><span class="pre">'r'</span></code>, que significa abrir el archivo en modo de lectura.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Si el valor de <em>encoding</em> no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, entonces, los archivos codificados subyacentes siempre se abren en modo binario. No se realiza ninguna conversión automática de <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> al leer y escribir. El argumento <em>mode</em> puede ser cualquier modo binario aceptable para la función integrada <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a>; la <code class="docutils literal notranslate"><span class="pre">'b'</span></code> se añade automáticamente.</p>
+</div>
+<p><em>encoding</em> especifica la codificación que se utilizará para el archivo. Se permite cualquier codificación que codifique y decodifique desde bytes, y los tipos de datos admitidos por los métodos de archivo dependen del códec utilizado.</p>
+<p>pueden proporcionarse <em>errors</em> para definir el manejo de errores. El valor predeterminado es <code class="docutils literal notranslate"><span class="pre">'estricto'</span></code>, lo que hace que se genere un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> en caso de que ocurra un error de codificación.</p>
+<p><em>buffering</em> tiene el mismo significado que para la función incorporada <a class="reference internal" href="functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a>. Su valor predeterminado es -1, lo que significa que se utilizará el tamaño predeterminado del búfer.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>El modo <code class="docutils literal notranslate"><span class="pre">'U'</span></code> ha sido eliminado.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.EncodedFile">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">EncodedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.EncodedFile" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una instancia de <a class="reference internal" href="#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a>, una versión envuelta de <em>file</em> que proporciona transcodificación transparente. El archivo original se cierra cuando se cierra la versión empaquetada.</p>
+<p>Los datos escritos en el archivo empaquetado se decodifican de acuerdo con la <em>data_encoding</em> dada y luego se escriben en el archivo original como bytes usando <em>file_encoding</em>. Los bytes leídos del archivo original se decodifican según <em>file_encoding</em>, y el resultado se codifica utilizando <em>data_encoding</em>.</p>
+<p>Si no se proporciona <em>file_encoding</em>, el valor predeterminado es <em>data_encoding</em>.</p>
+<p>Pueden proporcionarse <em>errors</em> para definir el manejo de errores. Su valor predeterminado es <code class="docutils literal notranslate"><span class="pre">'estricto'</span></code>, lo que hace que se genere <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> en caso de que ocurra un error de codificación.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.iterencode">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">iterencode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.iterencode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Utiliza un codificador incremental para codificar iterativamente la entrada proporcionada por <em>iterator</em>. Esta función es un <a class="reference internal" href="../glossary.html#term-generator"><span class="xref std std-term">generator</span></a>. El argumento <em>errors</em> (así como cualquier otro argumento de palabra clave) se pasa al codificador incremental.</p>
+<p>Esta función requiere que el códec acepte texto en objetos <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> para codificar. Por lo tanto, no admite codificadores de bytes a bytes, como <code class="docutils literal notranslate"><span class="pre">base64_codec</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.iterdecode">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">iterdecode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.iterdecode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Utiliza un decodificador incremental para decodificar iterativamente la entrada proporcionada por <em>iterator</em>. Esta función es un <a class="reference internal" href="../glossary.html#term-generator"><span class="xref std std-term">generator</span></a>. El argumento <em>errors</em> (así como cualquier otro argumento de palabra clave) se pasa al decodificador incremental.</p>
+<p>Esta función requiere que el códec acepte objetos <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> para decodificar. Por lo tanto, no admite codificadores de texto a texto como <code class="docutils literal notranslate"><span class="pre">rot_13</span></code>, aunque <code class="docutils literal notranslate"><span class="pre">rot_13</span></code> puede usarse de manera equivalente con <a class="reference internal" href="#codecs.iterencode" title="codecs.iterencode"><code class="xref py py-func docutils literal notranslate"><span class="pre">iterencode()</span></code></a>.</p>
+</dd></dl>
+
+<p>El módulo también proporciona las siguientes constantes que son útiles para leer y escribir en archivos dependientes de la plataforma:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="codecs.BOM">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM</span></span><a class="headerlink" href="#codecs.BOM" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_BE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_BE</span></span><a class="headerlink" href="#codecs.BOM_BE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_LE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_LE</span></span><a class="headerlink" href="#codecs.BOM_LE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF8">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF8</span></span><a class="headerlink" href="#codecs.BOM_UTF8" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF16">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF16</span></span><a class="headerlink" href="#codecs.BOM_UTF16" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF16_BE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF16_BE</span></span><a class="headerlink" href="#codecs.BOM_UTF16_BE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF16_LE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF16_LE</span></span><a class="headerlink" href="#codecs.BOM_UTF16_LE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF32">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF32</span></span><a class="headerlink" href="#codecs.BOM_UTF32" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF32_BE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF32_BE</span></span><a class="headerlink" href="#codecs.BOM_UTF32_BE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="codecs.BOM_UTF32_LE">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">BOM_UTF32_LE</span></span><a class="headerlink" href="#codecs.BOM_UTF32_LE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Estas constantes definen varias secuencias de bytes, que son marcas de orden de bytes Unicode (BOM) para varias codificaciones. Se utilizan en flujos de datos UTF-16 y UTF-32 para indicar el orden de bytes utilizado, y en UTF-8 como firma Unicode. <a class="reference internal" href="#codecs.BOM_UTF16" title="codecs.BOM_UTF16"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16</span></code></a> es <a class="reference internal" href="#codecs.BOM_UTF16_BE" title="codecs.BOM_UTF16_BE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16_BE</span></code></a> o <a class="reference internal" href="#codecs.BOM_UTF16_LE" title="codecs.BOM_UTF16_LE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16_LE</span></code></a> dependiendo del orden de bytes nativo de la plataforma, <a class="reference internal" href="#codecs.BOM" title="codecs.BOM"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM</span></code></a> es un alias para <a class="reference internal" href="#codecs.BOM_UTF16" title="codecs.BOM_UTF16"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16</span></code></a>, <a class="reference internal" href="#codecs.BOM_LE" title="codecs.BOM_LE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_LE</span></code></a> para <a class="reference internal" href="#codecs.BOM_UTF16_LE" title="codecs.BOM_UTF16_LE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16_LE</span></code></a> y <a class="reference internal" href="#codecs.BOM_BE" title="codecs.BOM_BE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_BE</span></code></a> para <a class="reference internal" href="#codecs.BOM_UTF16_BE" title="codecs.BOM_UTF16_BE"><code class="xref py py-const docutils literal notranslate"><span class="pre">BOM_UTF16_BE</span></code></a>. Los otros representan la lista de materiales en las codificaciones UTF-8 y UTF-32.</p>
+</dd></dl>
+
+<section id="codec-base-classes">
+<span id="id1"></span><h2>Clases Base de Códec<a class="headerlink" href="#codec-base-classes" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El módulo <a class="reference internal" href="#module-codecs" title="codecs: Encode and decode data and streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code></a> define un conjunto de clases base que definen las interfaces para trabajar con objetos de códec, y también puede usarse como base para implementaciones de códec personalizadas.</p>
+<p>Cada códec tiene que definir cuatro interfaces para que pueda usarse como códec en Python: codificador sin estado, decodificador sin estado, lector de flujo y escritor de flujo. El lector de flujo y los escritores suelen reutilizar el codificador/decodificador sin estado para implementar los protocolos de archivo. Los autores de códecs también necesitan definir cómo manejará los errores de codificación y decodificación.</p>
+<section id="error-handlers">
+<span id="surrogateescape"></span><span id="id2"></span><h3>Manejadores de errores<a class="headerlink" href="#error-handlers" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Para simplificar y estandarizar el manejo de errores, los códecs pueden implementar diferentes esquemas de manejo de errores aceptando el argumento de cadena <em>errors</em>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;German ß, ♬&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;backslashreplace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;German \\xdf, \\u266c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;German ß, ♬&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;German &amp;#223;, &amp;#9836;&#39;</span>
+</pre></div>
+</div>
+<p id="index-1">Los siguientes manejadores de errores se pueden emplear con todos los códecs Python <a class="reference internal" href="#standard-encodings"><span class="std std-ref">Codificaciones estándar</span></a>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Valor</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'strict'</span></code></p></td>
+<td><p>Lanza <a class="reference internal" href="exceptions.html#UnicodeError" title="UnicodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeError</span></code></a> (o una subclase), este es el valor predeterminado. Implementado en <code class="xref py py-func docutils literal notranslate"><span class="pre">strictly_errors()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'ignore'</span></code></p></td>
+<td><p>Ignore los datos mal formados y continúe sin previo aviso. Implementado en <a class="reference internal" href="#codecs.ignore_errors" title="codecs.ignore_errors"><code class="xref py py-func docutils literal notranslate"><span class="pre">ignore_errors()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'replace'</span></code></p></td>
+<td><p>Sustituir con un marcador de reemplazo. Al codificar, emplear <code class="docutils literal notranslate"><span class="pre">?</span></code> (carácter ASCII). Al decodificar, usar <code class="docutils literal notranslate"><span class="pre">�</span></code> (U+FFFD, el CARÁCTER DE REEMPLAZO oficial). Implementado en <a class="reference internal" href="#codecs.replace_errors" title="codecs.replace_errors"><code class="xref py py-func docutils literal notranslate"><span class="pre">replace_errors()</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'backslashreplace'</span></code></p></td>
+<td><p>Reemplazar con secuencias de escape mediante barra invertida. Al codificar, emplear la forma hexadecimal del punto de código Unicode con los formatos <code class="docutils literal notranslate"><span class="pre">\xhh</span></code> <code class="docutils literal notranslate"><span class="pre">\uxxxx</span></code> <code class="docutils literal notranslate"><span class="pre">\Uxxxxxxxx</span></code>. Al decodificar, usa la forma hexadecimal del valor del byte con el formato <code class="docutils literal notranslate"><span class="pre">\xhh</span></code>. Implementado en <a class="reference internal" href="#codecs.backslashreplace_errors" title="codecs.backslashreplace_errors"><code class="xref py py-func docutils literal notranslate"><span class="pre">backslashreplace_errors()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'surrogateescape'</span></code></p></td>
+<td><p>En la decodificación, reemplace el byte con código sustituto individual que va desde <code class="docutils literal notranslate"><span class="pre">U+DC80</span></code> a <code class="docutils literal notranslate"><span class="pre">U+DCFF</span></code>. Este código se volverá a convertir en el mismo byte cuando se use el manejador de errores <code class="docutils literal notranslate"><span class="pre">'sustituto</span> <span class="pre">de</span> <span class="pre">paisaje'</span></code> al codificar los datos. (Ver <span class="target" id="index-26"></span><a class="pep reference external" href="https://peps.python.org/pep-0383/"><strong>PEP 383</strong></a> para más información).</p></td>
+</tr>
+</tbody>
+</table>
+<p id="index-3">Los siguientes manejadores de errores solo son aplicables a <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">codificaciones de texto</span></a>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Valor</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'xmlcharrefreplace'</span></code></p></td>
+<td><p>Reemplazar con una referencia de carácter numérico XML/HTML, que es una forma decimal del punto de código Unicode con formato <code class="docutils literal notranslate"><span class="pre">&amp;#num;</span></code> Implementado en <a class="reference internal" href="#codecs.xmlcharrefreplace_errors" title="codecs.xmlcharrefreplace_errors"><code class="xref py py-func docutils literal notranslate"><span class="pre">xmlcharrefreplace_errors()</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">'namereplace'</span></code></p></td>
+<td><p>Reemplazar con secuencias de escape <code class="docutils literal notranslate"><span class="pre">\N{...}</span></code>, lo que aparece entre llaves, es la propiedad Nombre de la Base de datos de Caracteres Unicode. Implementado en <a class="reference internal" href="#codecs.namereplace_errors" title="codecs.namereplace_errors"><code class="xref py py-func docutils literal notranslate"><span class="pre">namereplace_errors()</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p id="index-4">Además, el siguiente manejador de errores es específico de los códecs dados:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 28%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Valor</p></th>
+<th class="head"><p>Códecs</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">'surrogatepass'</span></code></p></td>
+<td><p>utf-8, utf-16, utf-32,
+utf-16-be, utf-16-le,
+utf-32-be, utf-32-le</p></td>
+<td><p>Permite la codificación y decodificación del punto de código sustituto (<code class="docutils literal notranslate"><span class="pre">U+D800</span></code> - <code class="docutils literal notranslate"><span class="pre">U+DFFF</span></code>) como punto de código normal. De lo contrario, estos códecs tratan la presencia de un punto de código sustituto en <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> como un error.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1: </span>Los manejadores de errores <code class="docutils literal notranslate"><span class="pre">'surrogateescape'</span></code> y <code class="docutils literal notranslate"><span class="pre">'surrogatepass'</span></code>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Los manejadores de errores <code class="docutils literal notranslate"><span class="pre">'surrogatepass'</span></code> ahora funcionan con los códecs utf-16* y utf-32*.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5: </span>El manejador de errores <code class="docutils literal notranslate"><span class="pre">'namereplace'</span></code>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>El manejador de errores <code class="docutils literal notranslate"><span class="pre">'backslashreplace'</span></code> ahora funciona con decodificación y traducción.</p>
+</div>
+<p>El conjunto de valores permitidos puede ampliarse registrando un nuevo manejador de errores con nombre:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.register_error">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">register_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.register_error" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Registre la función de manejo de errores <em>error_handler</em> bajo el nombre <em>name</em>. Se invocará el argumento <em>error_handler</em> durante la codificación y decodificación en caso de error, cuando <em>name</em> se especifica como el parámetro de errores.</p>
+<p>Para la codificación, se llamará a <em>error_handler</em> con una instancia <a class="reference internal" href="exceptions.html#UnicodeEncodeError" title="UnicodeEncodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code></a>, que contiene información sobre la ubicación del error. El manejador de errores debe generar esta o una excepción diferente, o retornar una tupla con un reemplazo para la parte no codificable de la entrada y una posición donde la codificación debe continuar. El reemplazo puede ser <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. Si el reemplazo son bytes, el codificador simplemente los copiará en el búfer de salida. Si el reemplazo es una cadena de caracteres, el codificador codificará el reemplazo. La codificación continúa en la entrada original en la posición especificada. Los valores de posición negativos se tratarán como relativos al final de la cadena de entrada. Si la posición resultante está fuera del límite, se lanzará <a class="reference internal" href="exceptions.html#IndexError" title="IndexError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code></a>.</p>
+<p>La decodificación y la traducción funcionan de manera similar, excepto que <a class="reference internal" href="exceptions.html#UnicodeDecodeError" title="UnicodeDecodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeDecodeError</span></code></a> o <a class="reference internal" href="exceptions.html#UnicodeTranslateError" title="UnicodeTranslateError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeTranslateError</span></code></a> se pasarán al manejador y el sustituto del manejador de errores se colocará directamente en la salida.</p>
+</dd></dl>
+
+<p>Los manejadores de errores registrados previamente (incluidos los manejadores de error estándar) se pueden buscar por nombre:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.lookup_error">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">lookup_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.lookup_error" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el manejador de errores previamente registrado con el nombre <em>name</em>.</p>
+<p>Lanza un <a class="reference internal" href="exceptions.html#LookupError" title="LookupError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> en caso de que no se pueda encontrar el controlador.</p>
+</dd></dl>
+
+<p>Los siguientes manejadores de errores estándar también están disponibles como funciones de nivel de módulo:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.strict_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">strict_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.strict_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejo de errores <code class="docutils literal notranslate"><span class="pre">'strict'</span></code>.</p>
+<p>Cada error de codificación o decodificación genera un <a class="reference internal" href="exceptions.html#UnicodeError" title="UnicodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.ignore_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">ignore_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.ignore_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejo de errores <code class="docutils literal notranslate"><span class="pre">'ignore'</span></code>.</p>
+<p>Los datos con formato incorrecto se ignoran; la codificación o decodificación continúa sin previo aviso.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.replace_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">replace_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.replace_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejo de errores <code class="docutils literal notranslate"><span class="pre">'replace'</span></code> .</p>
+<p>Sustituye <code class="docutils literal notranslate"><span class="pre">?</span></code> (carácter ASCII) por errores de codificación o <code class="docutils literal notranslate"><span class="pre">�</span></code> (U+FFFD, el CARÁCTER DE REEMPLAZO oficial) por errores de decodificación.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.backslashreplace_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">backslashreplace_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.backslashreplace_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejador de errores <code class="docutils literal notranslate"><span class="pre">'backslashreplace'</span></code>.</p>
+<p>Los datos con formato incorrecto se reemplazan por una secuencia de escape con barra invertida. Al codificar, emplea la forma hexadecimal del punto de código Unicode con los formatos <code class="docutils literal notranslate"><span class="pre">\xhh</span></code> <code class="docutils literal notranslate"><span class="pre">\uxxxx</span></code> <code class="docutils literal notranslate"><span class="pre">\Uxxxxxxxx</span></code>. Al decodificar, usa la forma hexadecimal del valor del byte con el formato <code class="docutils literal notranslate"><span class="pre">\xhh</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Funciona con la decodificación y traducción.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.xmlcharrefreplace_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">xmlcharrefreplace_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.xmlcharrefreplace_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejador de errores <code class="docutils literal notranslate"><span class="pre">'xmlcharrefreplace'</span></code> (solo para codificar dentro de <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encoding</span></a>).</p>
+<p>El carácter no codificable se reemplaza por una referencia de carácter numérico XML/HTML adecuada, que es una forma decimal del punto de código Unicode con formato <code class="docutils literal notranslate"><span class="pre">&amp;#num;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codecs.namereplace_errors">
+<span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">namereplace_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.namereplace_errors" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa el manejo de errores <code class="docutils literal notranslate"><span class="pre">'namereplace</span></code> (solo para codificar dentro de <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encoding</span></a>).</p>
+<p>El carácter no codificable se reemplaza por una secuencia de escape <code class="docutils literal notranslate"><span class="pre">\N{...}</span></code>. El conjunto de caracteres que aparecen entre llaves es la propiedad Nombre de la Base de datos de Caracteres Unicode. Por ejemplo, la letra minúscula alemana <code class="docutils literal notranslate"><span class="pre">'ß'</span></code> se convertirá en la secuencia de bytes <code class="docutils literal notranslate"><span class="pre">\N{LATIN</span> <span class="pre">SMALL</span> <span class="pre">LETTER</span> <span class="pre">SHARP</span> <span class="pre">S}</span></code> .</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="stateless-encoding-and-decoding">
+<span id="codec-objects"></span><h3>Codificación y decodificación sin estado<a class="headerlink" href="#stateless-encoding-and-decoding" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La clase base <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code> define estos métodos que también definen las interfaces de función del codificador y decodificador sin estado:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.Codec.encode">
+<span class="sig-prename descclassname"><span class="pre">Codec.</span></span><span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.Codec.encode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Codifica el objeto <em>input</em> y retorna una tupla (objeto de salida, longitud consumida). Por ejemplo <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encoding</span></a> convierte un objeto de cadena de caracteres en un objeto de bytes utilizando una codificación de juego de caracteres particular (por ejemplo,``cp1252`` o <code class="docutils literal notranslate"><span class="pre">iso-8859-1</span></code>).</p>
+<p>El argumento <em>errors</em> define el manejo de errores a aplicar. El valor predeterminado es el manejo <code class="docutils literal notranslate"><span class="pre">estricto</span></code>.</p>
+<p>Es posible que el método no almacene estado en la instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code>. Use <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> para códecs que deben mantener el estado para que la codificación sea eficiente.</p>
+<p>El codificador debe poder manejar la entrada de longitud cero y retornar un objeto vacío del tipo de objeto de salida en esta situación.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.Codec.decode">
+<span class="sig-prename descclassname"><span class="pre">Codec.</span></span><span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.Codec.decode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decodifica el objeto <em>input</em> y retorna una tupla (objeto de salida, longitud consumida). Por ejemplo, para un <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">codificación de texto</span></a>, la decodificación convierte un objeto de bytes codificado usando una codificación de juego de caracteres particular en un objeto de cadena de caracteres.</p>
+<p>Para codificaciones de texto y códecs de bytes a bytes, <em>input</em> debe ser un objeto de bytes o uno que proporcione la interfaz de búfer de solo lectura, por ejemplo, objetos de búfer y archivos mapeados en memoria.</p>
+<p>El argumento <em>errors</em> define el manejo de errores a aplicar. El valor predeterminado es el manejo <code class="docutils literal notranslate"><span class="pre">estricto</span></code>.</p>
+<p>Es posible que el método no almacene estado en la instancia de <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code>. Use <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> para códecs que deben mantener el estado para que la decodificación sea eficiente.</p>
+<p>El decodificador debe poder manejar la entrada de longitud cero y retornar un objeto vacío del tipo de objeto de salida en esta situación.</p>
+</dd></dl>
+
+</section>
+<section id="incremental-encoding-and-decoding">
+<h3>Codificación y decodificación incrementales<a class="headerlink" href="#incremental-encoding-and-decoding" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las clases <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a> y <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a> proporcionan la interfaz básica para la codificación y decodificación incrementales. La codificación/decodificación de la entrada no se realiza con una llamada a la función de codificador/decodificador sin estado, sino con varias llamadas al método <a class="reference internal" href="#codecs.IncrementalEncoder.encode" title="codecs.IncrementalEncoder.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encode()</span></code></a>/<a class="reference internal" href="#codecs.IncrementalDecoder.decode" title="codecs.IncrementalDecoder.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> del codificador incremental /decodificador. El codificador/decodificador incremental realiza un seguimiento del proceso de codificación/decodificación durante las llamadas a métodos.</p>
+<p>La salida combinada de las llamadas al método <a class="reference internal" href="#codecs.IncrementalEncoder.encode" title="codecs.IncrementalEncoder.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encode()</span></code></a>/<a class="reference internal" href="#codecs.IncrementalDecoder.decode" title="codecs.IncrementalDecoder.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> es el mismo que si todas las entradas individuales se unieran en una, y esta entrada se codificara/decodificara con codificador/decodificador sin estado.</p>
+<section id="incrementalencoder-objects">
+<span id="incremental-encoder-objects"></span><h4>Objetos IncrementalEncoder<a class="headerlink" href="#incrementalencoder-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a> se usa para codificar una entrada en varios pasos. Define los siguientes métodos que cada codificador incremental debe definir para ser compatible con el registro de códec Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.IncrementalEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">IncrementalEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalEncoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Constructor para una clase instancia de <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a>.</p>
+<p>Todos los codificadores incrementales deben proporcionar esta interfaz de constructor. Son libres de agregar argumentos de palabras clave adicionales, pero el registro de códecs de Python solo utiliza los definidos aquí.</p>
+<p>La clase <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a> puede implementar diferentes esquemas de manejo de errores al proporcionar el argumento de palabra clave <em>errors</em>. Ver <a class="reference internal" href="#error-handlers"><span class="std std-ref">Manejadores de errores</span></a> para posibles valores.</p>
+<p>El argumento <em>errors</em> se asignará a un atributo del mismo nombre. La asignación a este atributo hace posible cambiar entre diferentes estrategias de manejo de errores durante la vida útil del objeto <a class="reference internal" href="#codecs.IncrementalEncoder" title="codecs.IncrementalEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalEncoder</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalEncoder.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalEncoder.encode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Codifica <em>object</em> (teniendo en cuenta el estado actual del codificador) y retorna el objeto codificado resultante. Si esta es la última llamada a <a class="reference internal" href="#codecs.encode" title="codecs.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">encode()</span></code></a> <em>final</em> debe ser verdadero (el valor predeterminado es falso).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalEncoder.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalEncoder.reset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Restablece el codificador al estado inicial. La salida se descarta: llama a <code class="docutils literal notranslate"><span class="pre">.encode(object,</span> <span class="pre">final=True)</span></code>, pasando un byte vacío o una cadena de texto si es necesario, para restablecer el codificador y obtener la salida.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalEncoder.getstate">
+<span class="sig-name descname"><span class="pre">getstate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalEncoder.getstate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el estado actual del codificador que debe ser un número entero. La implementación debe asegurarse de que <code class="docutils literal notranslate"><span class="pre">0</span></code> sea el estado más común. (Los estados que son más complicados que los enteros se pueden convertir en un entero al empaquetar/serializar el estado y codificar los bytes de la cadena resultante en un entero).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalEncoder.setstate">
+<span class="sig-name descname"><span class="pre">setstate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalEncoder.setstate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el estado del codificador en <em>state</em>. <em>state</em> debe ser un estado de codificador retornado por <a class="reference internal" href="#codecs.IncrementalEncoder.getstate" title="codecs.IncrementalEncoder.getstate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getstate()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="incrementaldecoder-objects">
+<span id="incremental-decoder-objects"></span><h4>Objetos IncrementalDecoder<a class="headerlink" href="#incrementaldecoder-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a> se usa para decodificar una entrada en varios pasos. Define los siguientes métodos que cada decodificador incremental debe definir para ser compatible con el registro de códec Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.IncrementalDecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">IncrementalDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalDecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Constructor para una instancia de <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a>.</p>
+<p>Todos los decodificadores incrementales deben proporcionar esta interfaz de constructor. Son libres de agregar argumentos de palabras clave adicionales, pero el registro de códecs de Python solo utiliza los definidos aquí.</p>
+<p>La clase <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a> puede implementar diferentes esquemas de manejo de errores al proporcionar el argumento de palabra clave <em>errors</em>. Ver <a class="reference internal" href="#error-handlers"><span class="std std-ref">Manejadores de errores</span></a> para posibles valores.</p>
+<p>El argumento <em>errors</em> se asignará a un atributo del mismo nombre. La asignación a este atributo hace posible cambiar entre diferentes estrategias de manejo de errores durante la vida útil del objeto <a class="reference internal" href="#codecs.IncrementalDecoder" title="codecs.IncrementalDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncrementalDecoder</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalDecoder.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalDecoder.decode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decodifica <em>object</em> (teniendo en cuenta el estado actual del decodificador) y retorna el objeto decodificado resultante. Si esta es la última llamada a <a class="reference internal" href="#codecs.decode" title="codecs.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> <em>final</em> debe ser verdadero (el valor predeterminado es falso). Si <em>final</em> es verdadero, el decodificador debe decodificar la entrada por completo y debe vaciar todos los búferes. Si esto no es posible (por ejemplo, debido a secuencias de bytes incompletas al final de la entrada), debe iniciar el manejo de errores al igual que en el caso sin estado (lo que podría generar una excepción).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalDecoder.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalDecoder.reset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Restablece el decodificador al estado inicial.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalDecoder.getstate">
+<span class="sig-name descname"><span class="pre">getstate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalDecoder.getstate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el estado actual del decodificador. Debe ser una tupla con dos elementos, el primero debe ser el búfer que contiene la entrada aún sin codificar. El segundo debe ser un número entero y puede ser información de estado adicional. (La implementación debe asegurarse de que <code class="docutils literal notranslate"><span class="pre">0</span></code> sea la información de estado adicional más común). Si esta información de estado adicional es <code class="docutils literal notranslate"><span class="pre">0</span></code>, debe ser posible establecer el decodificador en el estado que no tiene entrada almacenada y <code class="docutils literal notranslate"><span class="pre">0</span></code> como información de estado adicional, de modo que alimentar la entrada previamente almacenada en el búfer al decodificador la retorna al estado anterior sin producir ninguna salida. (La información de estado adicional que es más complicada que los enteros se puede convertir en un entero al empaquetar/serializar la información y codificar los bytes de la cadena resultante en un entero).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.IncrementalDecoder.setstate">
+<span class="sig-name descname"><span class="pre">setstate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.IncrementalDecoder.setstate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca el estado del decodificador en <em>state</em>. <em>state</em> debe ser un estado de decodificador retornado por <a class="reference internal" href="#codecs.IncrementalDecoder.getstate" title="codecs.IncrementalDecoder.getstate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getstate()</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="stream-encoding-and-decoding">
+<h3>Codificación y decodificación de flujos<a class="headerlink" href="#stream-encoding-and-decoding" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las clases <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> y <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> proporcionan interfaces de trabajo genéricas que se pueden usar para implementar nuevos submódulos de codificación muy fácilmente. Ir a <code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.utf_8</span></code> para ver un ejemplo de cómo se hace esto.</p>
+<section id="streamwriter-objects">
+<span id="stream-writer-objects"></span><h4>Objetos StreamWriter<a class="headerlink" href="#streamwriter-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> es una subclase de <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code> y define los siguientes métodos que cada escritor del flujo debe definir para ser compatible con el registro de códecs Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.StreamWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">StreamWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamWriter" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Constructor para una instancia de <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a>.</p>
+<p>Todos los escritores de flujos deben proporcionar esta interfaz de constructor. Son libres de agregar argumentos de palabras clave adicionales, pero el registro de códecs de Python solo utiliza los definidos aquí.</p>
+<p>El argumento <em>stream</em> debe ser un objeto tipo archivo abierto para escribir texto o datos binarios, según corresponda para el códec específico.</p>
+<p>La clase <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> puede implementar diferentes esquemas de manejo de errores al proporcionar el argumento de palabra clave <em>errors</em>. Consulte <a class="reference internal" href="#error-handlers"><span class="std std-ref">Manejadores de errores</span></a> para ver los manejadores de errores estándar que puede admitir el códec de flujo subyacente.</p>
+<p>El argumento <em>errors</em> se asignará a un atributo del mismo nombre. La asignación a este atributo hace posible cambiar entre diferentes estrategias de manejo de errores durante la vida útil del objeto <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamWriter.write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe el contenido del objeto codificado en el flujo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamWriter.writelines">
+<span class="sig-name descname"><span class="pre">writelines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamWriter.writelines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escribe una lista concatenada de cadenas en el flujo (posiblemente reutilizando el método <a class="reference internal" href="#codecs.StreamWriter.write" title="codecs.StreamWriter.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>). No se admiten iterables infinitos o muy grandes. Los códecs estándar de bytes a bytes no admiten este método.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamWriter.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamWriter.reset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Restablece los búfers de códec utilizados para mantener el estado interno.</p>
+<p>Llamar a este método debería garantizar que los datos en la salida se pongan en un estado limpio que permita agregar datos nuevos sin tener que volver a escanear todo el flujo para recuperar el estado.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Además de los métodos anteriores, la clase <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> también debe heredar todos los demás métodos y atributos del flujo subyacente.</p>
+</section>
+<section id="streamreader-objects">
+<span id="stream-reader-objects"></span><h4>Objetos StreamReader<a class="headerlink" href="#streamreader-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> es una subclase de <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code> y define los siguientes métodos que cada lector de flujo debe definir para ser compatible con el registro de códecs de Python.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.StreamReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">StreamReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReader" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Constructor para una instancia de <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a>.</p>
+<p>Todos los lectores de flujo deben proporcionar esta interfaz de constructor. Son libres de agregar argumentos de palabras clave adicionales, pero el registro de códecs de Python solo utiliza los definidos aquí.</p>
+<p>El argumento <em>stream</em> debe ser un objeto tipo archivo abierto para leer texto o datos binarios, según corresponda para el códec específico.</p>
+<p>La clase <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> puede implementar diferentes esquemas de manejo de errores al proporcionar el argumento de palabra clave <em>errors</em>. Consulte <a class="reference internal" href="#error-handlers"><span class="std std-ref">Manejadores de errores</span></a> para ver los manejadores de errores estándar que puede admitir el códec de flujo subyacente.</p>
+<p>El argumento <em>errors</em> se asignará a un atributo del mismo nombre. La asignación a este atributo hace posible cambiar entre diferentes estrategias de manejo de errores durante la vida útil del objeto <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a>.</p>
+<p>El conjunto de valores permitidos para el argumento <em>errors</em> se puede ampliar con <a class="reference internal" href="#codecs.register_error" title="codecs.register_error"><code class="xref py py-func docutils literal notranslate"><span class="pre">register_error()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">firstline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReader.read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decodifica datos del flujo y retorna el objeto resultante.</p>
+<p>El argumento <em>chars</em> indica el número de puntos de código decodificados o bytes a retornar. El método <a class="reference internal" href="#codecs.StreamReader.read" title="codecs.StreamReader.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a> nunca retornará más datos de los solicitados, pero podría retornar menos, si no hay suficientes disponibles.</p>
+<p>El argumento <em>size</em> indica el número máximo aproximado de bytes codificados o puntos de código para leer para la decodificación. El decodificador puede modificar esta configuración según corresponda. El valor predeterminado -1 indica leer y decodificar tanto como sea posible. Este parámetro está diseñado para evitar tener que decodificar archivos grandes en un solo paso.</p>
+<p>La bandera <em>firstline</em> indica que sería suficiente retornar solo la primera línea, si hay errores de decodificación en las líneas posteriores.</p>
+<p>El método debe usar una estrategia de lectura codiciosa, lo que significa que debe leer la mayor cantidad de datos permitidos dentro de la definición de la codificación y el tamaño dado, por ejemplo si las terminaciones de codificación opcionales o los marcadores de estado están disponibles en la transmisión, también deben leerse.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamReader.readline">
+<span class="sig-name descname"><span class="pre">readline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepends</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReader.readline" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee una línea del flujo de entrada y retorna los datos decodificados.</p>
+<p><em>size</em>, si se da, se pasa como argumento de tamaño al método <a class="reference internal" href="#codecs.StreamReader.read" title="codecs.StreamReader.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> del <em>stream</em>.</p>
+<p>Si <em>keepends</em> es falso, las terminaciones de línea se eliminarán de las líneas retornadas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamReader.readlines">
+<span class="sig-name descname"><span class="pre">readlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sizehint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepends</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReader.readlines" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee todas las líneas disponibles en el flujo de entrada y las retorna como una lista de líneas.</p>
+<p>Los finales de línea se implementan utilizando el método <a class="reference internal" href="#codecs.decode" title="codecs.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> del códec y se incluyen en las entradas de la lista si <em>keepends</em> es verdadero.</p>
+<p><em>sizehint</em>, si se proporciona, se pasa como argumento <em>size</em> al método <a class="reference internal" href="#codecs.StreamReader.read" title="codecs.StreamReader.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> del <em>stream</em>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codecs.StreamReader.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReader.reset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Restablece los búfers de códec utilizados para mantener el estado interno.</p>
+<p>Tenga en cuenta que ningún reposicionamiento de flujo debe suceder. Este método está destinado principalmente a poder recuperarse de errores de decodificación.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Además de los métodos anteriores, la clase <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> también debe heredar todos los demás métodos y atributos del flujo subyacente.</p>
+</section>
+<section id="streamreaderwriter-objects">
+<span id="stream-reader-writer"></span><h4>Objetos StreamReaderWriter<a class="headerlink" href="#streamreaderwriter-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.StreamReaderWriter" title="codecs.StreamReaderWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReaderWriter</span></code></a> es una clase de conveniencia que permite envolver flujos que funcionan tanto en modo de lectura como de escritura.</p>
+<p>El diseño es tal que uno puede usar las funciones de fábrica retornadas por la función <a class="reference internal" href="#codecs.lookup" title="codecs.lookup"><code class="xref py py-func docutils literal notranslate"><span class="pre">lookup()</span></code></a> para construir la instancia.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.StreamReaderWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">StreamReaderWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamReaderWriter" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una instancia de <a class="reference internal" href="#codecs.StreamReaderWriter" title="codecs.StreamReaderWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReaderWriter</span></code></a>. <em>stream</em> debe ser un objeto similar a un archivo. <em>Reader</em> y <em>Writer</em> deben ser funciones o clases de fábrica que proporcionen la interfaz <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> y <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> respectivamente. El manejo de errores se realiza de la misma manera que se define para los lectores y escritores de flujos.</p>
+</dd></dl>
+
+<p>Las instancias <a class="reference internal" href="#codecs.StreamReaderWriter" title="codecs.StreamReaderWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReaderWriter</span></code></a> definen las interfaces combinadas de <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> y clases <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a>. Heredan todos los demás métodos y atributos del flujo subyacente.</p>
+</section>
+<section id="streamrecoder-objects">
+<span id="stream-recoder-objects"></span><h4>Objetos StreamRecoder<a class="headerlink" href="#streamrecoder-objects" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a> traduce datos de una codificación a otra, lo que a veces es útil cuando se trata de diferentes entornos de codificación.</p>
+<p>El diseño es tal que uno puede usar las funciones de fábrica retornadas por la función <a class="reference internal" href="#codecs.lookup" title="codecs.lookup"><code class="xref py py-func docutils literal notranslate"><span class="pre">lookup()</span></code></a> para construir la instancia.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="codecs.StreamRecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codecs.</span></span><span class="sig-name descname"><span class="pre">StreamRecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codecs.StreamRecoder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una instancia de <a class="reference internal" href="#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a> que implementa una conversión bidireccional: <em>encode</em> y <em>decode</em> funcionan en el <em>frontend</em>: los datos visibles para la llamada de código <code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code>, mientras que <em>Reader</em> y <em>Writer</em> funcionan en el <em>backend</em> — los datos en <em>stream</em>.</p>
+<p>Puede usar estos objetos para realizar transcodificaciones transparentes, por ejemplo, de Latin-1 a UTF-8 y viceversa.</p>
+<p>El argumento <em>stream</em> debe ser un objeto similar a un archivo.</p>
+<p>Los argumentos <em>encode</em> y <em>decode</em> deben cumplir con la interfaz de <code class="xref py py-class docutils literal notranslate"><span class="pre">Codec</span></code>. <em>Reader</em> y <em>Writer</em> deben ser funciones o clases de fábrica que proporcionen objetos de la interfaz <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> y <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a> respectivamente.</p>
+<p>El manejo de errores se realiza de la misma manera que se define para los lectores y escritores de flujos.</p>
+</dd></dl>
+
+<p>las instancias <a class="reference internal" href="#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a> definen las interfaces combinadas de las clases <a class="reference internal" href="#codecs.StreamReader" title="codecs.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamReader</span></code></a> y <a class="reference internal" href="#codecs.StreamWriter" title="codecs.StreamWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWriter</span></code></a>. Heredan todos los demás métodos y atributos del flujo subyacente.</p>
+</section>
+</section>
+</section>
+<section id="encodings-and-unicode">
+<span id="encodings-overview"></span><h2>Codificaciones y Unicode<a class="headerlink" href="#encodings-and-unicode" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las cadenas de caracteres se almacenan internamente como secuencias de puntos de código en el rango <code class="docutils literal notranslate"><span class="pre">U+0000</span></code>–<code class="docutils literal notranslate"><span class="pre">U+10FFFF</span></code>. (Consultar <span class="target" id="index-27"></span><a class="pep reference external" href="https://peps.python.org/pep-0393/"><strong>PEP 393</strong></a> para obtener más detalles sobre la implementación). Una vez utilizado un objeto de cadena de caracteres fuera de la CPU y de la memoria, la <em>endianness</em> y cómo se almacenan estas matrices como bytes se convierte en un problema. Al igual que con otros códecs, la serialización de una cadena en una secuencia de bytes se conoce como codificación, y la recreación de la cadena a partir de los bytes se conoce como decodificación. Hay múltiples códecs para la serialización de texto, a los que se puede consultar colectivamente mediante <a class="reference internal" href="../glossary.html#term-text-encoding"><span class="xref std std-term">text encodings</span></a>.</p>
+<p>La codificación de texto más simple (llamada <code class="docutils literal notranslate"><span class="pre">'latin-1'</span></code> o <code class="docutils literal notranslate"><span class="pre">'iso-8859-1'</span></code>) asigna los puntos de código 0–255 a los bytes <code class="docutils literal notranslate"><span class="pre">0x0</span></code> – <code class="docutils literal notranslate"><span class="pre">0xff</span></code>, lo que significa que un objeto de cadena de caracteres que contiene puntos de código encima de <code class="docutils literal notranslate"><span class="pre">U+00FF</span></code> no se puede codificar con este códec. Al hacerlo, lanzará un <a class="reference internal" href="exceptions.html#UnicodeEncodeError" title="UnicodeEncodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code></a> que se parece a lo siguiente (aunque los detalles del mensaje de error pueden diferir): <code class="docutils literal notranslate"><span class="pre">UnicodeEncodeError:</span> <span class="pre">'latin-1'</span> <span class="pre">codec</span> <span class="pre">can't</span> <span class="pre">encode</span> <span class="pre">character</span> <span class="pre">'\u1234'</span> <span class="pre">'in</span> <span class="pre">position</span> <span class="pre">3:</span> <span class="pre">ordinal</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">range(256)</span></code>.</p>
+<p>Hay otro grupo de codificaciones (las llamadas codificaciones de mapa de caracteres) que eligen un subconjunto diferente de todos los puntos de código Unicode y cómo estos puntos de código se asignan a los bytes <code class="docutils literal notranslate"><span class="pre">0x0</span></code> – <code class="docutils literal notranslate"><span class="pre">0xff</span></code>. Para ver cómo se hace esto, simplemente abra, por ejemplo <code class="file docutils literal notranslate"><span class="pre">encodings/cp1252.py</span></code> (que es una codificación que se usa principalmente en Windows). Hay una cadena constante con 256 caracteres que le muestra qué carácter está asignado a qué valor de byte.</p>
+<p>Todas estas codificaciones solo pueden codificar 256 de los 1114112 puntos de código definidos en Unicode. Una manera simple y directa que permita almacenar cada punto de código Unicode, es almacenar cada punto de código como cuatro bytes consecutivos. Hay dos posibilidades: almacenar los bytes en orden <em>big endian</em> o <em>little endian</em>. Estas dos codificaciones se denominan <code class="docutils literal notranslate"><span class="pre">UTF-32-BE</span></code> y <code class="docutils literal notranslate"><span class="pre">UTF-32-LE</span></code> respectivamente. Su desventaja es que, si por ejemplo, usa <code class="docutils literal notranslate"><span class="pre">UTF-32-BE</span></code> en una pequeña máquina <em>endian</em>, siempre tendrá que intercambiar bytes en la codificación y decodificación. <code class="docutils literal notranslate"><span class="pre">UTF-32</span></code> evita este problema: los bytes siempre estarán en <em>endianness</em> natural. Cuando estos bytes son leídos por una CPU con una <em>endianness</em> diferente, entonces los bytes deben intercambiarse. Para poder detectar el <em>endian</em> de una secuencia de bytes <code class="docutils literal notranslate"><span class="pre">UTF-16</span></code> o <code class="docutils literal notranslate"><span class="pre">UTF-32</span></code>, existe la llamada BOM («Marca de orden de bytes», o en inglés <em>Byte Order Mark</em>). Este es el carácter Unicode <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code>. Este carácter puede anteponerse a cada secuencia de bytes <code class="docutils literal notranslate"><span class="pre">UTF-16</span></code> o <code class="docutils literal notranslate"><span class="pre">UTF-32</span></code>. La versión intercambiada de bytes de este carácter (<code class="docutils literal notranslate"><span class="pre">0xFFFE</span></code>) es un carácter ilegal que puede no aparecer en un texto Unicode. Entonces, cuando el primer carácter en una secuencia de bytes <code class="docutils literal notranslate"><span class="pre">UTF-16</span></code> o <code class="docutils literal notranslate"><span class="pre">UTF-32</span></code> parece ser un <code class="docutils literal notranslate"><span class="pre">U+FFFE</span></code>, los bytes deben intercambiarse en la decodificación. Desafortunadamente, el carácter <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code> tenía un segundo propósito como <code class="docutils literal notranslate"><span class="pre">ESPACIO</span> <span class="pre">DE</span> <span class="pre">ANCHO</span> <span class="pre">CERO</span> <span class="pre">SIN</span> <span class="pre">QUIEBRA</span></code>: un carácter que no tiene ancho y no permite dividir una palabra. Por ejemplo, puede ser usado para dar pistas a un algoritmo de ligadura. Con Unicode 4.0, el uso de <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code> como <code class="docutils literal notranslate"><span class="pre">ESPACIO</span> <span class="pre">DE</span> <span class="pre">ANCHO</span> <span class="pre">CERO</span> <span class="pre">SIN</span> <span class="pre">QUIEBRA</span></code> ha quedado obsoleto (con <code class="docutils literal notranslate"><span class="pre">U+2060</span></code> (<code class="docutils literal notranslate"><span class="pre">WORD</span> <span class="pre">JOINER</span></code>) asumiendo este rol). Sin embargo, el software Unicode aún debe ser capaz de manejar <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code> en ambos roles: como BOM, es un dispositivo para determinar el diseño de almacenamiento de los bytes codificados, y desaparece una vez que la secuencia de bytes ha sido decodificada en una cadena; como un <code class="docutils literal notranslate"><span class="pre">ESPACIO</span> <span class="pre">DE</span> <span class="pre">ANCHO</span> <span class="pre">CERO</span> <span class="pre">SIN</span> <span class="pre">QUIEBRA</span></code> es un carácter normal que se decodificará como cualquier otro.</p>
+<p>Hay otra codificación que puede codificar el rango completo de caracteres Unicode: UTF-8. UTF-8 es una codificación de 8 bits, lo que significa que no hay problemas con el orden de bytes en UTF-8. Cada byte en una secuencia de bytes UTF-8 consta de dos partes: bits marcadores (los bits más significativos) y bits de carga útil. Los bits marcadores son una secuencia de cero a cuatro bits <code class="docutils literal notranslate"><span class="pre">1</span></code> seguidos de un bit <code class="docutils literal notranslate"><span class="pre">0</span></code>. Los caracteres Unicode se codifican de esta manera (con x siendo bits de carga útil, que cuando se concatenan dan el carácter Unicode):</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Rango</p></th>
+<th class="head"><p>Codificación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">U-00000000</span></code> … <code class="docutils literal notranslate"><span class="pre">U-0000007F</span></code></p></td>
+<td><p>0xxxxxxx</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">U-00000080</span></code> … <code class="docutils literal notranslate"><span class="pre">U-000007FF</span></code></p></td>
+<td><p>110xxxxx 10xxxxxx</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">U-00000800</span></code> … <code class="docutils literal notranslate"><span class="pre">U-0000FFFF</span></code></p></td>
+<td><p>1110xxxx 10xxxxxx 10xxxxxx</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">U-00010000</span></code> … <code class="docutils literal notranslate"><span class="pre">U-0010FFFF</span></code></p></td>
+<td><p>11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</p></td>
+</tr>
+</tbody>
+</table>
+<p>El bit menos significativo del carácter Unicode es el bit x más a la derecha.</p>
+<p>Como UTF-8 es una codificación de 8 bits, no se requiere una lista de materiales y cualquier carácter <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code> en la cadena decodificada (incluso si es el primer carácter) se trata como un <code class="docutils literal notranslate"><span class="pre">ESPACIO</span> <span class="pre">SIN</span> <span class="pre">QUIEBRE</span> <span class="pre">DE</span> <span class="pre">ANCHO</span> <span class="pre">CERO</span></code> (<em>``ZERO WIDTH NO-BREAK SPACE``</em>).</p>
+<p>Sin información externa, es imposible determinar de manera fidedigna qué codificación se utilizó para codificar una cadena de caracteres. Cada codificación de mapa de caracteres puede decodificar cualquier secuencia de bytes aleatoria. Sin embargo, eso no es posible con UTF-8, ya que las secuencias de bytes UTF-8 tienen una estructura que no permite secuencias de bytes arbitrarias. Para aumentar la confiabilidad con la que se puede detectar una codificación UTF-8, Microsoft inventó una variante de UTF-8 (que Python 2.5 llama <code class="docutils literal notranslate"><span class="pre">&quot;utf-8-sig&quot;</span></code>) para su programa Bloc de notas: Antes de que cualquier carácter Unicode sea escrito en un archivo, se escribe un BOM codificado en UTF-8 (que se muestra como una secuencia de bytes: <code class="docutils literal notranslate"><span class="pre">0xef</span></code>, <code class="docutils literal notranslate"><span class="pre">0xbb</span></code>, <code class="docutils literal notranslate"><span class="pre">0xbf</span></code>). Como es bastante improbable que cualquier archivo codificado del mapa de caracteres comience con estos valores de bytes (que, por ejemplo, se asignarían a</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">LETRA LATINA PEQUEÑA I CON DIAERESIS</div>
+<div class="line">SEÑALADO A LA DERECHA DE DOBLE ÁNGULO MARCA DE CITA</div>
+<div class="line">SIGNO DE PREGUNTA INVERTIDO</div>
+</div>
+</div></blockquote>
+<p>en iso-8859-1), esto aumenta la probabilidad de que una codificación <code class="docutils literal notranslate"><span class="pre">utf-8-sig</span></code> pueda adivinarse correctamente a partir de la secuencia de bytes. Por lo tanto, aquí la lista de materiales no se utiliza para poder determinar el orden de bytes utilizado para generar la secuencia de bytes, sino como una firma que ayuda a adivinar la codificación. Al codificar, el códec utf-8-sig escribirá <code class="docutils literal notranslate"><span class="pre">0xef</span></code>, <code class="docutils literal notranslate"><span class="pre">0xbb</span></code>, <code class="docutils literal notranslate"><span class="pre">0xbf</span></code> como los primeros tres bytes del archivo. Al decodificar, <code class="docutils literal notranslate"><span class="pre">utf-8-sig</span></code> omitirá esos tres bytes si aparecen como los primeros tres bytes en el archivo. En UTF-8, se desaconseja el uso de la lista de materiales y, en general, debe evitarse.</p>
+</section>
+<section id="standard-encodings">
+<span id="id3"></span><h2>Codificaciones estándar<a class="headerlink" href="#standard-encodings" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Python viene con una serie de códecs integrados, ya sea implementados como funciones C o con diccionarios como tablas de mapeo. La siguiente tabla enumera los códecs por nombre, junto con algunos alias comunes y los idiomas para los que probablemente se usa la codificación. Ni la lista de alias ni la lista de idiomas deben ser exhaustivas. Tenga en cuenta que las alternativas de ortografía que solo difieren en el caso o usan un guión en lugar de un guión bajo también son alias válidos; por lo tanto, por ejemplo <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> es un alias válido para el códec <code class="docutils literal notranslate"><span class="pre">'utf_8'</span></code>.</p>
+<div class="impl-detail compound">
+<p class="compound-first"><strong>Detalles de implementación de CPython:</strong> Algunas codificaciones comunes pueden omitir la maquinaria de búsqueda de códecs para mejorar el rendimiento. CPython solo reconoce estas oportunidades de optimización para un conjunto limitado de alias (sin distinción entre mayúsculas y minúsculas): utf-8, utf8, latin-1, latin1, iso-8859-1, iso8859-1, mbcs (solo Windows), ascii, us-ascii, utf-16, utf16, utf-32, utf32, y lo mismo usando guiones bajos en lugar de guiones. El uso de alias alternativos para estas codificaciones puede resultar en una ejecución más lenta.</p>
+<div class="compound-last versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>Oportunidad de optimización reconocida para us-ascii.</p>
+</div>
+</div>
+<p>Muchos de los juegos de caracteres admiten los mismos idiomas. Varían en caracteres individuales (por ejemplo, si el SIGNO EURO es compatible o no), y en la asignación de caracteres para codificar posiciones. Para los idiomas europeos en particular, generalmente existen las siguientes variantes:</p>
+<ul class="simple">
+<li><p>un conjunto de códigos ISO 8859</p></li>
+<li><p>una página de códigos de Microsoft Windows, que generalmente se deriva de un conjunto de códigos 8859, pero reemplaza los caracteres de control con caracteres gráficos adicionales</p></li>
+<li><p>una página de códigos EBCDIC de IBM</p></li>
+<li><p>una página de códigos de IBM PC, que es compatible con ASCII</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Códec</p></th>
+<th class="head"><p>Aliases</p></th>
+<th class="head"><p>Lenguajes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ascii</p></td>
+<td><p>646, us-ascii</p></td>
+<td><p>Inglés</p></td>
+</tr>
+<tr class="row-odd"><td><p>big5</p></td>
+<td><p>big5-tw, csbig5</p></td>
+<td><p>Chino Tradicional</p></td>
+</tr>
+<tr class="row-even"><td><p>big5hkscs</p></td>
+<td><p>big5-hkscs, hkscs</p></td>
+<td><p>Chino Tradicional</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp037</p></td>
+<td><p>IBM037, IBM039</p></td>
+<td><p>Inglés</p></td>
+</tr>
+<tr class="row-even"><td><p>cp273</p></td>
+<td><p>273, IBM273, csIBM273</p></td>
+<td><p>Alemán</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>cp424</p></td>
+<td><p>EBCDIC-CP-HE, IBM424</p></td>
+<td><p>Hebreo</p></td>
+</tr>
+<tr class="row-even"><td><p>cp437</p></td>
+<td><p>437, IBM437</p></td>
+<td><p>Inglés</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp500</p></td>
+<td><p>EBCDIC-CP-BE, EBCDIC-CP-CH,
+IBM500</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-even"><td><p>cp720</p></td>
+<td></td>
+<td><p>Árabe</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp737</p></td>
+<td></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-even"><td><p>cp775</p></td>
+<td><p>IBM775</p></td>
+<td><p>Lenguajes bálticos</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp850</p></td>
+<td><p>850, IBM850</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-even"><td><p>cp852</p></td>
+<td><p>852, IBM852</p></td>
+<td><p>Europa central y del este</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp855</p></td>
+<td><p>855, IBM855</p></td>
+<td><p>Búlgaro, Bielorruso, Macedonio, Ruso, Serbio</p></td>
+</tr>
+<tr class="row-even"><td><p>cp856</p></td>
+<td></td>
+<td><p>Hebreo</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp857</p></td>
+<td><p>857, IBM857</p></td>
+<td><p>Turco</p></td>
+</tr>
+<tr class="row-even"><td><p>cp858</p></td>
+<td><p>858, IBM858</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp860</p></td>
+<td><p>860, IBM860</p></td>
+<td><p>Portugués</p></td>
+</tr>
+<tr class="row-even"><td><p>cp861</p></td>
+<td><p>861, CP-IS, IBM861</p></td>
+<td><p>Islandés</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp862</p></td>
+<td><p>862, IBM862</p></td>
+<td><p>Hebreo</p></td>
+</tr>
+<tr class="row-even"><td><p>cp863</p></td>
+<td><p>863, IBM863</p></td>
+<td><p>Canadiense</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp864</p></td>
+<td><p>IBM864</p></td>
+<td><p>Árabe</p></td>
+</tr>
+<tr class="row-even"><td><p>cp865</p></td>
+<td><p>865, IBM865</p></td>
+<td><p>Danés, Noruego</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp866</p></td>
+<td><p>866, IBM866</p></td>
+<td><p>Ruso</p></td>
+</tr>
+<tr class="row-even"><td><p>cp869</p></td>
+<td><p>869, CP-GR, IBM869</p></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp874</p></td>
+<td></td>
+<td><p>Tailandés</p></td>
+</tr>
+<tr class="row-even"><td><p>cp875</p></td>
+<td></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp932</p></td>
+<td><p>932, ms932, mskanji, ms-kanji</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>cp949</p></td>
+<td><p>949, ms949, uhc</p></td>
+<td><p>Coreano</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp950</p></td>
+<td><p>950, ms950</p></td>
+<td><p>Chino Tradicional</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1006</p></td>
+<td></td>
+<td><p>Urdu</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp1026</p></td>
+<td><p>ibm1026</p></td>
+<td><p>Turco</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1125</p></td>
+<td><p>1125, ibm1125, cp866u, ruscii</p></td>
+<td><p>Ucraniano</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>cp1140</p></td>
+<td><p>ibm1140</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1250</p></td>
+<td><p>windows-1250</p></td>
+<td><p>Europa central y del este</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp1251</p></td>
+<td><p>windows-1251</p></td>
+<td><p>Búlgaro, Bielorruso, Macedonio, Ruso, Serbio</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1252</p></td>
+<td><p>windows-1252</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp1253</p></td>
+<td><p>windows-1253</p></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1254</p></td>
+<td><p>windows-1254</p></td>
+<td><p>Turco</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp1255</p></td>
+<td><p>windows-1255</p></td>
+<td><p>Hebreo</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1256</p></td>
+<td><p>windows-1256</p></td>
+<td><p>Árabe</p></td>
+</tr>
+<tr class="row-odd"><td><p>cp1257</p></td>
+<td><p>windows-1257</p></td>
+<td><p>Lenguajes bálticos</p></td>
+</tr>
+<tr class="row-even"><td><p>cp1258</p></td>
+<td><p>windows-1258</p></td>
+<td><p>Vietnamita</p></td>
+</tr>
+<tr class="row-odd"><td><p>euc_jp</p></td>
+<td><p>eucjp, ujis, u-jis</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>euc_jis_2004</p></td>
+<td><p>jisx0213, eucjis2004</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-odd"><td><p>euc_jisx0213</p></td>
+<td><p>eucjisx0213</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>euc_kr</p></td>
+<td><p>euckr, korean, ksc5601,
+ks_c-5601, ks_c-5601-1987,
+ksx1001, ks_x-1001</p></td>
+<td><p>Coreano</p></td>
+</tr>
+<tr class="row-odd"><td><p>gb2312</p></td>
+<td><p>chinese, csiso58gb231280,
+euc-cn, euccn, eucgb2312-cn,
+gb2312-1980, gb2312-80,
+iso-ir-58</p></td>
+<td><p>Chino simplificado</p></td>
+</tr>
+<tr class="row-even"><td><p>gbk</p></td>
+<td><p>936, cp936, ms936</p></td>
+<td><p>Chino Unificado</p></td>
+</tr>
+<tr class="row-odd"><td><p>gb18030</p></td>
+<td><p>gb18030-2000</p></td>
+<td><p>Chino Unificado</p></td>
+</tr>
+<tr class="row-even"><td><p>hz</p></td>
+<td><p>hzgb, hz-gb, hz-gb-2312</p></td>
+<td><p>Chino simplificado</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso2022_jp</p></td>
+<td><p>csiso2022jp, iso2022jp,
+iso-2022-jp</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>iso2022_jp_1</p></td>
+<td><p>iso2022jp-1, iso-2022-jp-1</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso2022_jp_2</p></td>
+<td><p>iso2022jp-2, iso-2022-jp-2</p></td>
+<td><p>Japonés, Coreano, Chino simplificado, Europa occidental, Griego</p></td>
+</tr>
+<tr class="row-even"><td><p>iso2022_jp_2004</p></td>
+<td><p>iso2022jp-2004,
+iso-2022-jp-2004</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso2022_jp_3</p></td>
+<td><p>iso2022jp-3, iso-2022-jp-3</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>iso2022_jp_ext</p></td>
+<td><p>iso2022jp-ext, iso-2022-jp-ext</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso2022_kr</p></td>
+<td><p>csiso2022kr, iso2022kr,
+iso-2022-kr</p></td>
+<td><p>Coreano</p></td>
+</tr>
+<tr class="row-even"><td><p>latin_1</p></td>
+<td><p>iso-8859-1, iso8859-1, 8859,
+cp819, latin, latin1, L1</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_2</p></td>
+<td><p>iso-8859-2, latin2, L2</p></td>
+<td><p>Europa central y del este</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_3</p></td>
+<td><p>iso-8859-3, latin3, L3</p></td>
+<td><p>Esperanto, Maltés</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_4</p></td>
+<td><p>iso-8859-4, latin4, L4</p></td>
+<td><p>Lenguajes bálticos</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_5</p></td>
+<td><p>iso-8859-5, cyrillic</p></td>
+<td><p>Búlgaro, Bielorruso, Macedonio, Ruso, Serbio</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_6</p></td>
+<td><p>iso-8859-6, arabic</p></td>
+<td><p>Árabe</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_7</p></td>
+<td><p>iso-8859-7, greek, greek8</p></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_8</p></td>
+<td><p>iso-8859-8, hebrew</p></td>
+<td><p>Hebreo</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_9</p></td>
+<td><p>iso-8859-9, latin5, L5</p></td>
+<td><p>Turco</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_10</p></td>
+<td><p>iso-8859-10, latin6, L6</p></td>
+<td><p>Lenguajes nórdicos</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_11</p></td>
+<td><p>iso-8859-11, thai</p></td>
+<td><p>Lenguajes tailandeses</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_13</p></td>
+<td><p>iso-8859-13, latin7, L7</p></td>
+<td><p>Lenguajes bálticos</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_14</p></td>
+<td><p>iso-8859-14, latin8, L8</p></td>
+<td><p>Lenguajes Celtas</p></td>
+</tr>
+<tr class="row-odd"><td><p>iso8859_15</p></td>
+<td><p>iso-8859-15, latin9, L9</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-even"><td><p>iso8859_16</p></td>
+<td><p>iso-8859-16, latin10, L10</p></td>
+<td><p>Europa sudoriental</p></td>
+</tr>
+<tr class="row-odd"><td><p>johab</p></td>
+<td><p>cp1361, ms1361</p></td>
+<td><p>Coreano</p></td>
+</tr>
+<tr class="row-even"><td><p>koi8_r</p></td>
+<td></td>
+<td><p>Ruso</p></td>
+</tr>
+<tr class="row-odd"><td><p>koi8_t</p></td>
+<td></td>
+<td><p>Tayiko</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>koi8_u</p></td>
+<td></td>
+<td><p>Ucraniano</p></td>
+</tr>
+<tr class="row-odd"><td><p>kz1048</p></td>
+<td><p>kz_1048, strk1048_2002, rk1048</p></td>
+<td><p>Kazajo</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>mac_cyrillic</p></td>
+<td><p>maccyrillic</p></td>
+<td><p>Búlgaro, Bielorruso, Macedonio, Ruso, Serbio</p></td>
+</tr>
+<tr class="row-odd"><td><p>mac_greek</p></td>
+<td><p>macgreek</p></td>
+<td><p>Griego</p></td>
+</tr>
+<tr class="row-even"><td><p>mac_iceland</p></td>
+<td><p>maciceland</p></td>
+<td><p>Islandés</p></td>
+</tr>
+<tr class="row-odd"><td><p>mac_latin2</p></td>
+<td><p>maclatin2, maccentraleurope,
+mac_centeuro</p></td>
+<td><p>Europa central y del este</p></td>
+</tr>
+<tr class="row-even"><td><p>mac_roman</p></td>
+<td><p>macroman, macintosh</p></td>
+<td><p>Europa Occidental</p></td>
+</tr>
+<tr class="row-odd"><td><p>mac_turkish</p></td>
+<td><p>macturkish</p></td>
+<td><p>Turco</p></td>
+</tr>
+<tr class="row-even"><td><p>ptcp154</p></td>
+<td><p>csptcp154, pt154, cp154,
+cyrillic-asian</p></td>
+<td><p>Kazajo</p></td>
+</tr>
+<tr class="row-odd"><td><p>shift_jis</p></td>
+<td><p>csshiftjis, shiftjis, sjis,
+s_jis</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>shift_jis_2004</p></td>
+<td><p>shiftjis2004, sjis_2004,
+sjis2004</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-odd"><td><p>shift_jisx0213</p></td>
+<td><p>shiftjisx0213, sjisx0213,
+s_jisx0213</p></td>
+<td><p>Japonés</p></td>
+</tr>
+<tr class="row-even"><td><p>utf_32</p></td>
+<td><p>U32, utf32</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-odd"><td><p>utf_32_be</p></td>
+<td><p>UTF-32BE</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-even"><td><p>utf_32_le</p></td>
+<td><p>UTF-32LE</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-odd"><td><p>utf_16</p></td>
+<td><p>U16, utf16</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-even"><td><p>utf_16_be</p></td>
+<td><p>UTF-16BE</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-odd"><td><p>utf_16_le</p></td>
+<td><p>UTF-16LE</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-even"><td><p>utf_7</p></td>
+<td><p>U7, unicode-1-1-utf-7</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-odd"><td><p>utf_8</p></td>
+<td><p>U8, UTF, utf8, cp65001</p></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+<tr class="row-even"><td><p>utf_8_sig</p></td>
+<td></td>
+<td><p>todos los lenguajes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Los codificadores utf-16* y utf-32* ya no permiten codificar puntos de código sustitutos (<code class="docutils literal notranslate"><span class="pre">U+D800</span></code> – <code class="docutils literal notranslate"><span class="pre">U+DFFF</span></code>). Los decodificadores utf-32* ya no decodifican secuencias de bytes que corresponden a puntos de código sustituto.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span><code class="docutils literal notranslate"><span class="pre">cp65001</span></code> ahora es un alias de <code class="docutils literal notranslate"><span class="pre">utf_8</span></code>.</p>
+</div>
+</section>
+<section id="python-specific-encodings">
+<h2>Codificaciones específicas de Python<a class="headerlink" href="#python-specific-encodings" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Varios códecs predefinidos son específicos de Python, por lo que sus nombres de códec no tienen significado fuera de Python. Estos se enumeran en las tablas a continuación según los tipos de entrada y salida esperados (tenga en cuenta que si bien las codificaciones de texto son el caso de uso más común para los códecs, la infraestructura de códecs subyacente admite transformaciones de datos arbitrarias en lugar de solo codificaciones de texto). Para los códecs asimétricos, el significado indicado describe la dirección de codificación.</p>
+<section id="text-encodings">
+<h3>Codificaciones de texto<a class="headerlink" href="#text-encodings" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los siguientes códecs proporcionan codificación de <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> a <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> y decodificación de <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> a <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, similar a las codificaciones de texto Unicode.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 16%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Códec</p></th>
+<th class="head"><p>Aliases</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>idna</p></td>
+<td></td>
+<td><p>Implementar <span class="target" id="index-28"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3490.html"><strong>RFC 3490</strong></a>, ver también <a class="reference internal" href="#module-encodings.idna" title="encodings.idna: Internationalized Domain Names implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.idna</span></code></a>. Solo se admite <code class="docutils literal notranslate"><span class="pre">errors='strict'</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>mbcs</p></td>
+<td><p>ansi,
+dbcs</p></td>
+<td><p>Solo Windows: codifique el operando de acuerdo con la página de códigos ANSI (CP_ACP).</p></td>
+</tr>
+<tr class="row-even"><td><p>oem</p></td>
+<td></td>
+<td><p>Solo Windows: codifique el operando de acuerdo con la página de códigos OEM (CP_OEMCP).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>palmos</p></td>
+<td></td>
+<td><p>Codificación de PalmOS 3.5.</p></td>
+</tr>
+<tr class="row-even"><td><p>punycode</p></td>
+<td></td>
+<td><p>Implementar <span class="target" id="index-29"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3492.html"><strong>RFC 3492</strong></a>. Los códecs con estado no son compatibles.</p></td>
+</tr>
+<tr class="row-odd"><td><p>raw_unicode_escape</p></td>
+<td></td>
+<td><p>Codificación Latin-1 con <code class="docutils literal notranslate"><span class="pre">\uXXXX</span></code> y <code class="docutils literal notranslate"><span class="pre">\UXXXXXXXX</span></code> para otros puntos de código. Las barras invertidas existentes no se escapan de ninguna manera. Se usa en el protocolo Python <em>pickle</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p>indefinido</p></td>
+<td></td>
+<td><p>Lanza una excepción para todas las conversiones, incluso cadenas vacías. El manejador de errores se ignora.</p></td>
+</tr>
+<tr class="row-odd"><td><p>unicode_escape</p></td>
+<td></td>
+<td><p>Codificación adecuada como contenido de un literal Unicode en código fuente Python codificado en ASCII, excepto que no se escapan las comillas. Decodificar desde el código fuente Latin-1. Tenga en cuenta que el código fuente de Python realmente usa UTF-8 por defecto.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Se elimina el códec «unicode_internal».</p>
+</div>
+</section>
+<section id="binary-transforms">
+<span id="id4"></span><h3>Transformaciones Binarias<a class="headerlink" href="#binary-transforms" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los siguientes códecs proporcionan transformaciones binarias: mapeos de <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> a <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. No son compatibles con <a class="reference internal" href="stdtypes.html#bytes.decode" title="bytes.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bytes.decode()</span></code></a> (que solo produce <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> de salida).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 18%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Códec</p></th>
+<th class="head"><p>Aliases</p></th>
+<th class="head"><p>Significado</p></th>
+<th class="head"><p>Codificador / decodificador</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>base64_codec <a class="footnote-reference brackets" href="#b64" id="id5">1</a></p></td>
+<td><p>base64, base_64</p></td>
+<td><p>Convierta el operando a MIME base64 multilínea (el resultado siempre incluye un <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> final).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>acepta cualquier <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> como entrada para codificar y decodificar</p>
+</div>
+</td>
+<td><p><a class="reference internal" href="base64.html#base64.encodebytes" title="base64.encodebytes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">base64.encodebytes()</span></code></a> /
+<a class="reference internal" href="base64.html#base64.decodebytes" title="base64.decodebytes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">base64.decodebytes()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>bz2_codec</p></td>
+<td><p>bz2</p></td>
+<td><p>Comprime el operando usando bz2.</p></td>
+<td><p><a class="reference internal" href="bz2.html#bz2.compress" title="bz2.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bz2.compress()</span></code></a> /
+<a class="reference internal" href="bz2.html#bz2.decompress" title="bz2.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bz2.decompress()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>hex_codec</p></td>
+<td><p>hex</p></td>
+<td><p>Convierte el operando en representación hexadecimal, con dos dígitos por byte.</p></td>
+<td><p><a class="reference internal" href="binascii.html#binascii.b2a_hex" title="binascii.b2a_hex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">binascii.b2a_hex()</span></code></a> /
+<a class="reference internal" href="binascii.html#binascii.a2b_hex" title="binascii.a2b_hex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">binascii.a2b_hex()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>quopri_codec</p></td>
+<td><p>quopri,
+quotedprintable,
+quoted_printable</p></td>
+<td><p>Convierte el operando a MIME citado imprimible.</p></td>
+<td><p><a class="reference internal" href="quopri.html#quopri.encode" title="quopri.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">quopri.encode()</span></code></a> con <code class="docutils literal notranslate"><span class="pre">quotetabs=True</span></code> / <a class="reference internal" href="quopri.html#quopri.decode" title="quopri.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">quopri.decode()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>uu_codec</p></td>
+<td><p>uu</p></td>
+<td><p>Convierte el operando usando uuencode.</p></td>
+<td><p><a class="reference internal" href="uu.html#uu.encode" title="uu.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">uu.encode()</span></code></a> /
+<a class="reference internal" href="uu.html#uu.decode" title="uu.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">uu.decode()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>zlib_codec</p></td>
+<td><p>zip, zlib</p></td>
+<td><p>Comprime el operando usando gzip.</p></td>
+<td><p><a class="reference internal" href="zlib.html#zlib.compress" title="zlib.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">zlib.compress()</span></code></a> /
+<a class="reference internal" href="zlib.html#zlib.decompress" title="zlib.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">zlib.decompress()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="b64"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
+<dd><p>Además de <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">objetos similares a bytes</span></a>, <code class="docutils literal notranslate"><span class="pre">'base64_codec'</span></code> también acepta instancias solo ASCII de <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> para decodificación</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2: </span>Restauración de las transformaciones binarias.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Restauración de los alias para las transformaciones binarias.</p>
+</div>
+</section>
+<section id="text-transforms">
+<span id="id6"></span><h3>Transformaciones de texto<a class="headerlink" href="#text-transforms" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El siguiente códec proporciona una transformación de texto: un mapeo de <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> a <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>. No es compatible con <a class="reference internal" href="stdtypes.html#str.encode" title="str.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.encode()</span></code></a> (que solo produce <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> de salida).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 16%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Códec</p></th>
+<th class="head"><p>Aliases</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>rot_13</p></td>
+<td><p>rot13</p></td>
+<td><p>Retorna el cifrado César (<em>Caesar-cypher</em>) del operando.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2: </span>Restauración de la transformación de texto <code class="docutils literal notranslate"><span class="pre">rot_13</span></code>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Restauración del alias <code class="docutils literal notranslate"><span class="pre">rot13</span></code>.</p>
+</div>
+</section>
+</section>
+<section id="module-encodings.idna">
+<span id="encodings-idna-internationalized-domain-names-in-applications"></span><h2><a class="reference internal" href="#module-encodings.idna" title="encodings.idna: Internationalized Domain Names implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.idna</span></code></a> — Nombres de dominio internacionalizados en aplicaciones<a class="headerlink" href="#module-encodings.idna" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Este módulo implementa <span class="target" id="index-30"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3490.html"><strong>RFC 3490</strong></a> (nombres de dominio internacionalizados en aplicaciones) y <span class="target" id="index-31"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3492.html"><strong>RFC 3492</strong></a> (<em>Nameprep</em>: un perfil de <em>Stringprep</em> para nombres de dominio internacionalizados (IDN)). Se basa en la codificación <code class="docutils literal notranslate"><span class="pre">punycode</span></code> y <a class="reference internal" href="stringprep.html#module-stringprep" title="stringprep: String preparation, as per RFC 3453"><code class="xref py py-mod docutils literal notranslate"><span class="pre">stringprep</span></code></a>.</p>
+<p>Si necesita el estándar IDNA 2008 de <span class="target" id="index-32"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc5891.html"><strong>RFC 5891</strong></a> y <span class="target" id="index-33"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc5895.html"><strong>RFC 5895</strong></a>, use el <cite>módulo idna &lt;https://pypi.org/project/idna/&gt;_</cite> de terceros.</p>
+<p>Estas RFC juntas definen un protocolo para admitir caracteres no ASCII en los nombres de dominio. Un nombre de dominio que contiene caracteres no ASCII (como <code class="docutils literal notranslate"><span class="pre">www.Alliancefrançaise.nu</span></code>) se convierte en una codificación compatible con ASCII (ACE, como <code class="docutils literal notranslate"><span class="pre">www.xn--alliancefranaise-npb.nu</span></code>). La forma ACE del nombre de dominio se utiliza en todos los lugares donde el protocolo no permite caracteres arbitrarios, como consultas DNS, campos HTTP <em class="mailheader">Host</em>, etc. Esta conversión se lleva a cabo en la aplicación; si es posible invisible para el usuario: la aplicación debe convertir de forma transparente las etiquetas de dominio Unicode a IDNA en el cable, y volver a convertir las etiquetas ACE a Unicode antes de presentarlas al usuario.</p>
+<p>Python admite esta conversión de varias maneras: el códec <code class="docutils literal notranslate"><span class="pre">idna</span></code> realiza la conversión entre Unicode y ACE, separando una cadena de entrada en etiquetas basadas en los caracteres separadores definidos en la sección 3.1 de RFC 3490 <span class="target" id="index-34"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3490.html#section-3.1"><strong>RFC 3490#section-3.1</strong></a> y convertir cada etiqueta a ACE según sea necesario, y por el contrario, separar una cadena de bytes de entrada en etiquetas basadas en el separador <code class="docutils literal notranslate"><span class="pre">.</span></code> y convertir cualquier etiqueta ACE encontrada en unicode. Además, el módulo <a class="reference internal" href="socket.html#module-socket" title="socket: Low-level networking interface."><code class="xref py py-mod docutils literal notranslate"><span class="pre">socket</span></code></a> convierte de forma transparente los nombres de host Unicode a ACE, por lo que las aplicaciones no necesitan preocuparse por convertir los nombres de host ellos mismos cuando los pasan al módulo de socket. Además de eso, los módulos que tienen nombres de host como parámetros de función, como <a class="reference internal" href="http.client.html#module-http.client" title="http.client: HTTP and HTTPS protocol client (requires sockets)."><code class="xref py py-mod docutils literal notranslate"><span class="pre">http.client</span></code></a> y <a class="reference internal" href="ftplib.html#module-ftplib" title="ftplib: FTP protocol client (requires sockets)."><code class="xref py py-mod docutils literal notranslate"><span class="pre">ftplib</span></code></a>, aceptan nombres de host Unicode (<a class="reference internal" href="http.client.html#module-http.client" title="http.client: HTTP and HTTPS protocol client (requires sockets)."><code class="xref py py-mod docutils literal notranslate"><span class="pre">http.client</span></code></a> y luego también envían un mensaje transparente IDNA <em>hostname</em> en el campo <em class="mailheader">Host</em> si envía ese campo).</p>
+<p>Al recibir nombres de host desde el cable (como en la búsqueda inversa de nombres), no se realiza una conversión automática a Unicode: las aplicaciones que deseen presentar dichos nombres de host al usuario deben decodificarlos en Unicode.</p>
+<p>El módulo <a class="reference internal" href="#module-encodings.idna" title="encodings.idna: Internationalized Domain Names implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.idna</span></code></a> también implementa el procedimiento <em>nameprep</em>, que realiza ciertas normalizaciones en los nombres de host, para lograr la insensibilidad a mayúsculas y minúsculas de los nombres de dominio internacionales y unificar caracteres similares. Las funciones <em>nameprep</em> se pueden usar directamente si lo desea.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="encodings.idna.nameprep">
+<span class="sig-prename descclassname"><span class="pre">encodings.idna.</span></span><span class="sig-name descname"><span class="pre">nameprep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#encodings.idna.nameprep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la versión pasada por <em>nameprep</em> (o versión <em>nameprepped</em>) de <em>label</em>. La implementación actualmente asume cadenas de caracteres de consulta, por lo que <code class="docutils literal notranslate"><span class="pre">AllowUnassigned</span></code> es verdadero.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="encodings.idna.ToASCII">
+<span class="sig-prename descclassname"><span class="pre">encodings.idna.</span></span><span class="sig-name descname"><span class="pre">ToASCII</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#encodings.idna.ToASCII" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Convierte una etiqueta a ASCII, como se especifica en <span class="target" id="index-35"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3490.html"><strong>RFC 3490</strong></a>. Se supone que <code class="docutils literal notranslate"><span class="pre">UseSTD3ASCIIRules</span></code> es falso.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="encodings.idna.ToUnicode">
+<span class="sig-prename descclassname"><span class="pre">encodings.idna.</span></span><span class="sig-name descname"><span class="pre">ToUnicode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#encodings.idna.ToUnicode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Convierte una etiqueta a Unicode, como se especifica en <span class="target" id="index-36"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3490.html"><strong>RFC 3490</strong></a>.</p>
+</dd></dl>
+
+</section>
+<section id="module-encodings.mbcs">
+<span id="encodings-mbcs-windows-ansi-codepage"></span><h2><a class="reference internal" href="#module-encodings.mbcs" title="encodings.mbcs: Windows ANSI codepage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.mbcs</span></code></a> — Página de códigos ANSI de Windows<a class="headerlink" href="#module-encodings.mbcs" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Este módulo implementa la página de códigos ANSI (CP_ACP).</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: Windows.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Admite cualquier manejador de errores.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>Antes de 3.2, se ignoraba el argumento <em>errors</em>; <code class="docutils literal notranslate"><span class="pre">'replace'</span></code> siempre se usó para codificar e <code class="docutils literal notranslate"><span class="pre">'ignore'</span></code> para decodificar.</p>
+</div>
+</section>
+<section id="module-encodings.utf_8_sig">
+<span id="encodings-utf-8-sig-utf-8-codec-with-bom-signature"></span><h2><a class="reference internal" href="#module-encodings.utf_8_sig" title="encodings.utf_8_sig: UTF-8 codec with BOM signature"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.utf_8_sig</span></code></a> — Códec UTF-8 con firma BOM<a class="headerlink" href="#module-encodings.utf_8_sig" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Este módulo implementa una variante del códec UTF-8. Al codificar, una lista de materiales codificada en UTF-8 se antepondrá a los bytes codificados en UTF-8. Para el codificador con estado esto solo se hace una vez (en la primera escritura en el flujo de bytes). En la decodificación, se omitirá una lista de materiales opcional codificada en UTF-8 al comienzo de los datos.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code> — Registro de códec y clases base</a><ul>
+<li><a class="reference internal" href="#codec-base-classes">Clases Base de Códec</a><ul>
+<li><a class="reference internal" href="#error-handlers">Manejadores de errores</a></li>
+<li><a class="reference internal" href="#stateless-encoding-and-decoding">Codificación y decodificación sin estado</a></li>
+<li><a class="reference internal" href="#incremental-encoding-and-decoding">Codificación y decodificación incrementales</a><ul>
+<li><a class="reference internal" href="#incrementalencoder-objects">Objetos IncrementalEncoder</a></li>
+<li><a class="reference internal" href="#incrementaldecoder-objects">Objetos IncrementalDecoder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stream-encoding-and-decoding">Codificación y decodificación de flujos</a><ul>
+<li><a class="reference internal" href="#streamwriter-objects">Objetos StreamWriter</a></li>
+<li><a class="reference internal" href="#streamreader-objects">Objetos StreamReader</a></li>
+<li><a class="reference internal" href="#streamreaderwriter-objects">Objetos StreamReaderWriter</a></li>
+<li><a class="reference internal" href="#streamrecoder-objects">Objetos StreamRecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#encodings-and-unicode">Codificaciones y Unicode</a></li>
+<li><a class="reference internal" href="#standard-encodings">Codificaciones estándar</a></li>
+<li><a class="reference internal" href="#python-specific-encodings">Codificaciones específicas de Python</a><ul>
+<li><a class="reference internal" href="#text-encodings">Codificaciones de texto</a></li>
+<li><a class="reference internal" href="#binary-transforms">Transformaciones Binarias</a></li>
+<li><a class="reference internal" href="#text-transforms">Transformaciones de texto</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-encodings.idna"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.idna</span></code> — Nombres de dominio internacionalizados en aplicaciones</a></li>
+<li><a class="reference internal" href="#module-encodings.mbcs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.mbcs</span></code> — Página de códigos ANSI de Windows</a></li>
+<li><a class="reference internal" href="#module-encodings.utf_8_sig"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encodings.utf_8_sig</span></code> — Códec UTF-8 con firma BOM</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="struct.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">struct</span></code> — Interpreta bytes como paquetes de datos binarios</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="datatypes.html"
+                          title="próximo capítulo">Tipos de datos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/codecs.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="datatypes.html" title="Tipos de datos"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="struct.html" title="struct — Interpreta bytes como paquetes de datos binarios"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="binary.html" >Servicios de datos binarios</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code> — Registro de códec y clases base</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

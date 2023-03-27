@@ -1,0 +1,1688 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="dis — Desensamblador para bytecode de Python" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/dis.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/dis.py El módulo dis admite el análisis de CPython bytecode al desarmarlo. El bytecode de CPython que este módulo toma como entrada se define en el archivo Include/opcode.h y lo ..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/dis.py El módulo dis admite el análisis de CPython bytecode al desarmarlo. El bytecode de CPython que este módulo toma como entrada se define en el archivo Include/opcode.h y lo ..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>dis — Desensamblador para bytecode de Python &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="pickletools — Herramientas para desarrolladores pickle" href="pickletools.html" />
+    <link rel="prev" title="compileall — Bibliotecas de Python de compilación de bytes" href="compileall.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/dis.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code> — Desensamblador para bytecode de Python</a><ul>
+<li><a class="reference internal" href="#bytecode-analysis">Análisis de bytecode</a></li>
+<li><a class="reference internal" href="#analysis-functions">Funciones de análisis</a></li>
+<li><a class="reference internal" href="#python-bytecode-instructions">Instrucciones bytecode de Python</a></li>
+<li><a class="reference internal" href="#opcode-collections">Colecciones opcode</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="compileall.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compileall</span></code> — Bibliotecas de Python de compilación de bytes</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="pickletools.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickletools</span></code> — Herramientas para desarrolladores pickle</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/dis.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="pickletools.html" title="pickletools — Herramientas para desarrolladores pickle"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="compileall.html" title="compileall — Bibliotecas de Python de compilación de bytes"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="language.html" accesskey="U">Servicios del lenguaje Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code> — Desensamblador para bytecode de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-dis">
+<span id="dis-disassembler-for-python-bytecode"></span><h1><a class="reference internal" href="#module-dis" title="dis: Disassembler for Python bytecode."><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code></a> — Desensamblador para bytecode de Python<a class="headerlink" href="#module-dis" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/dis.py">Lib/dis.py</a></p>
+<hr class="docutils" />
+<p>El módulo <a class="reference internal" href="#module-dis" title="dis: Disassembler for Python bytecode."><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code></a> admite el análisis de CPython <a class="reference internal" href="../glossary.html#term-bytecode"><span class="xref std std-term">bytecode</span></a> al desarmarlo. El bytecode de CPython que este módulo toma como entrada se define en el archivo <code class="file docutils literal notranslate"><span class="pre">Include/opcode.h</span></code> y lo utilizan el compilador y el intérprete.</p>
+<div class="impl-detail compound">
+<p class="compound-first"><strong>Detalles de implementación de CPython:</strong> Bytecode es un detalle de implementación del intérprete CPython. No se garantiza que el bytecode no se agregará, eliminará ni cambiará entre las versiones de Python. El uso de este módulo no debe considerarse para trabajar en diferentes máquinas virtuales Python o versiones de Python.</p>
+<div class="compound-middle versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>Use 2 bytes para cada instrucción. Anteriormente, el número de bytes variaba según la instrucción.</p>
+</div>
+<div class="compound-middle versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>El argumento de las instrucciones de salto, manejo de excepciones y bucle ahora es el desplazamiento de instrucción en lugar del desplazamiento de byte.</p>
+</div>
+<div class="compound-last versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Some instructions are accompanied by one or more inline cache entries,
+which take the form of <a class="reference internal" href="#opcode-CACHE"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">CACHE</span></code></a> instructions. These instructions
+are hidden by default, but can be shown by passing <code class="docutils literal notranslate"><span class="pre">show_caches=True</span></code> to
+any <a class="reference internal" href="#module-dis" title="dis: Disassembler for Python bytecode."><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code></a> utility. Furthermore, the interpreter now adapts the
+bytecode to specialize it for different runtime conditions. The
+adaptive bytecode can be shown by passing <code class="docutils literal notranslate"><span class="pre">adaptive=True</span></code>.</p>
+</div>
+</div>
+<p>Ejemplo: dada la función <code class="xref py py-func docutils literal notranslate"><span class="pre">myfunc()</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>el siguiente comando se puede utilizar para mostrar el desmontaje de <code class="xref py py-func docutils literal notranslate"><span class="pre">myfunc()</span></code>:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">myfunc</span><span class="p">)</span>
+<span class="go">  2           0 RESUME                   0</span>
+
+<span class="go">  3           2 LOAD_GLOBAL              1 (NULL + len)</span>
+<span class="go">             14 LOAD_FAST                0 (alist)</span>
+<span class="go">             16 PRECALL                  1</span>
+<span class="go">             20 CALL                     1</span>
+<span class="go">             30 RETURN_VALUE</span>
+</pre></div>
+</div>
+<p>(El «2» es un número de línea).</p>
+<section id="bytecode-analysis">
+<h2>Análisis de bytecode<a class="headerlink" href="#bytecode-analysis" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<p>La API de análisis de bytecode permite que partes del código Python se envuelvan en un objeto <a class="reference internal" href="#dis.Bytecode" title="dis.Bytecode"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytecode</span></code></a> que proporciona un fácil acceso a los detalles del código compilado.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dis.Bytecode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">Bytecode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.Bytecode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Analiza el bytecode correspondiente a una función, generador, generador asíncrono, corutina, método, cadena de código fuente o un objeto de código (como lo retorna <a class="reference internal" href="functions.html#compile" title="compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">compile()</span></code></a>).</p>
+<p>Este es un contenedor conveniente para muchas de las funciones enumeradas a continuación, en particular <a class="reference internal" href="#dis.get_instructions" title="dis.get_instructions"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_instructions()</span></code></a>, ya que iterar sobre una instancia de <a class="reference internal" href="#dis.Bytecode" title="dis.Bytecode"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytecode</span></code></a> produce las operaciones de bytecode como instancias de <a class="reference internal" href="#dis.Instruction" title="dis.Instruction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instruction</span></code></a>.</p>
+<p>Si <em>first_line</em> no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, indica el número de línea que se debe informar para la primera línea de origen en el código desmontado. De lo contrario, la información de la línea de origen (si la hay) se toma directamente del objeto de código desmontado.</p>
+<p>Si <em>current_offset</em> no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, se refiere a un desplazamiento de instrucción en el código desmontado. Establecer esto significa <a class="reference internal" href="#dis.Bytecode.dis" title="dis.Bytecode.dis"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dis()</span></code></a> mostrará un marcador de «instrucción actual» contra el código de operación especificado.</p>
+<p>If <em>show_caches</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, <a class="reference internal" href="#dis.Bytecode.dis" title="dis.Bytecode.dis"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dis()</span></code></a> will display inline cache
+entries used by the interpreter to specialize the bytecode.</p>
+<p>If <em>adaptive</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, <a class="reference internal" href="#dis.Bytecode.dis" title="dis.Bytecode.dis"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dis()</span></code></a> will display specialized bytecode
+that may be different from the original bytecode.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dis.Bytecode.from_traceback">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_traceback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tb</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.Bytecode.from_traceback" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Construye una instancia de <a class="reference internal" href="#dis.Bytecode" title="dis.Bytecode"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytecode</span></code></a> a partir del <em>traceback</em> dado, estableciendo <em>current_offset</em> en la instrucción responsable de la excepción.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Bytecode.codeobj">
+<span class="sig-name descname"><span class="pre">codeobj</span></span><a class="headerlink" href="#dis.Bytecode.codeobj" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El objeto de código compilado.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Bytecode.first_line">
+<span class="sig-name descname"><span class="pre">first_line</span></span><a class="headerlink" href="#dis.Bytecode.first_line" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La primera línea de origen del objeto de código (si está disponible)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dis.Bytecode.dis">
+<span class="sig-name descname"><span class="pre">dis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dis.Bytecode.dis" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una vista formateada de las operaciones de bytecode (lo mismo que impreso por <a class="reference internal" href="#dis.dis" title="dis.dis"><code class="xref py py-func docutils literal notranslate"><span class="pre">dis.dis()</span></code></a>, pero retornado como una cadena de caracteres multilínea).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dis.Bytecode.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dis.Bytecode.info" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una cadena de caracteres multilínea formateada con información detallada sobre el objeto de código, como <a class="reference internal" href="#dis.code_info" title="dis.code_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">code_info()</span></code></a>.</p>
+</dd></dl>
+
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Esto ahora puede manejar objetos generadores asíncronos y de corutinas.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Added the <em>show_caches</em> and <em>adaptive</em> parameters.</p>
+</div>
+</dd></dl>
+
+<p>Ejemplo:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bytecode</span> <span class="o">=</span> <span class="n">dis</span><span class="o">.</span><span class="n">Bytecode</span><span class="p">(</span><span class="n">myfunc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">instr</span> <span class="ow">in</span> <span class="n">bytecode</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">instr</span><span class="o">.</span><span class="n">opname</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">RESUME</span>
+<span class="go">LOAD_GLOBAL</span>
+<span class="go">LOAD_FAST</span>
+<span class="go">PRECALL</span>
+<span class="go">CALL</span>
+<span class="go">RETURN_VALUE</span>
+</pre></div>
+</div>
+</section>
+<section id="analysis-functions">
+<h2>Funciones de análisis<a class="headerlink" href="#analysis-functions" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El módulo <a class="reference internal" href="#module-dis" title="dis: Disassembler for Python bytecode."><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code></a> también define las siguientes funciones de análisis que convierten la entrada directamente en la salida deseada. Pueden ser útiles si solo se realiza una sola operación, por lo que el objeto de análisis intermedio no es útil:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.code_info">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">code_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.code_info" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una cadena de caracteres multilínea formateada con información detallada del objeto de código para la función, generador, generador asíncrono, corutina, método, cadena de código fuente u objeto de código suministrados.</p>
+<p>Tenga en cuenta que el contenido exacto de las cadenas de información de código depende en gran medida de la implementación y puede cambiar arbitrariamente en las diferentes máquinas virtuales Python o las versiones de Python.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Esto ahora puede manejar objetos generadores asíncronos y de corutinas.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.show_code">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">show_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.show_code" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime información detallada del objeto de código para la función, método, cadena de código fuente u objeto de código suministrado en <em>file</em> (o <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code> si <em>file</em> no está especificado).</p>
+<p>Esta es una abreviatura conveniente para <code class="docutils literal notranslate"><span class="pre">print(code_info(x),</span> <span class="pre">file=file)</span></code>, destinado a la exploración interactiva en el indicador del intérprete (<em>prompt</em>).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Agrega un parámetro <em>file</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.dis">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">dis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.dis" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desmontar el objeto <em>x</em>. <em>x</em> puede denotar un módulo, una clase, un método, una función, un generador, un generador asíncrono, una corutina, un objeto de código, una cadena de código fuente o una secuencia de bytes de código de bytes sin procesar. Para un módulo, desmonta todas las funciones. Para una clase, desmonta todos los métodos (incluidos los métodos de clase y estáticos). Para un objeto de código o secuencia de bytecode sin procesar, imprime una línea por instrucción de bytecode. También desmonta recursivamente objetos de código anidados (el código de comprensiones, expresiones generadoras y funciones anidadas, y el código utilizado para construir clases anidadas). Las cadenas de caracteres se compilan primero en objetos de código con la función incorporada <a class="reference internal" href="functions.html#compile" title="compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">compile()</span></code></a> antes de desmontarse. Si no se proporciona ningún objeto, esta función desmonta el último rastreo.</p>
+<p>El desensamblaje se escribe como texto en el argumento <em>file</em> proporcionado si se proporciona y, de lo contrario, <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code>.</p>
+<p>La profundidad máxima de recursión está limitada por <em>depth</em> a menos que sea <code class="docutils literal notranslate"><span class="pre">None</span></code>. <code class="docutils literal notranslate"><span class="pre">depth=0</span></code> significa que no hay recursión.</p>
+<p>If <em>show_caches</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function will display inline cache
+entries used by the interpreter to specialize the bytecode.</p>
+<p>If <em>adaptive</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function will display specialized bytecode
+that may be different from the original bytecode.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Agrega un parámetro <em>file</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Desensamblaje recursivo implementado y parámetro agregado <em>depth</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Esto ahora puede manejar objetos generadores asíncronos y de corutinas.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Added the <em>show_caches</em> and <em>adaptive</em> parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.distb">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">distb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.distb" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desmonta la función de inicio de pila de un rastreo, utilizando el último rastreo si no se pasó ninguno. Se indica la instrucción que causa la excepción.</p>
+<p>El desensamblaje se escribe como texto en el argumento <em>file</em> proporcionado si se proporciona y, de lo contrario, <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Agrega un parámetro <em>file</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Added the <em>show_caches</em> and <em>adaptive</em> parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.disassemble">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">disassemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lasti</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.disassemble" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="dis.disco">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">disco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lasti</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.disco" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desmonta un objeto de código, que indica la última instrucción si se proporcionó <em>lasti</em>. La salida se divide en las siguientes columnas:</p>
+<ol class="arabic simple">
+<li><p>el número de línea, para la primera instrucción de cada línea</p></li>
+<li><p>la instrucción actual, indicada como <code class="docutils literal notranslate"><span class="pre">--&gt;</span></code>,</p></li>
+<li><p>una instrucción etiquetada, indicada con <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</p></li>
+<li><p>la dirección de la instrucción,</p></li>
+<li><p>el nombre del código de operación,</p></li>
+<li><p>parámetros de operación, y</p></li>
+<li><p>interpretación de los parámetros entre paréntesis.</p></li>
+</ol>
+<p>La interpretación de parámetros reconoce nombres de variables locales y globales, valores constantes, objetivos de ramificación y operadores de comparación.</p>
+<p>El desensamblaje se escribe como texto en el argumento <em>file</em> proporcionado si se proporciona y, de lo contrario, <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Agrega un parámetro <em>file</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Added the <em>show_caches</em> and <em>adaptive</em> parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.get_instructions">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">get_instructions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_caches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.get_instructions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna un iterador sobre las instrucciones en la función, método, cadena de código fuente u objeto de código suministrado.</p>
+<p>El iterador genera una serie de tuplas con nombre <a class="reference internal" href="#dis.Instruction" title="dis.Instruction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instruction</span></code></a> que dan los detalles de cada operación en el código suministrado.</p>
+<p>Si <em>first_line</em> no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, indica el número de línea que se debe informar para la primera línea de origen en el código desmontado. De lo contrario, la información de la línea de origen (si la hay) se toma directamente del objeto de código desmontado.</p>
+<p>The <em>show_caches</em> and <em>adaptive</em> parameters work as they do in <a class="reference internal" href="#module-dis" title="dis: Disassembler for Python bytecode."><code class="xref py py-func docutils literal notranslate"><span class="pre">dis()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Added the <em>show_caches</em> and <em>adaptive</em> parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.findlinestarts">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">findlinestarts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.findlinestarts" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función generadora utiliza el método <code class="docutils literal notranslate"><span class="pre">co_lines</span></code> del objeto de código <em>code</em> para encontrar las compensaciones que son los comienzos de las líneas en el código fuente. Se generan como pares <code class="docutils literal notranslate"><span class="pre">(offset,</span> <span class="pre">lineno)</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>Los números de línea pueden estar disminuyendo. Antes, siempre estaban aumentando.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Se utiliza el método <span class="target" id="index-3"></span><a class="pep reference external" href="https://peps.python.org/pep-0626/"><strong>PEP 626</strong></a> <code class="docutils literal notranslate"><span class="pre">co_lines</span></code> en lugar de los atributos <code class="docutils literal notranslate"><span class="pre">co_firstlineno</span></code> y <code class="docutils literal notranslate"><span class="pre">co_lnotab</span></code> del objeto de código.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.findlabels">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">findlabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.findlabels" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Detecta todos los desplazamientos en la cadena de caracteres de código de byte compilada <em>code</em> que son objetivos de salto y retorna una lista de estos desplazamientos.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dis.stack_effect">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">stack_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oparg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dis.stack_effect" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Calcula el efecto de pila de <em>opcode</em> con el argumento <em>oparg</em>.</p>
+<p>Si el código tiene un objetivo de salto y <em>jump</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, <a class="reference internal" href="#dis.stack_effect" title="dis.stack_effect"><code class="xref py py-func docutils literal notranslate"><span class="pre">stack_effect()</span></code></a> retornará el efecto de pila del salto. Si <em>jump</em> es <code class="docutils literal notranslate"><span class="pre">False</span></code>, retornará el efecto de acumulación de no saltar. Y si <em>jump</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> (predeterminado), retornará el efecto de acumulación máxima de ambos casos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Agrega un parámetro <em>jump</em>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="python-bytecode-instructions">
+<span id="bytecodes"></span><h2>Instrucciones bytecode de Python<a class="headerlink" href="#python-bytecode-instructions" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La función <a class="reference internal" href="#dis.get_instructions" title="dis.get_instructions"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_instructions()</span></code></a> y clase <a class="reference internal" href="#dis.Bytecode" title="dis.Bytecode"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bytecode</span></code></a> proporcionan detalles de las instrucciones bytecode como instancias <a class="reference internal" href="#dis.Instruction" title="dis.Instruction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instruction</span></code></a>:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dis.Instruction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">Instruction</span></span><a class="headerlink" href="#dis.Instruction" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Detalles para una operación de bytecode</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.opcode">
+<span class="sig-name descname"><span class="pre">opcode</span></span><a class="headerlink" href="#dis.Instruction.opcode" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>código numérico para la operación, correspondiente a los valores del opcode listados a continuación y los valores de bytecode en <a class="reference internal" href="#opcode-collections"><span class="std std-ref">Colecciones opcode</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.opname">
+<span class="sig-name descname"><span class="pre">opname</span></span><a class="headerlink" href="#dis.Instruction.opname" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>nombre legible por humanos para la operación</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.arg">
+<span class="sig-name descname"><span class="pre">arg</span></span><a class="headerlink" href="#dis.Instruction.arg" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>argumento numérico para la operación (si existe), de lo contrario <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.argval">
+<span class="sig-name descname"><span class="pre">argval</span></span><a class="headerlink" href="#dis.Instruction.argval" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>valor de argumento resuelto (si lo hay); de lo contrario, <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.argrepr">
+<span class="sig-name descname"><span class="pre">argrepr</span></span><a class="headerlink" href="#dis.Instruction.argrepr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>descripción legible por humanos del argumento de la operación (si lo hay); de lo contrario, una cadena vacía.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><a class="headerlink" href="#dis.Instruction.offset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>índice de inicio de operación dentro de la secuencia de bytecode</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.starts_line">
+<span class="sig-name descname"><span class="pre">starts_line</span></span><a class="headerlink" href="#dis.Instruction.starts_line" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>línea iniciada por este código de operación (si existe), de lo contrario <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.is_jump_target">
+<span class="sig-name descname"><span class="pre">is_jump_target</span></span><a class="headerlink" href="#dis.Instruction.is_jump_target" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> si otro código salta aquí, de lo contrario, <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Instruction.positions">
+<span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#dis.Instruction.positions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Objeto <a class="reference internal" href="#dis.Positions" title="dis.Positions"><code class="xref py py-class docutils literal notranslate"><span class="pre">dis.Positions</span></code></a> que contiene las ubicaciones de inicio y finalización cubiertas por esta instrucción.</p>
+</dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Se agrega el campo <code class="docutils literal notranslate"><span class="pre">positions</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dis.Positions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">Positions</span></span><a class="headerlink" href="#dis.Positions" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>En caso de que la información no esté disponible, algunos campos pueden ser <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Positions.lineno">
+<span class="sig-name descname"><span class="pre">lineno</span></span><a class="headerlink" href="#dis.Positions.lineno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Positions.end_lineno">
+<span class="sig-name descname"><span class="pre">end_lineno</span></span><a class="headerlink" href="#dis.Positions.end_lineno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Positions.col_offset">
+<span class="sig-name descname"><span class="pre">col_offset</span></span><a class="headerlink" href="#dis.Positions.col_offset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.Positions.end_col_offset">
+<span class="sig-name descname"><span class="pre">end_col_offset</span></span><a class="headerlink" href="#dis.Positions.end_col_offset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<p>El compilador de Python actualmente genera las siguientes instrucciones de bytecode.</p>
+<p><strong>Instrucciones generales</strong></p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-NOP">
+<span class="sig-name descname"><span class="pre">NOP</span></span><a class="headerlink" href="#opcode-NOP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Código que no hace nada. Utilizado como marcador de posición por el optimizador de bytecode y para generar eventos de seguimiento de línea.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_TOP">
+<span class="sig-name descname"><span class="pre">POP_TOP</span></span><a class="headerlink" href="#opcode-POP_TOP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Elimina el elemento de la parte superior de la pila (TOS).</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-COPY">
+<span class="sig-name descname"><span class="pre">COPY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-COPY" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Empuje el elemento <em>i</em>-th a la parte superior de la pila. El elemento no se elimina de su ubicación original.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-SWAP">
+<span class="sig-name descname"><span class="pre">SWAP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-SWAP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Intercambie TOS con el artículo en la posición <em>i</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CACHE">
+<span class="sig-name descname"><span class="pre">CACHE</span></span><a class="headerlink" href="#opcode-CACHE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>En lugar de ser una instrucción real, este código de operación se usa para marcar espacio adicional para que el intérprete almacene en caché datos útiles directamente en el bytecode. Todas las utilidades <code class="docutils literal notranslate"><span class="pre">dis</span></code> lo ocultan automáticamente, pero se puede ver con <code class="docutils literal notranslate"><span class="pre">show_caches=True</span></code>.</p>
+<p>Lógicamente, este espacio forma parte de la instrucción anterior. Muchos códigos de operación esperan ser seguidos por un número exacto de cachés y le indicarán al intérprete que los omita en tiempo de ejecución.</p>
+<p>Los cachés poblados pueden parecer instrucciones arbitrarias, por lo que se debe tener mucho cuidado al leer o modificar el bytecode adaptativo sin procesar que contiene datos acelerados.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<p><strong>Operaciones unarias</strong></p>
+<p>Las operaciones unarias toman la parte superior de la pila, aplican la operación y retornan el resultado a la pila.</p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNARY_POSITIVE">
+<span class="sig-name descname"><span class="pre">UNARY_POSITIVE</span></span><a class="headerlink" href="#opcode-UNARY_POSITIVE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">+TOS</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNARY_NEGATIVE">
+<span class="sig-name descname"><span class="pre">UNARY_NEGATIVE</span></span><a class="headerlink" href="#opcode-UNARY_NEGATIVE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">-TOS</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNARY_NOT">
+<span class="sig-name descname"><span class="pre">UNARY_NOT</span></span><a class="headerlink" href="#opcode-UNARY_NOT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">not</span> <span class="pre">TOS</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNARY_INVERT">
+<span class="sig-name descname"><span class="pre">UNARY_INVERT</span></span><a class="headerlink" href="#opcode-UNARY_INVERT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">~TOS</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_ITER">
+<span class="sig-name descname"><span class="pre">GET_ITER</span></span><a class="headerlink" href="#opcode-GET_ITER" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">iter(TOS)</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_YIELD_FROM_ITER">
+<span class="sig-name descname"><span class="pre">GET_YIELD_FROM_ITER</span></span><a class="headerlink" href="#opcode-GET_YIELD_FROM_ITER" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si <code class="docutils literal notranslate"><span class="pre">TOS</span></code> es un <a class="reference internal" href="../glossary.html#term-generator-iterator"><span class="xref std std-term">iterador generador</span></a> o un objeto <a class="reference internal" href="../glossary.html#term-coroutine"><span class="xref std std-term">corutina</span></a> se deja como está. De lo contrario, implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">iter(TOS)</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<p><strong>Operaciones binarias e in situ</strong></p>
+<p>Las operaciones binarias eliminan el elemento superior de la pila (TOS) y el segundo elemento de la pila superior (TOS1) de la pila. Realizan la operación y retornan el resultado a la pila.</p>
+<p>Las operaciones en el lugar son como operaciones binarias, ya que eliminan TOS y TOS1, y retornan el resultado a la pila, pero la operación se realiza en el lugar cuando TOS1 lo admite, y el TOS resultante puede ser (pero no tiene ser) el TOS1 original.</p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BINARY_OP">
+<span class="sig-name descname"><span class="pre">BINARY_OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">op</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BINARY_OP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa los operadores binarios e in situ (según el valor de <em>op</em>).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BINARY_SUBSCR">
+<span class="sig-name descname"><span class="pre">BINARY_SUBSCR</span></span><a class="headerlink" href="#opcode-BINARY_SUBSCR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1[TOS]</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_SUBSCR">
+<span class="sig-name descname"><span class="pre">STORE_SUBSCR</span></span><a class="headerlink" href="#opcode-STORE_SUBSCR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS1[TOS]</span> <span class="pre">=</span> <span class="pre">TOS2</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_SUBSCR">
+<span class="sig-name descname"><span class="pre">DELETE_SUBSCR</span></span><a class="headerlink" href="#opcode-DELETE_SUBSCR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">TOS1[TOS]</span></code>.</p>
+</dd></dl>
+
+<p><strong>Opcodes de corutinas</strong></p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_AWAITABLE">
+<span class="sig-name descname"><span class="pre">GET_AWAITABLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">where</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-GET_AWAITABLE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">get_awaitable(TOS)</span></code>, donde <code class="docutils literal notranslate"><span class="pre">get_awaitable(o)</span></code> retorna <code class="docutils literal notranslate"><span class="pre">o</span></code> si <code class="docutils literal notranslate"><span class="pre">o</span></code> es un objeto de corutina o un objeto generador con el indicador CO_ITERABLE_COROUTINE, o resuelve <code class="docutils literal notranslate"><span class="pre">o.__await__</span></code>.</p>
+<blockquote>
+<div><p>Si el operando <code class="docutils literal notranslate"><span class="pre">where</span></code> es distinto de cero, indica dónde ocurre la instrucción:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> Después de una llamada a <code class="docutils literal notranslate"><span class="pre">__aenter__</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> Después de una llamada a <code class="docutils literal notranslate"><span class="pre">__aexit__</span></code></p></li>
+</ul>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Anteriormente, esta instrucción no tenía un oparg.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_AITER">
+<span class="sig-name descname"><span class="pre">GET_AITER</span></span><a class="headerlink" href="#opcode-GET_AITER" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS.__aiter__()</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Ya no se admite el retorno de objetos <em>awaitable</em> de <code class="docutils literal notranslate"><span class="pre">__aiter__</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_ANEXT">
+<span class="sig-name descname"><span class="pre">GET_ANEXT</span></span><a class="headerlink" href="#opcode-GET_ANEXT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Agrega <code class="docutils literal notranslate"><span class="pre">get_awaitable(TOS.__anext__())</span></code> a la pila. Consulte <code class="docutils literal notranslate"><span class="pre">GET_AWAITABLE</span></code> para obtener detalles sobre <code class="docutils literal notranslate"><span class="pre">get_awaitable</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-END_ASYNC_FOR">
+<span class="sig-name descname"><span class="pre">END_ASYNC_FOR</span></span><a class="headerlink" href="#opcode-END_ASYNC_FOR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Terminates an <a class="reference internal" href="../reference/compound_stmts.html#async-for"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span></code></a> loop.  Handles an exception raised
+when awaiting a next item. The stack contains the async iterable in
+TOS1 and the raised exception in TOS. Both are popped.
+If the exception is not <a class="reference internal" href="exceptions.html#StopAsyncIteration" title="StopAsyncIteration"><code class="xref py py-exc docutils literal notranslate"><span class="pre">StopAsyncIteration</span></code></a>, it is re-raised.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8: </span></p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>La representación de excepciones en la pila ahora consta de uno, no de tres elementos.</p>
+</div>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BEFORE_ASYNC_WITH">
+<span class="sig-name descname"><span class="pre">BEFORE_ASYNC_WITH</span></span><a class="headerlink" href="#opcode-BEFORE_ASYNC_WITH" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Resuelve <code class="docutils literal notranslate"><span class="pre">__aenter__</span></code> y <code class="docutils literal notranslate"><span class="pre">__aexit__</span></code> del objeto en la parte superior de la pila. Apila <code class="docutils literal notranslate"><span class="pre">__aexit__</span></code> y el resultado de <code class="docutils literal notranslate"><span class="pre">__aenter__()</span></code> a la pila.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.</span></p>
+</div>
+</dd></dl>
+
+<p><strong>Opcodes misceláneos</strong></p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-PRINT_EXPR">
+<span class="sig-name descname"><span class="pre">PRINT_EXPR</span></span><a class="headerlink" href="#opcode-PRINT_EXPR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa la declaración de expresión para el modo interactivo. TOS se elimina de la pila y se imprime. En modo no interactivo, una declaración de expresión termina con <a class="reference internal" href="#opcode-POP_TOP"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">POP_TOP</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-SET_ADD">
+<span class="sig-name descname"><span class="pre">SET_ADD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-SET_ADD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">set.add(TOS1[-i],</span> <span class="pre">TOS)</span></code>. Se utiliza para implementar comprensiones de conjuntos.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LIST_APPEND">
+<span class="sig-name descname"><span class="pre">LIST_APPEND</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LIST_APPEND" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">list.append(TOS1[-i],</span> <span class="pre">TOS)</span></code>. Se utiliza para implementar listas por comprensión.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MAP_ADD">
+<span class="sig-name descname"><span class="pre">MAP_ADD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-MAP_ADD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">dict.__setitem__(TOS1[-i],</span> <span class="pre">TOS1,</span> <span class="pre">TOS)</span></code>. Se utiliza para implementar comprensiones de diccionarios.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>El valor del mapa es TOS y la clave del mapa es TOS1. Antes, esos fueron revertidos.</p>
+</div>
+</dd></dl>
+
+<p>Para todas las instrucciones <a class="reference internal" href="#opcode-SET_ADD"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">SET_ADD</span></code></a>, <a class="reference internal" href="#opcode-LIST_APPEND"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">LIST_APPEND</span></code></a> y <a class="reference internal" href="#opcode-MAP_ADD"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">MAP_ADD</span></code></a>, mientras el valor agregado o el par clave/valor aparece, el objeto contenedor permanece en la pila para que quede disponible para futuras iteraciones del bucle.</p>
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-RETURN_VALUE">
+<span class="sig-name descname"><span class="pre">RETURN_VALUE</span></span><a class="headerlink" href="#opcode-RETURN_VALUE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna con TOS a quien llama la función.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-YIELD_VALUE">
+<span class="sig-name descname"><span class="pre">YIELD_VALUE</span></span><a class="headerlink" href="#opcode-YIELD_VALUE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Desapila TOS y lo genera (<em>yield</em>) de un <a class="reference internal" href="../glossary.html#term-generator"><span class="xref std std-term">generator</span></a>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-SETUP_ANNOTATIONS">
+<span class="sig-name descname"><span class="pre">SETUP_ANNOTATIONS</span></span><a class="headerlink" href="#opcode-SETUP_ANNOTATIONS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Comprueba si <code class="docutils literal notranslate"><span class="pre">__anotaciones__</span></code> está definido en <code class="docutils literal notranslate"><span class="pre">locals()</span></code>, si no está configurado como un <code class="docutils literal notranslate"><span class="pre">dict</span></code> vacío. Este código de operación solo se emite si el cuerpo de una clase o módulo contiene <a class="reference internal" href="../glossary.html#term-variable-annotation"><span class="xref std std-term">anotaciones de variables</span></a> estáticamente.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-IMPORT_STAR">
+<span class="sig-name descname"><span class="pre">IMPORT_STAR</span></span><a class="headerlink" href="#opcode-IMPORT_STAR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Carga todos los símbolos que no comienzan con <code class="docutils literal notranslate"><span class="pre">'_'</span></code> directamente desde el TOS del módulo al espacio de nombres local. El módulo se desapila después de cargar todos los nombres. Este opcode implementa <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">module</span> <span class="pre">import</span> <span class="pre">*</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_EXCEPT">
+<span class="sig-name descname"><span class="pre">POP_EXCEPT</span></span><a class="headerlink" href="#opcode-POP_EXCEPT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Extrae un valor de la pila, que se utiliza para restaurar el estado de excepción.</p>
+<blockquote>
+<div><div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>La representación de excepciones en la pila ahora consta de uno, no de tres elementos.</p>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-RERAISE">
+<span class="sig-name descname"><span class="pre">RERAISE</span></span><a class="headerlink" href="#opcode-RERAISE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Vuelve a generar la excepción que se encuentra actualmente en la parte superior de la pila. Si oparg no es cero, extrae un valor adicional de la pila que se usa para establecer <code class="docutils literal notranslate"><span class="pre">f_lasti</span></code> del marco actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>La representación de excepciones en la pila ahora consta de uno, no de tres elementos.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-PUSH_EXC_INFO">
+<span class="sig-name descname"><span class="pre">PUSH_EXC_INFO</span></span><a class="headerlink" href="#opcode-PUSH_EXC_INFO" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Extrae un valor de la pila. Agrega la excepción actual a la parte superior de la pila. Agrega el valor que apareció originalmente de vuelta a la pila. Se utiliza en los controladores de excepciones.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CHECK_EXC_MATCH">
+<span class="sig-name descname"><span class="pre">CHECK_EXC_MATCH</span></span><a class="headerlink" href="#opcode-CHECK_EXC_MATCH" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Realiza coincidencias de excepciones para <code class="docutils literal notranslate"><span class="pre">except</span></code>. Comprueba si TOS1 es una excepción que coincide con TOS. Aparece TOS y agrega el resultado booleano de la prueba.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CHECK_EG_MATCH">
+<span class="sig-name descname"><span class="pre">CHECK_EG_MATCH</span></span><a class="headerlink" href="#opcode-CHECK_EG_MATCH" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Realiza coincidencias de excepciones para <code class="docutils literal notranslate"><span class="pre">except*</span></code>. Aplica <code class="docutils literal notranslate"><span class="pre">split(TOS)</span></code> en el grupo de excepción que representa TOS1.</p>
+<p>En caso de coincidencia, extrae dos elementos de la pila y agrega el subgrupo que no coincide (<code class="docutils literal notranslate"><span class="pre">None</span></code> en caso de coincidencia total) seguido del subgrupo coincidente. Cuando no hay ninguna coincidencia, muestra un elemento (el tipo de coincidencia) y presiona <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-PREP_RERAISE_STAR">
+<span class="sig-name descname"><span class="pre">PREP_RERAISE_STAR</span></span><a class="headerlink" href="#opcode-PREP_RERAISE_STAR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Combina la lista de excepciones generadas y re-elevadas de TOS en un grupo de excepciones para propagar desde un bloque try-except*. Utiliza el grupo de excepción original de TOS1 para reconstruir la estructura de las excepciones replanteadas. Saca dos elementos de la pila y agrega la excepción a relanzar o <code class="docutils literal notranslate"><span class="pre">None</span></code> si no hay una.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-WITH_EXCEPT_START">
+<span class="sig-name descname"><span class="pre">WITH_EXCEPT_START</span></span><a class="headerlink" href="#opcode-WITH_EXCEPT_START" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a la función en la posición 4 de la pila con argumentos (tipo, val, tb) que representan la excepción en la parte superior de la pila. Se utiliza para implementar la llamada <code class="docutils literal notranslate"><span class="pre">context_manager.__exit__(*exc_info())</span></code> cuando se ha producido una excepción en una sentencia <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>La función <code class="docutils literal notranslate"><span class="pre">__exit__</span></code> está en la posición 4 de la pila en lugar de la 7. La representación de excepciones en la pila ahora consta de uno, no de tres, elementos.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_ASSERTION_ERROR">
+<span class="sig-name descname"><span class="pre">LOAD_ASSERTION_ERROR</span></span><a class="headerlink" href="#opcode-LOAD_ASSERTION_ERROR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Inserta <a class="reference internal" href="exceptions.html#AssertionError" title="AssertionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AssertionError</span></code></a> en la pila. Utilizado por la declaración <a class="reference internal" href="../reference/simple_stmts.html#assert"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">assert</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_BUILD_CLASS">
+<span class="sig-name descname"><span class="pre">LOAD_BUILD_CLASS</span></span><a class="headerlink" href="#opcode-LOAD_BUILD_CLASS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Agrega <code class="xref py py-func docutils literal notranslate"><span class="pre">builtins.__build_class__()</span></code> a la pila. Más tarde se llama para construir una clase.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BEFORE_WITH">
+<span class="sig-name descname"><span class="pre">BEFORE_WITH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BEFORE_WITH" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este código de operación realiza varias operaciones antes de que comience un bloque with. Primero, carga <a class="reference internal" href="../reference/datamodel.html#object.__exit__" title="object.__exit__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__exit__()</span></code></a> desde el administrador de contexto y lo agrega a la pila para que <a class="reference internal" href="#opcode-WITH_EXCEPT_START"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">WITH_EXCEPT_START</span></code></a> lo use más tarde. Entonces, se llama <a class="reference internal" href="../reference/datamodel.html#object.__enter__" title="object.__enter__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__enter__()</span></code></a>. Finalmente, el resultado de llamar al método <code class="docutils literal notranslate"><span class="pre">__enter__()</span></code> se agrega en la pila.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-GET_LEN">
+<span class="sig-name descname"><span class="pre">GET_LEN</span></span><a class="headerlink" href="#opcode-GET_LEN" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila <code class="docutils literal notranslate"><span class="pre">len(TOS)</span></code> en la pila.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MATCH_MAPPING">
+<span class="sig-name descname"><span class="pre">MATCH_MAPPING</span></span><a class="headerlink" href="#opcode-MATCH_MAPPING" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es una instancia de <a class="reference internal" href="collections.abc.html#collections.abc.Mapping" title="collections.abc.Mapping"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Mapping</span></code></a> (o, más técnicamente, si tiene el indicador <a class="reference internal" href="../c-api/typeobj.html#Py_TPFLAGS_MAPPING" title="Py_TPFLAGS_MAPPING"><code class="xref py py-const docutils literal notranslate"><span class="pre">Py_TPFLAGS_MAPPING</span></code></a>  establecido en su <a class="reference internal" href="../c-api/typeobj.html#c.PyTypeObject.tp_flags" title="PyTypeObject.tp_flags"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_flags</span></code></a>), apila <code class="docutils literal notranslate"><span class="pre">True</span></code> en la pila. De lo contrario apila <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MATCH_SEQUENCE">
+<span class="sig-name descname"><span class="pre">MATCH_SEQUENCE</span></span><a class="headerlink" href="#opcode-MATCH_SEQUENCE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es una instancia de <a class="reference internal" href="collections.abc.html#collections.abc.Sequence" title="collections.abc.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Sequence</span></code></a> y <em>no</em> es una instancia de <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>/<a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>/<a class="reference internal" href="stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> (o, más técnicamente, si tiene el indicador <a class="reference internal" href="../c-api/typeobj.html#Py_TPFLAGS_SEQUENCE" title="Py_TPFLAGS_SEQUENCE"><code class="xref py py-const docutils literal notranslate"><span class="pre">Py_TPFLAGS_SEQUENCE</span></code></a>  establecido en su <a class="reference internal" href="../c-api/typeobj.html#c.PyTypeObject.tp_flags" title="PyTypeObject.tp_flags"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_flags</span></code></a>), apila <code class="docutils literal notranslate"><span class="pre">True</span></code> en la pila. De lo contrario apila <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MATCH_KEYS">
+<span class="sig-name descname"><span class="pre">MATCH_KEYS</span></span><a class="headerlink" href="#opcode-MATCH_KEYS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>TOS es una tupla de claves de mapeo y TOS1 es el sujeto de coincidencia. Si TOS1 contiene todas las claves en TOS, agrega un <a class="reference internal" href="stdtypes.html#tuple" title="tuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> que contenga los valores correspondientes. De lo contrario, agrega <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Anteriormente, esta instrucción también generaba un valor booleano que indicaba éxito (<code class="docutils literal notranslate"><span class="pre">True</span></code>) o falla (<code class="docutils literal notranslate"><span class="pre">False</span></code>).</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_NAME">
+<span class="sig-name descname"><span class="pre">STORE_NAME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-STORE_NAME" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">TOS</span></code>. <em>namei</em> es el índice de <em>name</em> en el atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">co_names</span></code> del objeto de código. El compilador intenta usar <a class="reference internal" href="#opcode-STORE_FAST"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">STORE_FAST</span></code></a> o <a class="reference internal" href="#opcode-STORE_GLOBAL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">STORE_GLOBAL</span></code></a> si es posible.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_NAME">
+<span class="sig-name descname"><span class="pre">DELETE_NAME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DELETE_NAME" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">name</span></code>, donde <em>namei</em> es el índice en atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">co_names</span></code> del objeto de código.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNPACK_SEQUENCE">
+<span class="sig-name descname"><span class="pre">UNPACK_SEQUENCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-UNPACK_SEQUENCE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Descomprime TOS en <em>count</em> valores individuales, que se colocan en la pila de derecha a izquierda.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-UNPACK_EX">
+<span class="sig-name descname"><span class="pre">UNPACK_EX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">counts</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-UNPACK_EX" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa la asignación con un objetivo destacado: desempaqueta un iterable en TOS en valores individuales, donde el número total de valores puede ser menor que el número de elementos en el iterable: uno de los nuevos valores será una lista de todos los elementos sobrantes.</p>
+<p>El byte bajo de <em>count</em> es el número de valores antes del valor de la lista, el byte alto de <em>count</em> es el número de valores después de él. Los valores resultantes se colocan en la pila de derecha a izquierda.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_ATTR">
+<span class="sig-name descname"><span class="pre">STORE_ATTR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-STORE_ATTR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">TOS.name</span> <span class="pre">=</span> <span class="pre">TOS1</span></code>, donde <em>namei</em> es el índice del nombre en <code class="xref py py-attr docutils literal notranslate"><span class="pre">co_names</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_ATTR">
+<span class="sig-name descname"><span class="pre">DELETE_ATTR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DELETE_ATTR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Implementa <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">TOS.name</span></code>, usando <em>namei</em> como índice en <code class="xref py py-attr docutils literal notranslate"><span class="pre">co_names</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_GLOBAL">
+<span class="sig-name descname"><span class="pre">STORE_GLOBAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-STORE_GLOBAL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Funciona como <a class="reference internal" href="#opcode-STORE_NAME"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">STORE_NAME</span></code></a>, pero almacena el nombre como global.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_GLOBAL">
+<span class="sig-name descname"><span class="pre">DELETE_GLOBAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DELETE_GLOBAL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Funciona como <a class="reference internal" href="#opcode-DELETE_NAME"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">DELETE_NAME</span></code></a>, pero elimina un nombre global.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_CONST">
+<span class="sig-name descname"><span class="pre">LOAD_CONST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">consti</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_CONST" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila <code class="docutils literal notranslate"><span class="pre">co_consts[consti]</span></code> en la pila.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_NAME">
+<span class="sig-name descname"><span class="pre">LOAD_NAME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_NAME" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila el valor asociado con <code class="docutils literal notranslate"><span class="pre">co_names</span> <span class="pre">[namei]</span></code> en la pila.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_TUPLE">
+<span class="sig-name descname"><span class="pre">BUILD_TUPLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_TUPLE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una tupla que consume elementos <em>count</em> de la pila, y apila la tupla resultante a la pila.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_LIST">
+<span class="sig-name descname"><span class="pre">BUILD_LIST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_LIST" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Funciona como <a class="reference internal" href="#opcode-BUILD_TUPLE"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">BUILD_TUPLE</span></code></a>, pero crea una lista.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_SET">
+<span class="sig-name descname"><span class="pre">BUILD_SET</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_SET" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Funciona como <a class="reference internal" href="#opcode-BUILD_TUPLE"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">BUILD_TUPLE</span></code></a>, pero crea un conjunto.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_MAP">
+<span class="sig-name descname"><span class="pre">BUILD_MAP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_MAP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila un nuevo objeto de diccionario en la pila. Desapila <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">count</span></code> elementos para que el diccionario contenga <em>count</em> entradas: <code class="docutils literal notranslate"><span class="pre">{...,</span> <span class="pre">TOS3:</span> <span class="pre">TOS2,</span> <span class="pre">TOS1:</span> <span class="pre">TOS}</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>El diccionario se crea a partir de elementos de la pila en lugar de crear un diccionario vacío dimensionado previamente para contener <em>count</em> elementos.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_CONST_KEY_MAP">
+<span class="sig-name descname"><span class="pre">BUILD_CONST_KEY_MAP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_CONST_KEY_MAP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La versión de <a class="reference internal" href="#opcode-BUILD_MAP"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">BUILD_MAP</span></code></a> especializada para claves constantes. Desapila el elemento superior en la pila que contiene una tupla de claves, luego, a partir de <code class="docutils literal notranslate"><span class="pre">TOS1</span></code>, muestra los valores <em>count</em> para formar valores en el diccionario incorporado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_STRING">
+<span class="sig-name descname"><span class="pre">BUILD_STRING</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_STRING" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Concatena <em>count</em> cadenas de caracteres de la pila y empuja la cadena de caracteres resultante en la pila.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LIST_TO_TUPLE">
+<span class="sig-name descname"><span class="pre">LIST_TO_TUPLE</span></span><a class="headerlink" href="#opcode-LIST_TO_TUPLE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Saca una lista de la pila y empuja una tupla que contiene los mismos valores.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LIST_EXTEND">
+<span class="sig-name descname"><span class="pre">LIST_EXTEND</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LIST_EXTEND" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">list.extend(TOS1[-i],</span> <span class="pre">TOS)</span></code>. Se utiliza para crear listas.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-SET_UPDATE">
+<span class="sig-name descname"><span class="pre">SET_UPDATE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-SET_UPDATE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">set.update(TOS1[-i],</span> <span class="pre">TOS)</span></code>. Se usa para construir decorados.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DICT_UPDATE">
+<span class="sig-name descname"><span class="pre">DICT_UPDATE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DICT_UPDATE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">dict.update(TOS1[-i],</span> <span class="pre">TOS)</span></code>. Se usa para construir dictados.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DICT_MERGE">
+<span class="sig-name descname"><span class="pre">DICT_MERGE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DICT_MERGE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#opcode-DICT_UPDATE"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">DICT_UPDATE</span></code></a> pero lanza una excepción para claves duplicadas.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_ATTR">
+<span class="sig-name descname"><span class="pre">LOAD_ATTR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_ATTR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Reemplaza TOS con <code class="docutils literal notranslate"><span class="pre">getattr(TOS,</span> <span class="pre">co_names[namei])</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-COMPARE_OP">
+<span class="sig-name descname"><span class="pre">COMPARE_OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">opname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-COMPARE_OP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Realiza una operación booleana. El nombre de la operación se puede encontrar en <code class="docutils literal notranslate"><span class="pre">cmp_op[opname]</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-IS_OP">
+<span class="sig-name descname"><span class="pre">IS_OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">invert</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-IS_OP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Realiza una comparación <code class="docutils literal notranslate"><span class="pre">is</span></code> o <code class="docutils literal notranslate"><span class="pre">is</span> <span class="pre">not</span></code> si <code class="docutils literal notranslate"><span class="pre">invert</span></code> es 1.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CONTAINS_OP">
+<span class="sig-name descname"><span class="pre">CONTAINS_OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">invert</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-CONTAINS_OP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Realiza una comparación <code class="docutils literal notranslate"><span class="pre">in</span></code> o <code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">in</span></code> si <code class="docutils literal notranslate"><span class="pre">invert</span></code> es 1.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-IMPORT_NAME">
+<span class="sig-name descname"><span class="pre">IMPORT_NAME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-IMPORT_NAME" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Importa el módulo <code class="docutils literal notranslate"><span class="pre">co_names[namei]</span></code>. TOS y TOS1 aparecen y proporcionan los argumentos <em>fromlist</em> y <em>level</em> de <a class="reference internal" href="functions.html#import__" title="__import__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__import__()</span></code></a>. El objeto del módulo se empuja a la pila. El espacio de nombres actual no se ve afectado: para una instrucción de importación adecuada, una instrucción posterior <a class="reference internal" href="#opcode-STORE_FAST"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">STORE_FAST</span></code></a> modifica el espacio de nombres.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-IMPORT_FROM">
+<span class="sig-name descname"><span class="pre">IMPORT_FROM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-IMPORT_FROM" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Carga el atributo <code class="docutils literal notranslate"><span class="pre">co_names[namei]</span></code> del módulo que se encuentra en TOS. El objeto resultante se apila en la pila, para luego ser almacenado por la instrucción <a class="reference internal" href="#opcode-STORE_FAST"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">STORE_FAST</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-JUMP_FORWARD">
+<span class="sig-name descname"><span class="pre">JUMP_FORWARD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-JUMP_FORWARD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Incrementa el contador de bytecode en <em>delta</em>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-JUMP_BACKWARD">
+<span class="sig-name descname"><span class="pre">JUMP_BACKWARD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-JUMP_BACKWARD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decrementa el contador de bytecode en <em>delta</em>. Comprueba si hay interrupciones.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-JUMP_BACKWARD_NO_INTERRUPT">
+<span class="sig-name descname"><span class="pre">JUMP_BACKWARD_NO_INTERRUPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-JUMP_BACKWARD_NO_INTERRUPT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decrementa el contador de bytecode en <em>delta</em>. No busca interrupciones.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_FORWARD_IF_TRUE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_FORWARD_IF_TRUE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_FORWARD_IF_TRUE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es verdadero, incrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_BACKWARD_IF_TRUE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_BACKWARD_IF_TRUE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_BACKWARD_IF_TRUE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es verdadero, decrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_FORWARD_IF_FALSE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_FORWARD_IF_FALSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_FORWARD_IF_FALSE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es falso, incrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_BACKWARD_IF_FALSE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_BACKWARD_IF_FALSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_BACKWARD_IF_FALSE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es falso, decrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_FORWARD_IF_NOT_NONE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_FORWARD_IF_NOT_NONE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_FORWARD_IF_NOT_NONE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, incrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_BACKWARD_IF_NOT_NONE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_BACKWARD_IF_NOT_NONE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_BACKWARD_IF_NOT_NONE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, decrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_FORWARD_IF_NONE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_FORWARD_IF_NONE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_FORWARD_IF_NONE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es <code class="docutils literal notranslate"><span class="pre">None</span></code>, incrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-POP_JUMP_BACKWARD_IF_NONE">
+<span class="sig-name descname"><span class="pre">POP_JUMP_BACKWARD_IF_NONE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-POP_JUMP_BACKWARD_IF_NONE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es <code class="docutils literal notranslate"><span class="pre">None</span></code>, decrementa el contador de bytecode en <em>delta</em>. TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-JUMP_IF_TRUE_OR_POP">
+<span class="sig-name descname"><span class="pre">JUMP_IF_TRUE_OR_POP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-JUMP_IF_TRUE_OR_POP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es verdadero, incrementa el contador de bytecode en <em>delta</em> y deja TOS en la pila. De lo contrario (TOS es falso), TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>El oparg es ahora un delta relativo en lugar de un objetivo absoluto.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-JUMP_IF_FALSE_OR_POP">
+<span class="sig-name descname"><span class="pre">JUMP_IF_FALSE_OR_POP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-JUMP_IF_FALSE_OR_POP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si TOS es falso, incrementa el contador de bytecode en <em>delta</em> y deja TOS en la pila. De lo contrario (TOS es verdadero), TOS es retirado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>El oparg es ahora un delta relativo en lugar de un objetivo absoluto.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-FOR_ITER">
+<span class="sig-name descname"><span class="pre">FOR_ITER</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">delta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-FOR_ITER" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>TOS es un <a class="reference internal" href="../glossary.html#term-iterator"><span class="xref std std-term">iterador</span></a>. Llama a su método <a class="reference internal" href="stdtypes.html#iterator.__next__" title="iterator.__next__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__next__()</span></code></a>. Si esto produce un nuevo valor, lo apila en la pila (dejando el iterador debajo de él). Si el iterador indica que está agotado, se abre TOS y el contador de código de bytes se incrementa en <em>delta</em>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_GLOBAL">
+<span class="sig-name descname"><span class="pre">LOAD_GLOBAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_GLOBAL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Carga el <code class="docutils literal notranslate"><span class="pre">co_names[namei&gt;&gt;1]</span></code> global llamado en la pila.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Si se establece el bit bajo de <code class="docutils literal notranslate"><span class="pre">namei</span></code>, se agrega un <code class="docutils literal notranslate"><span class="pre">NULL</span></code> a la pila antes de la variable global.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_FAST">
+<span class="sig-name descname"><span class="pre">LOAD_FAST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">var_num</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_FAST" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila una referencia al local <code class="docutils literal notranslate"><span class="pre">co_varnames[var_num]</span></code> sobre la pila.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_FAST">
+<span class="sig-name descname"><span class="pre">STORE_FAST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">var_num</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-STORE_FAST" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Almacena TOS en el local <code class="docutils literal notranslate"><span class="pre">co_varnames[var_num]</span></code>.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_FAST">
+<span class="sig-name descname"><span class="pre">DELETE_FAST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">var_num</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DELETE_FAST" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Elimina la <code class="docutils literal notranslate"><span class="pre">co_varnames[var_num]</span></code> local.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MAKE_CELL">
+<span class="sig-name descname"><span class="pre">MAKE_CELL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-MAKE_CELL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea una nueva celda en la ranura <code class="docutils literal notranslate"><span class="pre">i</span></code>. Si esa ranura está vacía, ese valor se almacena en la nueva celda.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_CLOSURE">
+<span class="sig-name descname"><span class="pre">LOAD_CLOSURE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_CLOSURE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Inserta una referencia a la celda contenida en la ranura <code class="docutils literal notranslate"><span class="pre">i</span></code> del almacenamiento «locales rápidos». El nombre de la variable es <code class="docutils literal notranslate"><span class="pre">co_fastlocalnames[i]</span></code>.</p>
+<p>Tenga en cuenta que <code class="docutils literal notranslate"><span class="pre">LOAD_CLOSURE</span></code> es efectivamente un alias para <code class="docutils literal notranslate"><span class="pre">LOAD_FAST</span></code>. Existe para mantener el bytecode un poco más legible.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="docutils literal notranslate"><span class="pre">i</span></code> ya no se compensa con la longitud de <code class="docutils literal notranslate"><span class="pre">co_varnames</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_DEREF">
+<span class="sig-name descname"><span class="pre">LOAD_DEREF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_DEREF" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Carga la celda contenida en el slot <code class="docutils literal notranslate"><span class="pre">i</span></code> del almacenamiento «fast locals». Agrega una referencia al objeto que contiene la celda en la pila.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="docutils literal notranslate"><span class="pre">i</span></code> ya no se compensa con la longitud de <code class="docutils literal notranslate"><span class="pre">co_varnames</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_CLASSDEREF">
+<span class="sig-name descname"><span class="pre">LOAD_CLASSDEREF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_CLASSDEREF" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Al igual que <a class="reference internal" href="#opcode-LOAD_DEREF"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">LOAD_DEREF</span></code></a> pero primero verifica el diccionario local antes de consultar la celda. Esto se usa para cargar variables libres en los cuerpos de clase.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="docutils literal notranslate"><span class="pre">i</span></code> ya no se compensa con la longitud de <code class="docutils literal notranslate"><span class="pre">co_varnames</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-STORE_DEREF">
+<span class="sig-name descname"><span class="pre">STORE_DEREF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-STORE_DEREF" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Almacena TOS en la celda contenida en la ranura <code class="docutils literal notranslate"><span class="pre">i</span></code> del almacenamiento «locales rápidos».</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="docutils literal notranslate"><span class="pre">i</span></code> ya no se compensa con la longitud de <code class="docutils literal notranslate"><span class="pre">co_varnames</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-DELETE_DEREF">
+<span class="sig-name descname"><span class="pre">DELETE_DEREF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-DELETE_DEREF" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Vacía la celda contenida en la ranura <code class="docutils literal notranslate"><span class="pre">i</span></code> del almacenamiento de «locales rápidos». Utilizado por la instrucción <a class="reference internal" href="../reference/simple_stmts.html#del"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">del</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="docutils literal notranslate"><span class="pre">i</span></code> ya no se compensa con la longitud de <code class="docutils literal notranslate"><span class="pre">co_varnames</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-COPY_FREE_VARS">
+<span class="sig-name descname"><span class="pre">COPY_FREE_VARS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-COPY_FREE_VARS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Copia las variables libres <code class="docutils literal notranslate"><span class="pre">n</span></code> del cierre al marco. Elimina la necesidad de un código especial en el lado del que llama al llamar clausuras.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-RAISE_VARARGS">
+<span class="sig-name descname"><span class="pre">RAISE_VARARGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">argc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-RAISE_VARARGS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Provoca una excepción utilizando una de las 3 formas de la declaración <code class="docutils literal notranslate"><span class="pre">raise</span></code>, dependiendo del valor de <em>argc</em>:</p>
+<ul class="simple">
+<li><p>0: <code class="docutils literal notranslate"><span class="pre">raise</span></code> (vuelve a lanzar la excepción anterior)</p></li>
+<li><p>1: <code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">TOS</span></code> (lanza instancia de excepción o un tipo en <code class="docutils literal notranslate"><span class="pre">TOS</span></code>)</p></li>
+<li><p>2: <code class="docutils literal notranslate"><span class="pre">raise</span> <span class="pre">TOS1</span> <span class="pre">desde</span> <span class="pre">TOS</span></code> (lanza una instancia de excepción o tipo en <code class="docutils literal notranslate"><span class="pre">TOS1</span></code> con <code class="docutils literal notranslate"><span class="pre">__cause__</span></code> establecida en <code class="docutils literal notranslate"><span class="pre">TOS</span></code>)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CALL">
+<span class="sig-name descname"><span class="pre">CALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">argc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-CALL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a un objeto invocable con la cantidad de argumentos especificados por <code class="docutils literal notranslate"><span class="pre">argc</span></code>, incluidos los argumentos con nombre especificados por el <a class="reference internal" href="#opcode-KW_NAMES"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">KW_NAMES</span></code></a> anterior, si los hay. En la pila están (en orden ascendente), ya sea:</p>
+<ul class="simple">
+<li><p>NULL</p></li>
+<li><p>El llamable</p></li>
+<li><p>Los argumentos posicionales</p></li>
+<li><p>Los argumentos nombrados</p></li>
+</ul>
+<p>o:</p>
+<ul class="simple">
+<li><p>El llamable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">self</span></code></p></li>
+<li><p>Los argumentos posicionales restantes</p></li>
+<li><p>Los argumentos nombrados</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">argc</span></code> es el total de los argumentos posicionales y con nombre, excluyendo <code class="docutils literal notranslate"><span class="pre">self</span></code> cuando <code class="docutils literal notranslate"><span class="pre">NULL</span></code> no está presente.</p>
+<p><code class="docutils literal notranslate"><span class="pre">CALL</span></code> extrae todos los argumentos y el objeto invocable de la pila, llama al objeto invocable con esos argumentos y agrega el valor retornado por el objeto invocable.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-CALL_FUNCTION_EX">
+<span class="sig-name descname"><span class="pre">CALL_FUNCTION_EX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">flags</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-CALL_FUNCTION_EX" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a un objeto invocable con un conjunto variable de argumentos posicionales y de palabras clave. Si se establece el bit más bajo de <em>flags</em>, la parte superior de la pila contiene un objeto de mapeo que contiene argumentos de palabras clave adicionales. Antes de que se llame al invocable, el objeto de mapeo y el objeto iterable se «desempaquetan» y su contenido se pasa como palabra clave y argumentos posicionales, respectivamente. <code class="docutils literal notranslate"><span class="pre">CALL_FUNCTION_EX</span></code> saca todos los argumentos y el objeto invocable de la pila, llama al objeto invocable con esos argumentos y empuja el valor de retorno retornado por el objeto invocable.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-LOAD_METHOD">
+<span class="sig-name descname"><span class="pre">LOAD_METHOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">namei</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-LOAD_METHOD" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Carga un método denominado <code class="docutils literal notranslate"><span class="pre">co_names[namei]</span></code> desde el objeto TOS. TOS es retirado. Este código de bytes distingue dos casos: si TOS tiene un método con el nombre correcto, el código de bytes agrega el método independiente y TOS. <a class="reference internal" href="#opcode-CALL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">CALL</span></code></a> utilizará TOS como primer argumento (<code class="docutils literal notranslate"><span class="pre">self</span></code>) al llamar al método independiente. De lo contrario, se agregan <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y el objeto devuelto por la búsqueda de atributos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-PRECALL">
+<span class="sig-name descname"><span class="pre">PRECALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">argc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-PRECALL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Prefijos <a class="reference internal" href="#opcode-CALL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">CALL</span></code></a>. Lógicamente esto es un no op. Existe para permitir una especialización efectiva de las llamadas. <code class="docutils literal notranslate"><span class="pre">argc</span></code> es el número de argumentos como se describe en <a class="reference internal" href="#opcode-CALL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">CALL</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-PUSH_NULL">
+<span class="sig-name descname"><span class="pre">PUSH_NULL</span></span><a class="headerlink" href="#opcode-PUSH_NULL" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><blockquote>
+<div><p>Agrega un <code class="docutils literal notranslate"><span class="pre">NULL</span></code> a la pila. Se usa en la secuencia de llamadas para hacer coincidir el <code class="docutils literal notranslate"><span class="pre">NULL</span></code> enviado por <a class="reference internal" href="#opcode-LOAD_METHOD"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">LOAD_METHOD</span></code></a> para llamadas que no son de método.</p>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-KW_NAMES">
+<span class="sig-name descname"><span class="pre">KW_NAMES</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">i</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-KW_NAMES" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Prefijos <a class="reference internal" href="#opcode-PRECALL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">PRECALL</span></code></a>. Almacena una referencia a <code class="docutils literal notranslate"><span class="pre">co_consts[consti]</span></code> en una variable interna para uso de <a class="reference internal" href="#opcode-CALL"><code class="xref std std-opcode docutils literal notranslate"><span class="pre">CALL</span></code></a>. <code class="docutils literal notranslate"><span class="pre">co_consts[consti]</span></code> debe ser una tupla de cadenas.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MAKE_FUNCTION">
+<span class="sig-name descname"><span class="pre">MAKE_FUNCTION</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">flags</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-MAKE_FUNCTION" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Apila un nuevo objeto de función en la pila. De abajo hacia arriba, la pila consumida debe constar de valores si el argumento lleva un valor de marca especificado</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0x01</span></code>, una tupla de valores predeterminados para solo parámetros posicionales y posicionales o de palabras clave en orden posicional</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x02</span></code> un diccionario de valores predeterminados de solo palabras clave</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x04</span></code> una tupla de cadenas de caracteres que contiene anotaciones de parámetros</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x08</span></code> una tupla que contiene celdas para variables libres, haciendo un cierre (<em>closure</em>)</p></li>
+<li><p>el código asociado con la función (en TOS1)</p></li>
+<li><p>el <a class="reference internal" href="../glossary.html#term-qualified-name"><span class="xref std std-term">nombre calificado</span></a> de la función (en TOS)</p></li>
+</ul>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>El valor indicador <code class="docutils literal notranslate"><span class="pre">0x04</span></code> es una tupla de cadena de caracteres en vez de un diccionario</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-BUILD_SLICE">
+<span class="sig-name descname"><span class="pre">BUILD_SLICE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">argc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-BUILD_SLICE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p id="index-1">Apila un objeto de rebanada en la pila. <em>argc</em> debe ser 2 o 3. Si es 2, se apila <code class="docutils literal notranslate"><span class="pre">slice(TOS1,</span> <span class="pre">TOS)</span></code>; si es 3, se apila <code class="docutils literal notranslate"><span class="pre">slice(TOS2,</span> <span class="pre">TOS1,</span> <span class="pre">TOS)</span></code>. Consulte la función incorporada <a class="reference internal" href="functions.html#slice" title="slice"><code class="xref py py-func docutils literal notranslate"><span class="pre">slice()</span></code></a> para obtener más información.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-EXTENDED_ARG">
+<span class="sig-name descname"><span class="pre">EXTENDED_ARG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ext</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-EXTENDED_ARG" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Prefija cualquier código de operación que tenga un argumento demasiado grande para caber en el byte predeterminado. <em>ext</em> contiene un byte adicional que actúa como bits más altos en el argumento. Para cada opcode, como máximo se permiten tres prefijos <code class="docutils literal notranslate"><span class="pre">EXTENDED_ARG</span></code>, formando un argumento de dos bytes a cuatro bytes.</p>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-FORMAT_VALUE">
+<span class="sig-name descname"><span class="pre">FORMAT_VALUE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">flags</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-FORMAT_VALUE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se utiliza para implementar cadenas literales formateadas (cadenas de caracteres f). Desapila un <em>fmt_spec</em> opcional de la pila, luego un <em>value</em> requerido. <em>flags</em> se interpreta de la siguiente manera:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">(flags</span> <span class="pre">&amp;</span> <span class="pre">0x03)</span> <span class="pre">==</span> <span class="pre">0x00</span></code>: <em>value</em> es formateado como está.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(flags</span> <span class="pre">&amp;</span> <span class="pre">0x03)</span> <span class="pre">==</span> <span class="pre">0x01</span></code>: llama <a class="reference internal" href="stdtypes.html#str" title="str"><code class="xref py py-func docutils literal notranslate"><span class="pre">str()</span></code></a> sobre <em>value</em> antes de formatearlo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(flags</span> <span class="pre">&amp;</span> <span class="pre">0x03)</span> <span class="pre">==</span> <span class="pre">0x02</span></code>: llama <a class="reference internal" href="functions.html#repr" title="repr"><code class="xref py py-func docutils literal notranslate"><span class="pre">repr()</span></code></a> sobre <em>value</em> antes de formatearlo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(flags</span> <span class="pre">&amp;</span> <span class="pre">0x03)</span> <span class="pre">==</span> <span class="pre">0x03</span></code>: llama <a class="reference internal" href="functions.html#ascii" title="ascii"><code class="xref py py-func docutils literal notranslate"><span class="pre">ascii()</span></code></a> sobre <em>value</em> antes de formatearlo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">(flags</span> <span class="pre">&amp;</span> <span class="pre">0x04)</span> <span class="pre">==</span> <span class="pre">0x04</span></code>: desapila <em>fmt_spec</em> de la pila y lo usa, de lo contrario usa un <em>fmt_spec</em> vacío.</p></li>
+</ul>
+<p>El formateo se realiza usando <a class="reference internal" href="../c-api/object.html#c.PyObject_Format" title="PyObject_Format"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Format()</span></code></a>. El resultado se apila en la pila.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-MATCH_CLASS">
+<span class="sig-name descname"><span class="pre">MATCH_CLASS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">count</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-MATCH_CLASS" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>TOS es una tupla de nombres de atributos clave, TOS1 es la clase contra la cual se hace la coincidencia, y TOS2 es el sujeto de la coincidencia. <em>count</em> es el número de sub-patrones posicionales.</p>
+<p>Retira TOS, TOS1 y TOS2. Si TOS2 es una instancia de TOS1 y tiene los atributos posicionales y de palabra clave requeridos por <em>count</em> y TOS, agrega una tupla de atributos extraídos. De lo contrario, agrega <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span>Anteriormente, esta instrucción también generaba un valor booleano que indicaba éxito (<code class="docutils literal notranslate"><span class="pre">True</span></code>) o falla (<code class="docutils literal notranslate"><span class="pre">False</span></code>).</p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-RESUME">
+<span class="sig-name descname"><span class="pre">RESUME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">where</span></em><span class="sig-paren">)</span><a class="headerlink" href="#opcode-RESUME" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><blockquote>
+<div><p>Un no-op. Realiza comprobaciones internas de seguimiento, depuración y optimización.</p>
+<p>El operando <code class="docutils literal notranslate"><span class="pre">where</span></code> marca dónde ocurre el <code class="docutils literal notranslate"><span class="pre">RESUME</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> El comienzo de una función</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> Después de una expresión <code class="docutils literal notranslate"><span class="pre">yield</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> Después de una expresión <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code> Después de una expresión <code class="docutils literal notranslate"><span class="pre">await</span></code></p></li>
+</ul>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-RETURN_GENERATOR">
+<span class="sig-name descname"><span class="pre">RETURN_GENERATOR</span></span><a class="headerlink" href="#opcode-RETURN_GENERATOR" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crea un generador, corrutina o generador asíncrono a partir del marco actual. Borra el marco actual y retorna el generador recién creado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-SEND">
+<span class="sig-name descname"><span class="pre">SEND</span></span><a class="headerlink" href="#opcode-SEND" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía <code class="docutils literal notranslate"><span class="pre">None</span></code> al subgenerador de este generador. Se utiliza en sentencias <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span></code> y <code class="docutils literal notranslate"><span class="pre">await</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-ASYNC_GEN_WRAP">
+<span class="sig-name descname"><span class="pre">ASYNC_GEN_WRAP</span></span><a class="headerlink" href="#opcode-ASYNC_GEN_WRAP" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envuelve el valor en la parte superior de la pila en un <code class="docutils literal notranslate"><span class="pre">async_generator_wrapped_value</span></code>. Se utiliza para producir en generadores asíncronos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std opcode">
+<dt class="sig sig-object std" id="opcode-HAVE_ARGUMENT">
+<span class="sig-name descname"><span class="pre">HAVE_ARGUMENT</span></span><a class="headerlink" href="#opcode-HAVE_ARGUMENT" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esto no es realmente un opcode. Identifica la línea divisoria entre los opcode que no usan su argumento y los que lo hacen (<code class="docutils literal notranslate"><span class="pre">&lt;</span> <span class="pre">HAVE_ARGUMENT</span></code> y <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">HAVE_ARGUMENT</span></code>, respectivamente).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>Ahora cada instrucción tiene un argumento, pero los códigos de operación <code class="docutils literal notranslate"><span class="pre">&lt;HAVE_ARGUMENT</span></code> la ignoran. Antes, solo los códigos de operación <code class="docutils literal notranslate"><span class="pre">&gt;</span> <span class="pre">=</span> <span class="pre">HAVE_ARGUMENT</span></code> tenían un argumento.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="opcode-collections">
+<span id="id1"></span><h2>Colecciones opcode<a class="headerlink" href="#opcode-collections" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Estas colecciones se proporcionan para la introspección automática de instrucciones de bytecode:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.opname">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">opname</span></span><a class="headerlink" href="#dis.opname" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de nombres de operaciones, indexable utilizando el bytecode.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.opmap">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">opmap</span></span><a class="headerlink" href="#dis.opmap" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Nombres de operaciones de mapeo de diccionario a bytecodes.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.cmp_op">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">cmp_op</span></span><a class="headerlink" href="#dis.cmp_op" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de todos los nombres de operaciones de comparación.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hasconst">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hasconst</span></span><a class="headerlink" href="#dis.hasconst" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes que acceden a una constante.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hasfree">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hasfree</span></span><a class="headerlink" href="#dis.hasfree" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes que acceden a una variable libre (tenga en cuenta que “libre” en este contexto se refiere a nombres en el alcance actual a los que hacen referencia los ámbitos internos o los nombres en los ámbitos externos a los que se hace referencia desde este ámbito. <strong>No</strong> incluye referencias a ámbitos globales o integrados).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hasname">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hasname</span></span><a class="headerlink" href="#dis.hasname" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes que acceden a un atributo por nombre.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hasjrel">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hasjrel</span></span><a class="headerlink" href="#dis.hasjrel" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes que tienen un objetivo de salto relativo.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hasjabs">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hasjabs</span></span><a class="headerlink" href="#dis.hasjabs" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes que tienen un objetivo de salto absoluto.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.haslocal">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">haslocal</span></span><a class="headerlink" href="#dis.haslocal" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de códigos de bytes que acceden a una variable local.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="dis.hascompare">
+<span class="sig-prename descclassname"><span class="pre">dis.</span></span><span class="sig-name descname"><span class="pre">hascompare</span></span><a class="headerlink" href="#dis.hascompare" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Secuencia de bytecodes de operaciones booleanas.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code> — Desensamblador para bytecode de Python</a><ul>
+<li><a class="reference internal" href="#bytecode-analysis">Análisis de bytecode</a></li>
+<li><a class="reference internal" href="#analysis-functions">Funciones de análisis</a></li>
+<li><a class="reference internal" href="#python-bytecode-instructions">Instrucciones bytecode de Python</a></li>
+<li><a class="reference internal" href="#opcode-collections">Colecciones opcode</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="compileall.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compileall</span></code> — Bibliotecas de Python de compilación de bytes</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="pickletools.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickletools</span></code> — Herramientas para desarrolladores pickle</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/dis.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="pickletools.html" title="pickletools — Herramientas para desarrolladores pickle"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="compileall.html" title="compileall — Bibliotecas de Python de compilación de bytes"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="language.html" >Servicios del lenguaje Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">dis</span></code> — Desensamblador para bytecode de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

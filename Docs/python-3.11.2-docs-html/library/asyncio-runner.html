@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Ejecutores" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/asyncio-runner.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/asyncio/runners.py Esta sección muestra las primitivas asyncio de alto nivel para ejecutar código asyncio. Están construidos sobre un event loop con el objetivo de simplificar el..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/asyncio/runners.py Esta sección muestra las primitivas asyncio de alto nivel para ejecutar código asyncio. Están construidos sobre un event loop con el objetivo de simplificar el..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>Ejecutores &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Corrutinas y tareas" href="asyncio-task.html" />
+    <link rel="prev" title="asyncio — E/S Asíncrona" href="asyncio.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/asyncio-runner.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Ejecutores</a><ul>
+<li><a class="reference internal" href="#running-an-asyncio-program">Ejecutando un programa asyncio</a></li>
+<li><a class="reference internal" href="#runner-context-manager">Administrador de contexto del ejecutor</a></li>
+<li><a class="reference internal" href="#handling-keyboard-interruption">Manejando interrupciones de teclado</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="asyncio.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="asyncio-task.html"
+                          title="próximo capítulo">Corrutinas y tareas</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/asyncio-runner.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-task.html" title="Corrutinas y tareas"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio.html" title="asyncio — E/S Asíncrona"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Ejecutores</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="runners">
+<h1>Ejecutores<a class="headerlink" href="#runners" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/asyncio/runners.py">Lib/asyncio/runners.py</a></p>
+<p>Esta sección muestra las primitivas asyncio de alto nivel para ejecutar código asyncio.</p>
+<p>Están construidos sobre un <a class="reference internal" href="asyncio-eventloop.html#asyncio-event-loop"><span class="std std-ref">event loop</span></a> con el objetivo de simplificar el uso de código async para escenarios comunes de alta difusión.</p>
+<div class="contents local topic" id="contenido">
+<ul class="simple">
+<li><p><a class="reference internal" href="#running-an-asyncio-program" id="id1">Ejecutando un programa asyncio</a></p></li>
+<li><p><a class="reference internal" href="#runner-context-manager" id="id2">Administrador de contexto del ejecutor</a></p></li>
+<li><p><a class="reference internal" href="#handling-keyboard-interruption" id="id3">Manejando interrupciones de teclado</a></p></li>
+</ul>
+</div>
+<section id="running-an-asyncio-program">
+<h2><a class="toc-backref" href="#id1">Ejecutando un programa asyncio</a><a class="headerlink" href="#running-an-asyncio-program" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="asyncio.run">
+<span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coro</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecutar el <a class="reference internal" href="../glossary.html#term-coroutine"><span class="xref std std-term">coroutine</span></a> <em>coro</em> y retornar el resultado.</p>
+<p>Esta función ejecuta la co-rutina pasada, teniendo cuidado de manejar el bucle de eventos asyncio, <em>terminando los generadores asíncronos</em> y cerrando el pool de hilos.</p>
+<p>Esta función no puede ser llamada cuando otro bucle de eventos asyncio está corriendo en el mismo hilo.</p>
+<p>Si <em>debug</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, el bucle de eventos se ejecutará en modo debug. <code class="docutils literal notranslate"><span class="pre">False</span></code> deshabilita el modo debug de manera explícita. <code class="docutils literal notranslate"><span class="pre">None</span></code> se usa para respetar la configuración global <a class="reference internal" href="asyncio-dev.html#asyncio-debug-mode"><span class="std std-ref">Modo depuración</span></a>.</p>
+<p>Esta función siempre crea un nuevo bucle de eventos y lo cierra al final. Debería ser usado como el punto de entrada principal para programas asyncio e idealmente, llamado una sola vez.</p>
+<p>Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Actualizado para usar <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.shutdown_default_executor" title="asyncio.loop.shutdown_default_executor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.shutdown_default_executor()</span></code></a>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span><em>debug</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> por defecto para respetar la configuración global del modo debug.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="runner-context-manager">
+<h2><a class="toc-backref" href="#id2">Administrador de contexto del ejecutor</a><a class="headerlink" href="#runner-context-manager" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="asyncio.Runner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">asyncio.</span></span><span class="sig-name descname"><span class="pre">Runner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Runner" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un administrador de contexto que simplifica <em>multiples</em> llamadas asíncronas en el mismo contexto.</p>
+<p>A veces varias funciones asíncronas de alto nivel deberían ser llamadas en el mismo <a class="reference internal" href="asyncio-eventloop.html#asyncio-event-loop"><span class="std std-ref">bucle de eventos</span></a> y <a class="reference internal" href="contextvars.html#contextvars.Context" title="contextvars.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a>.</p>
+<p>Si <em>debug</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, el bucle de eventos se ejecutará en modo debug. <code class="docutils literal notranslate"><span class="pre">False</span></code> deshabilita el modo debug de manera explícita. <code class="docutils literal notranslate"><span class="pre">None</span></code> se usa para respetar la configuración global <a class="reference internal" href="asyncio-dev.html#asyncio-debug-mode"><span class="std std-ref">Modo depuración</span></a>.</p>
+<p><em>loop_factory</em> puede ser usado para redefinir la creación de bucles. Es responsabilidad de la <em>loop_factory</em> configurar el bucle creado como el bucle actual. Por defecto <a class="reference internal" href="asyncio-eventloop.html#asyncio.new_event_loop" title="asyncio.new_event_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.new_event_loop()</span></code></a> es usado y configura el nuevo bucle de eventos como el actual con <a class="reference internal" href="asyncio-eventloop.html#asyncio.set_event_loop" title="asyncio.set_event_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.set_event_loop()</span></code></a> si <em>loop_factory</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Básicamente, el ejemplo <a class="reference internal" href="#asyncio.run" title="asyncio.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.run()</span></code></a> puede ser re-escrito usando el ejecutor:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Runner</span><span class="p">()</span> <span class="k">as</span> <span class="n">runner</span><span class="p">:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.Runner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coro</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Runner.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecuta una <a class="reference internal" href="../glossary.html#term-coroutine"><span class="xref std std-term">co-rutina</span></a> <em>coro</em> en el bucle embebido.</p>
+<p>Retorna el resultado de la co-rutina o lanza excepción de dicha co-rutina.</p>
+<p>Un argumento opcional del <em>contexto</em> que consiste en una palabra clave permite especificar un <a class="reference internal" href="contextvars.html#contextvars.Context" title="contextvars.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a> personalizado donde correr la <em>coro</em> . El contexto por defecto del ejecutor es usado si el modo debug es <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Esta función no puede ser llamada cuando otro bucle de eventos asyncio está corriendo en el mismo hilo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.Runner.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Runner.close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el ejecutor.</p>
+<p>Termina los generadores asíncronos, apaga el ejecutor por defecto, cierra el bucle de eventos y libera el <a class="reference internal" href="contextvars.html#contextvars.Context" title="contextvars.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a> embebido.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="asyncio.Runner.get_loop">
+<span class="sig-name descname"><span class="pre">get_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Runner.get_loop" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el bucle de eventos asociado a la instancia del ejecutor.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><a class="reference internal" href="#asyncio.Runner" title="asyncio.Runner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Runner</span></code></a> usa una estrategia de inicialización perezosa, su constructor no inicializa las estructuras de bajo nivel subyacentes.</p>
+<p>El <em>bucle</em> y el <em>contexto</em> embebidos son creados al entrar al cuerpo <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a> o en la primera llamada a <a class="reference internal" href="#asyncio.run" title="asyncio.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> o a <a class="reference internal" href="#asyncio.Runner.get_loop" title="asyncio.Runner.get_loop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_loop()</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="handling-keyboard-interruption">
+<h2><a class="toc-backref" href="#id3">Manejando interrupciones de teclado</a><a class="headerlink" href="#handling-keyboard-interruption" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.11.</span></p>
+</div>
+<p>Cuando la excepción <a class="reference internal" href="signal.html#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGINT</span></code></a> es lanzada por <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd></kbd>, la excepción <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> es lanzada en el hilo principal por defecto. Sin embargo, esto no siempre funciona con <a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a> porque puede interrumpir llamadas internas a asyncio e impedir la salida del programa.</p>
+<p>Para mitigar este problema, <a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a> maneja <a class="reference internal" href="signal.html#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGINT</span></code></a> de la siguiente forma:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#asyncio.Runner.run" title="asyncio.Runner.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asyncio.Runner.run()</span></code></a> instala un administrador <a class="reference internal" href="signal.html#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGINT</span></code></a> personalizado antes que cualquier código de usuario sea ejecutado y lo remueve a la salida de la función.</p></li>
+<li><p>La <a class="reference internal" href="#asyncio.Runner" title="asyncio.Runner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Runner</span></code></a> crea la tarea principal que será pasada a la co-rutina para su ejecución.</p></li>
+<li><p>When <a class="reference internal" href="signal.html#signal.SIGINT" title="signal.SIGINT"><code class="xref py py-const docutils literal notranslate"><span class="pre">signal.SIGINT</span></code></a> is raised by <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd></kbd>, the custom signal handler
+cancels the main task by calling <a class="reference internal" href="asyncio-task.html#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asyncio.Task.cancel()</span></code></a> which raises
+<a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">asyncio.CancelledError</span></code></a> inside the main task.  This causes the Python stack
+to unwind, <code class="docutils literal notranslate"><span class="pre">try/except</span></code> and <code class="docutils literal notranslate"><span class="pre">try/finally</span></code> blocks can be used for resource
+cleanup.  After the main task is cancelled, <a class="reference internal" href="#asyncio.Runner.run" title="asyncio.Runner.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asyncio.Runner.run()</span></code></a> raises
+<a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a>.</p></li>
+<li><p>Un usuario podría escribir un bucle cerrado que no puede ser interrumpido por <a class="reference internal" href="asyncio-task.html#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asyncio.Task.cancel()</span></code></a>, en cuyo caso la segunda llamada a <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd></kbd> lanza inmediatamente <a class="reference internal" href="exceptions.html#KeyboardInterrupt" title="KeyboardInterrupt"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code></a> sin cancelar la tarea principal.</p></li>
+</ol>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Ejecutores</a><ul>
+<li><a class="reference internal" href="#running-an-asyncio-program">Ejecutando un programa asyncio</a></li>
+<li><a class="reference internal" href="#runner-context-manager">Administrador de contexto del ejecutor</a></li>
+<li><a class="reference internal" href="#handling-keyboard-interruption">Manejando interrupciones de teclado</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="asyncio.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="asyncio-task.html"
+                          title="próximo capítulo">Corrutinas y tareas</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/asyncio-runner.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-task.html" title="Corrutinas y tareas"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio.html" title="asyncio — E/S Asíncrona"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Ejecutores</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

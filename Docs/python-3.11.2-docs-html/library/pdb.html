@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="pdb — El Depurador de Python" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/pdb.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/unittest/mock.py El módulo pdb define un depurador de código fuente interactivo para programas Python. Soporta el establecimiento de puntos de ruptura (condicionales) y pasos sen..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/unittest/mock.py El módulo pdb define un depurador de código fuente interactivo para programas Python. Soporta el establecimiento de puntos de ruptura (condicionales) y pasos sen..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>pdb — El Depurador de Python &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Los perfiladores de Python" href="profile.html" />
+    <link rel="prev" title="faulthandler — Volcar el rastreo de Python" href="faulthandler.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/pdb.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a><ul>
+<li><a class="reference internal" href="#debugger-commands">Comandos del depurador</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="faulthandler.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code> — Volcar el rastreo de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="profile.html"
+                          title="próximo capítulo">Los perfiladores de Python</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/pdb.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="profile.html" title="Los perfiladores de Python"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="faulthandler.html" title="faulthandler — Volcar el rastreo de Python"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="debug.html" accesskey="U">Depuración y perfilado</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-pdb">
+<span id="pdb-the-python-debugger"></span><span id="debugger"></span><h1><a class="reference internal" href="#module-pdb" title="pdb: The Python debugger for interactive interpreters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code></a> — El Depurador de Python<a class="headerlink" href="#module-pdb" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/unittest/mock.py">Lib/unittest/mock.py</a></p>
+<hr class="docutils" id="index-0" />
+<p>El módulo <a class="reference internal" href="#module-pdb" title="pdb: The Python debugger for interactive interpreters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code></a> define un depurador de código fuente interactivo para programas Python.  Soporta el establecimiento de puntos de ruptura (condicionales) y pasos sencillos a nivel de línea de código fuente, inspección de marcos de pila, listado de código fuente, y evaluación de código Python arbitrario en el contexto de cualquier marco de pila.  También soporta depuración post-mortem y puede ser llamado bajo control del programa.</p>
+<p id="index-1">El depurador es extensible – en realidad se define como la clase <a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pdb</span></code></a>. Esto no está actualmente documentado pero se entiende fácilmente leyendo la fuente.  La interfaz de extensión usa los módulos <a class="reference internal" href="bdb.html#module-bdb" title="bdb: Debugger framework."><code class="xref py py-mod docutils literal notranslate"><span class="pre">bdb</span></code></a> y <a class="reference internal" href="cmd.html#module-cmd" title="cmd: Build line-oriented command interpreters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">cmd</span></code></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<dl class="simple">
+<dt>Module <a class="reference internal" href="faulthandler.html#module-faulthandler" title="faulthandler: Dump the Python traceback."><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code></a></dt><dd><p>Used to dump Python tracebacks explicitly, on a fault, after a timeout,
+or on a user signal.</p>
+</dd>
+<dt>Module <a class="reference internal" href="traceback.html#module-traceback" title="traceback: Print or retrieve a stack traceback."><code class="xref py py-mod docutils literal notranslate"><span class="pre">traceback</span></code></a></dt><dd><p>Standard interface to extract, format and print stack traces of Python programs.</p>
+</dd>
+</dl>
+</div>
+<p>El mensaje del depurador es <code class="docutils literal notranslate"><span class="pre">(Pdb)</span></code>. El uso típico para ejecutar un programa bajo el control del depurador es:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mymodule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;mymodule.test()&#39;</span><span class="p">)</span>
+<span class="go">&gt; &lt;string&gt;(0)?()</span>
+<span class="go">(Pdb) continue</span>
+<span class="go">&gt; &lt;string&gt;(1)?()</span>
+<span class="go">(Pdb) continue</span>
+<span class="go">NameError: &#39;spam&#39;</span>
+<span class="go">&gt; &lt;string&gt;(1)?()</span>
+<span class="go">(Pdb)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>La finalización de tabulación a través del módulo <a class="reference internal" href="readline.html#module-readline" title="readline: GNU readline support for Python. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">readline</span></code></a> está disponible para comandos y argumentos de comando, por ejemplo. Los nombres globales y locales actuales se ofrecen como argumentos del comando <code class="docutils literal notranslate"><span class="pre">p</span></code>.</p>
+</div>
+<p><code class="file docutils literal notranslate"><span class="pre">pdb.py</span></code> también puede ser invocado como un script para depurar otros scripts.  Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pdb</span> <span class="n">myscript</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Cuando se invoca como script, pdb entrará automáticamente en la depuración post-mortem si el programa que se depura sale de forma anormal.  Después de la depuración post-mortem (o después de la salida normal del programa), pdb reiniciará el programa.  El reinicio automático preserva el estado de pdb (como los puntos de ruptura) y en la mayoría de los casos es más útil que abandonar el depurador al salir del programa.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2: </span><code class="file docutils literal notranslate"><span class="pre">pdb.py</span></code> ahora acepta una opción <code class="docutils literal notranslate"><span class="pre">-c</span></code> que ejecuta comandos como si se dieran en un archivo <code class="file docutils literal notranslate"><span class="pre">.pdbrc</span></code>, ver <a class="reference internal" href="#debugger-commands"><span class="std std-ref">Comandos del depurador</span></a>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7: </span><code class="file docutils literal notranslate"><span class="pre">pdb.py</span></code> now accepts a <code class="docutils literal notranslate"><span class="pre">-m</span></code> option that execute modules similar to the way
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span></code> does. As with a script, the debugger will pause execution just
+before the first line of the module.</p>
+</div>
+<p>The typical usage to break into the debugger is to insert:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>at the location you want to break into the debugger, and then run the program.
+You can then step through the code following this statement, and continue
+running without the debugger using the <a class="reference internal" href="#pdbcommand-continue"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">continue</span></code></a> command.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7: </span>La <a class="reference internal" href="functions.html#breakpoint" title="breakpoint"><code class="xref py py-func docutils literal notranslate"><span class="pre">breakpoint()</span></code></a> incorporada cuando se llama con los valores por defecto, puede ser usado en lugar del <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pdb;</span> <span class="pre">pdb.set_trace()</span></code>.</p>
+</div>
+<p>El uso típico para inspeccionar un programa que se ha estrellado es:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mymodule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mymodule</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;./mymodule.py&quot;</span>, line <span class="m">4</span>, in <span class="n">test</span>
+    <span class="n">test2</span><span class="p">()</span>
+  File <span class="nb">&quot;./mymodule.py&quot;</span>, line <span class="m">3</span>, in <span class="n">test2</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">spam</span><span class="p">)</span>
+<span class="gr">NameError</span>: <span class="n">spam</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">pm</span><span class="p">()</span>
+<span class="go">&gt; ./mymodule.py(3)test2()</span>
+<span class="go">-&gt; print(spam)</span>
+<span class="go">(Pdb)</span>
+</pre></div>
+</div>
+<p>El módulo define las siguientes funciones; cada una de ellas entra en el depurador de una manera ligeramente diferente:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.run">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecutar el <em>statement</em> (dado como una cadena o un objeto de código) bajo el control del depurador.  El prompt del depurador aparece antes de que se ejecute cualquier código; puedes establecer puntos de ruptura y escribir <a class="reference internal" href="#pdbcommand-continue"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">continue</span></code></a>, o puedes pasar por la declaración usando <a class="reference internal" href="#pdbcommand-step"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">step</span></code></a> o <a class="reference internal" href="#pdbcommand-next"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">next</span></code></a> (todos estos comandos se explican más abajo).  Los argumentos opcionales <em>globals</em> y <em>locals</em> especifican el entorno en el que se ejecuta el código; por defecto se utiliza el diccionario del módulo <a class="reference internal" href="__main__.html#module-__main__" title="__main__: The environment where top-level code is run. Covers command-line interfaces, import-time behavior, and ``__name__ == '__main__'``."><code class="xref py py-mod docutils literal notranslate"><span class="pre">__main__</span></code></a>.  (Ver la explicación de las funciones incorporadas <a class="reference internal" href="functions.html#exec" title="exec"><code class="xref py py-func docutils literal notranslate"><span class="pre">exec()</span></code></a> o <a class="reference internal" href="functions.html#eval" title="eval"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval()</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.runeval">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">runeval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.runeval" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Evalúa la <em>expression</em> (dada como una cadena o un objeto de código) bajo el control del depurador.  Cuando vuelve <a class="reference internal" href="#pdb.runeval" title="pdb.runeval"><code class="xref py py-func docutils literal notranslate"><span class="pre">runeval()</span></code></a>, retorna el valor de la expresión.  En caso contrario, esta función es similar a <a class="reference internal" href="#pdb.run" title="pdb.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.runcall">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">runcall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.runcall" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Llama a la <em>function</em> (un objeto de función o método, no una cadena) con los argumentos dados.  Cuando <a class="reference internal" href="#pdb.runcall" title="pdb.runcall"><code class="xref py py-func docutils literal notranslate"><span class="pre">runcall()</span></code></a> retorna, retorna lo que sea que la llamada de la función haya retornado.  El aviso del depurador aparece tan pronto como se introduce la función.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.set_trace">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">set_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.set_trace" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Entra en el depurador en el marco de la pila de llamadas.  Esto es útil para codificar duramente un punto de interrupción en un punto dado de un programa, incluso si el código no se depura de otra manera (por ejemplo, cuando una afirmación falla).  Si se da, se imprime el <em>header</em> en la consola justo antes de que comience la depuración.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>El argumento de la palabra clave <em>header</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.post_mortem">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">post_mortem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traceback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.post_mortem" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ingresa a la depuración post-mortem del objeto <em>traceback</em> dado.  Si no se da un <em>traceback</em>, utiliza el de la excepción que se está manejando actualmente (una excepción debe ser manejada si se va a utilizar el predeterminado).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pdb.pm">
+<span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">pm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pdb.pm" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ingresa a la depuración post-mortem de la traza encontrada en <a class="reference internal" href="sys.html#sys.last_traceback" title="sys.last_traceback"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.last_traceback</span></code></a>.</p>
+</dd></dl>
+
+<p>Las funciones <code class="docutils literal notranslate"><span class="pre">run*</span></code> y <a class="reference internal" href="#pdb.set_trace" title="pdb.set_trace"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_trace()</span></code></a> son alias para instanciar la clase <a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pdb</span></code></a> y llamar al método del mismo nombre.  Si quieres acceder a más funciones, tienes que hacerlo tú mismo:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pdb.Pdb">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pdb.</span></span><span class="sig-name descname"><span class="pre">Pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">completekey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tab'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nosigint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readrc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.Pdb" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p><a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pdb</span></code></a> es la clase de depuración.</p>
+<p>Los argumentos <em>completekey</em>, <em>stdin</em> y <em>stdout</em> se pasan a la subyacente <a class="reference internal" href="cmd.html#cmd.Cmd" title="cmd.Cmd"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmd.Cmd</span></code></a> class; ver la descripción allí.</p>
+<p>El argumento <em>skip</em>, si se da, debe ser un iterable de los patrones de nombre de los módulos de estilo global.  El depurador no entrará en marcos que se originen en un módulo que coincida con uno de estos patrones. <a class="footnote-reference brackets" href="#id3" id="id1">1</a></p>
+<p>Por defecto, Pdb establece un manejador para la señal de SIGINT (que se envía cuando el usuario presiona <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd></kbd> en la consola) cuando da un comando de <code class="docutils literal notranslate"><span class="pre">continue</span></code>. Esto te permite entrar en el depurador de nuevo presionando <kbd class="kbd compound docutils literal notranslate"><kbd class="kbd docutils literal notranslate">Ctrl</kbd>-<kbd class="kbd docutils literal notranslate">C</kbd></kbd>.  Si quieres que Pdb no toque el manejador de SIGINT, pon <em>nosigint</em> en true.</p>
+<p>El argumento * readrc * por defecto es verdadero y controla si Pdb cargará archivos .pdbrc desde el sistema de archivos.</p>
+<p>Ejemplo de llamada para permitir el rastreo con <em>skip</em>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">Pdb</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;django.*&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="audit-hook">Levanta una <a class="reference internal" href="sys.html#auditing"><span class="std std-ref">auditing event</span></a> <code class="docutils literal notranslate"><span class="pre">pdb.Pdb</span></code> sin argumentos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.1: </span>El argumento <em>skip</em>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2: </span>El argumento del <em>nosigint</em>.  Anteriormente, un manejador SIGINT nunca fue establecido por Pdb.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>El argumento <em>readrc</em>.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pdb.Pdb.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.Pdb.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="pdb.Pdb.runeval">
+<span class="sig-name descname"><span class="pre">runeval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.Pdb.runeval" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="pdb.Pdb.runcall">
+<span class="sig-name descname"><span class="pre">runcall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdb.Pdb.runcall" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="pdb.Pdb.set_trace">
+<span class="sig-name descname"><span class="pre">set_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pdb.Pdb.set_trace" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Véase la documentación para las funciones explicadas anteriormente.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="debugger-commands">
+<span id="id2"></span><h2>Comandos del depurador<a class="headerlink" href="#debugger-commands" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los comandos reconocidos por el depurador se enumeran a continuación.  La mayoría de los comandos pueden abreviarse a una o dos letras como se indica; por ejemplo, <code class="docutils literal notranslate"><span class="pre">h(elp)</span></code> significa que se puede usar <code class="docutils literal notranslate"><span class="pre">h</span></code> o <code class="docutils literal notranslate"><span class="pre">help</span></code> para introducir el comando de ayuda (pero no <code class="docutils literal notranslate"><span class="pre">he</span></code> o <code class="docutils literal notranslate"><span class="pre">hel</span></code>, ni <code class="docutils literal notranslate"><span class="pre">H</span></code> o <code class="docutils literal notranslate"><span class="pre">Help</span></code> o <code class="docutils literal notranslate"><span class="pre">HELP</span></code>).  Los argumentos de los comandos deben estar separados por espacios en blanco (espacios o tabulaciones).  Los argumentos opcionales están encerrados entre corchetes (<code class="docutils literal notranslate"><span class="pre">[]</span></code>) en la sintaxis del comando; los corchetes no deben escribirse.  Las alternativas en la sintaxis de los comandos están separadas por una barra vertical (<code class="docutils literal notranslate"><span class="pre">|</span></code>).</p>
+<p>Introducir una línea en blanco repite el último comando introducido.  Excepción: si el último comando fue un <a class="reference internal" href="#pdbcommand-list"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">list</span></code></a> comando, las siguientes 11 líneas están listadas.</p>
+<p>Se supone que los comandos que el depurador no reconoce son declaraciones en Python y se ejecutan en el contexto del programa que se está depurando.  Las declaraciones en Python también pueden ser precedidas por un signo de exclamación (<code class="docutils literal notranslate"><span class="pre">!</span></code>).  Esta es una manera poderosa de inspeccionar el programa que se está depurando; incluso es posible cambiar una variable o llamar a una función.  Cuando se produce una excepción en una sentencia de este tipo, se imprime el nombre de la excepción pero no se cambia el estado del depurador.</p>
+<p>El depurador soporta <a class="reference internal" href="#debugger-aliases"><span class="std std-ref">aliases</span></a>.  Los alias pueden tener parámetros que permiten un cierto nivel de adaptabilidad al contexto que se está examinando.</p>
+<p>Multiple commands may be entered on a single line, separated by <code class="docutils literal notranslate"><span class="pre">;;</span></code>.  (A
+single <code class="docutils literal notranslate"><span class="pre">;</span></code> is not used as it is the separator for multiple commands in a line
+that is passed to the Python parser.)  No intelligence is applied to separating
+the commands; the input is split at the first <code class="docutils literal notranslate"><span class="pre">;;</span></code> pair, even if it is in the
+middle of a quoted string. A workaround for strings with double semicolons
+is to use implicit string concatenation <code class="docutils literal notranslate"><span class="pre">';'';'</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;;&quot;&quot;;&quot;</span></code>.</p>
+<p id="index-2">If a file <code class="file docutils literal notranslate"><span class="pre">.pdbrc</span></code> exists in the user’s home directory or in the current
+directory, it is read with <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> encoding and executed as if it had been
+typed at the debugger prompt.  This is particularly useful for aliases.  If both
+files exist, the one in the home directory is read first and aliases defined there
+can be overridden by the local file.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.11: </span><code class="file docutils literal notranslate"><span class="pre">.pdbrc</span></code> es ahora leído con codificación <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code>. Antes, era leído con la codificación correspondiente a la configuración regional del sistema.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span><code class="file docutils literal notranslate"><span class="pre">.pdbrc</span></code> puede ahora contener comandos que continúan depurando, como <a class="reference internal" href="#pdbcommand-continue"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">continue</span></code></a> o <a class="reference internal" href="#pdbcommand-next"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">next</span></code></a>.  Anteriormente, estos comandos no tenían ningún efecto.</p>
+</div>
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-help">
+<span class="sig-name descname"><span class="pre">h(elp)</span></span><span class="sig-prename descclassname"> <span class="pre">[command]</span></span><a class="headerlink" href="#pdbcommand-help" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Sin argumento, imprime la lista de comandos disponibles.  Con un <em>command</em> como argumento, imprime la ayuda sobre ese comando.  <code class="docutils literal notranslate"><span class="pre">help</span> <span class="pre">pdb</span></code> muestra la documentación completa (el docstring del módulo <a class="reference internal" href="#module-pdb" title="pdb: The Python debugger for interactive interpreters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code></a>).  Como el argumento <em>command</em> debe ser un identificador, hay que introducir <code class="docutils literal notranslate"><span class="pre">help</span> <span class="pre">exec</span></code> para obtener ayuda sobre el comando <code class="docutils literal notranslate"><span class="pre">!</span></code>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-where">
+<span class="sig-name descname"><span class="pre">w(here)</span></span><a class="headerlink" href="#pdbcommand-where" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime un rastro de la pila (<em>stack trace</em>), con el marco más reciente en la parte inferior.  Una flecha indica el marco actual, que determina el contexto de la mayoría de los comandos.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-down">
+<span class="sig-name descname"><span class="pre">d(own)</span></span><span class="sig-prename descclassname"> <span class="pre">[count]</span></span><a class="headerlink" href="#pdbcommand-down" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Mueve los niveles del marco actual <em>count</em> (por defecto uno) hacia abajo en el trazado de la pila (<em>stack trace</em>) (a un marco más nuevo).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-up">
+<span class="sig-name descname"><span class="pre">u(p)</span></span><span class="sig-prename descclassname"> <span class="pre">[count]</span></span><a class="headerlink" href="#pdbcommand-up" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Mueve el marco actual <em>count</em> (por defecto uno) niveles hacia arriba en el trazado de la pila (<em>stack trace</em>) (a un marco más antiguo).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-break">
+<span class="sig-name descname"><span class="pre">b(reak)</span></span><span class="sig-prename descclassname"> <span class="pre">[([filename:]lineno</span> <span class="pre">|</span> <span class="pre">function)</span> <span class="pre">[,</span> <span class="pre">condition]]</span></span><a class="headerlink" href="#pdbcommand-break" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Con un argumento <em>lineno</em>, establece una ruptura allí en el archivo actual.  Con un argumento <em>function</em>, establece una ruptura en la primera declaración ejecutable dentro de esa función.  El número de línea puede ir precedido de un nombre de archivo y dos puntos, para especificar un punto de interrupción en otro archivo (probablemente uno que aún no se haya cargado).  El archivo se busca en <a class="reference internal" href="sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.  Observe que a cada punto de interrupción se le asigna un número al que se refieren todos los demás comandos de puntos de interrupción.</p>
+<p>Si un segundo argumento está presente, es una expresión que debe ser evaluada como verdadera antes de que el punto de ruptura sea honrado.</p>
+<p>Sin argumento, enumere todas las interrupciones, incluyendo para cada punto de interrupción, el número de veces que se ha alcanzado ese punto de interrupción, el conteo de ignorancia actual y la condición asociada, si la hay.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-tbreak">
+<span class="sig-name descname"><span class="pre">tbreak</span></span><span class="sig-prename descclassname"> <span class="pre">[([filename:]lineno</span> <span class="pre">|</span> <span class="pre">function)</span> <span class="pre">[,</span> <span class="pre">condition]]</span></span><a class="headerlink" href="#pdbcommand-tbreak" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Punto de interrupción temporal, que se elimina automáticamente cuando se ejecuta por primera vez. Los argumentos son los mismos que para <a class="reference internal" href="#pdbcommand-break"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">break</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-clear">
+<span class="sig-name descname"><span class="pre">cl(ear)</span></span><span class="sig-prename descclassname"> <span class="pre">[filename:lineno</span> <span class="pre">|</span> <span class="pre">bpnumber</span> <span class="pre">...]</span></span><a class="headerlink" href="#pdbcommand-clear" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Con el argumento <em>filename:lineno</em>, despeja todos los puntos de interrupción en esta línea. Con una lista de números de puntos de interrupción separados por espacios, despeja esos puntos de interrupción. Sin el argumento, despeja todos los puntos de interrupción (pero primero pide confirmación).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-disable">
+<span class="sig-name descname"><span class="pre">disable</span></span><span class="sig-prename descclassname"> <span class="pre">[bpnumber</span> <span class="pre">...]</span></span><a class="headerlink" href="#pdbcommand-disable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Deshabilitar los puntos de ruptura interrupción como una lista de números de puntos de ruptura separados por espacios.  Desactivar un punto de interrupción significa que no puede hacer que el programa detenga la ejecución, pero a diferencia de borrar un punto de interrupción, permanece en la lista de puntos de interrupción y puede ser (re)activado.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-enable">
+<span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-prename descclassname"> <span class="pre">[bpnumber</span> <span class="pre">...]</span></span><a class="headerlink" href="#pdbcommand-enable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Habilitar los puntos de interrupción especificados.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-ignore">
+<span class="sig-name descname"><span class="pre">ignore</span></span><span class="sig-prename descclassname"> <span class="pre">bpnumber</span> <span class="pre">[count]</span></span><a class="headerlink" href="#pdbcommand-ignore" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el conteo de ignorar el número de punto de interrupción dado.  Si se omite el recuento, el recuento de ignorar se establece en 0. Un punto de interrupción se activa cuando el recuento de ignorar es cero.  Cuando no es cero, el conteo se decrementa cada vez que se alcanza el punto de ruptura y el punto de ruptura no se desactiva y cualquier condición asociada se evalúa como verdadera.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-condition">
+<span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-prename descclassname"> <span class="pre">bpnumber</span> <span class="pre">[condition]</span></span><a class="headerlink" href="#pdbcommand-condition" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece una nueva <em>condition</em> para el punto de interrupción, una expresión que debe evaluarse como verdadera antes de que el punto de ruptura sea honrado.  Si la condición está ausente, se elimina cualquier condición existente, es decir, el punto de ruptura se hace incondicional.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-commands">
+<span class="sig-name descname"><span class="pre">commands</span></span><span class="sig-prename descclassname"> <span class="pre">[bpnumber]</span></span><a class="headerlink" href="#pdbcommand-commands" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Especifique una lista de comandos para el número del punto de interrupción <em>bpnumber</em>.  Los comandos mismos aparecen en las siguientes líneas.  Escriba una línea que contenga sólo <code class="docutils literal notranslate"><span class="pre">end</span></code> para terminar los comandos. Un ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">Pdb</span><span class="p">)</span> <span class="n">commands</span> <span class="mi">1</span>
+<span class="p">(</span><span class="n">com</span><span class="p">)</span> <span class="n">p</span> <span class="n">some_variable</span>
+<span class="p">(</span><span class="n">com</span><span class="p">)</span> <span class="n">end</span>
+<span class="p">(</span><span class="n">Pdb</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Para eliminar todos los comandos de un punto de interrupción, escribe <code class="docutils literal notranslate"><span class="pre">commands</span></code>  y sigue inmediatamente con <code class="docutils literal notranslate"><span class="pre">end</span></code> , es decir, no des órdenes.</p>
+<p>Sin el argumento <em>bpnumber</em>, <code class="docutils literal notranslate"><span class="pre">commands</span></code> se refiere al último punto de interrupción establecido.</p>
+<p>Puede utilizar los comandos de punto de interrupción para iniciar el programa de nuevo.  Simplemente usa el comando <a class="reference internal" href="#pdbcommand-continue"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">continue</span></code></a>, o <a class="reference internal" href="#pdbcommand-step"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">step</span></code></a>, o cualquier otro comando que reanude la ejecución.</p>
+<p>Al especificar cualquier comando que reanude la ejecución (actualmente <a class="reference internal" href="#pdbcommand-continue"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">continue</span></code></a>, <a class="reference internal" href="#pdbcommand-step"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">step</span></code></a>, <a class="reference internal" href="#pdbcommand-next"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">next</span></code></a>, <a class="reference internal" href="#pdbcommand-return"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">return</span></code></a>, <a class="reference internal" href="#pdbcommand-jump"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">jump</span></code></a>, <a class="reference internal" href="#pdbcommand-quit"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">quit</span></code></a> y sus abreviaturas) se termina la lista de comandos (como si ese comando fuera inmediatamente seguido de end.) Esto se debe a que cada vez que se reanuda la ejecución (incluso con un simple siguiente o paso), puede encontrarse con otro punto de interrupción, que podría tener su propia lista de comandos, lo que conduce a ambigüedades sobre qué lista ejecutar.</p>
+<p>Si utiliza el comando “silent” en la lista de comandos, no se imprime el mensaje habitual sobre la parada en un punto de interrupción.  Esto puede ser deseable para los puntos de interrupción que deben imprimir un mensaje específico y luego continuar.  Si ninguno de los otros comandos imprime nada, no se ve ninguna señal de que se haya alcanzado el punto de interrupción.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-step">
+<span class="sig-name descname"><span class="pre">s(tep)</span></span><a class="headerlink" href="#pdbcommand-step" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecutar la línea actual, detenerse en la primera ocasión posible (ya sea en una función que se llame o en la siguiente línea de la función actual).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-next">
+<span class="sig-name descname"><span class="pre">n(ext)</span></span><a class="headerlink" href="#pdbcommand-next" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Continúe la ejecución hasta que se alcance la siguiente línea de la función actual o vuelva.  (La diferencia entre <a class="reference internal" href="#pdbcommand-next"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">next</span></code></a> y <a class="reference internal" href="#pdbcommand-step"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">step</span></code></a> es que <a class="reference internal" href="#pdbcommand-step"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">step</span></code></a> se detiene dentro de una función llamada, mientras que <a class="reference internal" href="#pdbcommand-next"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">next</span></code></a> ejecuta las funciones llamadas a (casi) toda velocidad, deteniéndose sólo en la siguiente línea de la función actual).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-until">
+<span class="sig-name descname"><span class="pre">unt(il)</span></span><span class="sig-prename descclassname"> <span class="pre">[lineno]</span></span><a class="headerlink" href="#pdbcommand-until" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Sin argumento, continúe la ejecución hasta que se alcance la línea con un número mayor que el actual.</p>
+<p>Con un número de línea, continúe la ejecución hasta que se alcance una línea con un número mayor o igual a ese.  En ambos casos, también se detiene cuando vuelve la trama actual.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>Permita dar un número de línea explícito.</p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-return">
+<span class="sig-name descname"><span class="pre">r(eturn)</span></span><a class="headerlink" href="#pdbcommand-return" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Continúe la ejecución hasta que vuelva la función actual.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-continue">
+<span class="sig-name descname"><span class="pre">c(ont(inue))</span></span><a class="headerlink" href="#pdbcommand-continue" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Continúa la ejecución, sólo se detiene cuando se encuentra un punto de ruptura.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-jump">
+<span class="sig-name descname"><span class="pre">j(ump)</span></span><span class="sig-prename descclassname"> <span class="pre">lineno</span></span><a class="headerlink" href="#pdbcommand-jump" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establezca la siguiente línea que será ejecutada.  Sólo disponible en el marco de más bajo.  Esto te permite saltar hacia atrás y ejecutar el código de nuevo, o saltar hacia adelante para saltar el código que no quieres ejecutar.</p>
+<p>Cabe señalar que no todos los saltos están permitidos – por ejemplo, no es posible saltar en medio de un bucle <a class="reference internal" href="../reference/compound_stmts.html#for"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">for</span></code></a> o fuera de una cláusula <a class="reference internal" href="../reference/compound_stmts.html#finally"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">finally</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-list">
+<span class="sig-name descname"><span class="pre">l(ist)</span></span><span class="sig-prename descclassname"> <span class="pre">[first[,</span> <span class="pre">last]]</span></span><a class="headerlink" href="#pdbcommand-list" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Enumere el código fuente del archivo actual.  Sin argumentos, enumere 11 líneas alrededor de la línea actual o continúe la lista anterior.  Con <code class="docutils literal notranslate"><span class="pre">.</span></code> como argumento, enumere 11 líneas alrededor de la línea actual.  Con un argumento, enumere 11 líneas alrededor de esa línea.  Con dos argumentos, enumere el rango dado; si el segundo argumento es menor que el primero, se interpreta como un conteo.</p>
+<p>La línea actual en el cuadro actual se indica con <code class="docutils literal notranslate"><span class="pre">-&gt;</span></code>.  Si se está depurando una excepción, la línea donde la excepción fue originalmente planteada o propagada se indica con <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>, si difiere de la línea actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2: </span>El marcador <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> .</p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-ll">
+<span class="sig-name descname"><span class="pre">ll</span></span><span class="sig-prename descclassname"> <span class="pre">|</span> <span class="pre">longlist</span></span><a class="headerlink" href="#pdbcommand-ll" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Enumere todos los códigos fuente de la función o marco actual.  Las líneas interesantes están marcadas como <a class="reference internal" href="#pdbcommand-list"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">list</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-args">
+<span class="sig-name descname"><span class="pre">a(rgs)</span></span><a class="headerlink" href="#pdbcommand-args" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime la lista de argumentos de la función actual.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-p">
+<span class="sig-name descname"><span class="pre">p</span></span><span class="sig-prename descclassname"> <span class="pre">expression</span></span><a class="headerlink" href="#pdbcommand-p" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Evalúa la <em>expression</em> en el contexto actual e imprime su valor.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><code class="docutils literal notranslate"><span class="pre">print()</span></code> también se puede usar, pero no es un comando de depuración — esto ejecuta la función Python <a class="reference internal" href="functions.html#print" title="print"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-pp">
+<span class="sig-name descname"><span class="pre">pp</span></span><span class="sig-prename descclassname"> <span class="pre">expression</span></span><a class="headerlink" href="#pdbcommand-pp" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como el comando <a class="reference internal" href="#pdbcommand-p"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">p</span></code></a>, excepto que el valor de la expresión se imprime bastante usando el módulo <a class="reference internal" href="pprint.html#module-pprint" title="pprint: Data pretty printer."><code class="xref py py-mod docutils literal notranslate"><span class="pre">pprint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-whatis">
+<span class="sig-name descname"><span class="pre">whatis</span></span><span class="sig-prename descclassname"> <span class="pre">expression</span></span><a class="headerlink" href="#pdbcommand-whatis" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime el tipo de la <em>expression</em>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-source">
+<span class="sig-name descname"><span class="pre">source</span></span><span class="sig-prename descclassname"> <span class="pre">expression</span></span><a class="headerlink" href="#pdbcommand-source" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Intenta obtener el código fuente del objeto dado y mostrarlo.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-display">
+<span class="sig-name descname"><span class="pre">display</span></span><span class="sig-prename descclassname"> <span class="pre">[expression]</span></span><a class="headerlink" href="#pdbcommand-display" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Muestra el valor de la expresión si ha cambiado, cada vez que se detenga la ejecución en el marco actual.</p>
+<p>Sin expresión, enumere todas las expresiones de visualización para el cuadro actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-undisplay">
+<span class="sig-name descname"><span class="pre">undisplay</span></span><span class="sig-prename descclassname"> <span class="pre">[expression]</span></span><a class="headerlink" href="#pdbcommand-undisplay" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>No muestren más la expresión en el cuadro actual.  Sin la expresión, borre todas las expresiones de la pantalla para el marco actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-interact">
+<span class="sig-name descname"><span class="pre">interact</span></span><a class="headerlink" href="#pdbcommand-interact" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Inicie un intérprete interactivo (usando el módulo <a class="reference internal" href="code.html#module-code" title="code: Facilities to implement read-eval-print loops."><code class="xref py py-mod docutils literal notranslate"><span class="pre">code</span></code></a>) cuyo espacio de nombres global contiene todos los nombres (globales y locales) que se encuentran en el ámbito actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="debugger-aliases"></span><dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-alias">
+<span class="sig-name descname"><span class="pre">alias</span></span><span class="sig-prename descclassname"> <span class="pre">[name</span> <span class="pre">[command]]</span></span><a class="headerlink" href="#pdbcommand-alias" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crear un alias llamado <em>name</em> que ejecute el <em>command</em>.  El comando no debe estar entre comillas.  Los parámetros reemplazables pueden ser indicados por <code class="docutils literal notranslate"><span class="pre">%1</span></code>, <code class="docutils literal notranslate"><span class="pre">%2</span></code>, y así sucesivamente, mientras que <code class="docutils literal notranslate"><span class="pre">%*</span></code> es reemplazado por todos los parámetros. Si no se da ningún comando, se muestra el alias actual de <em>name</em>. Si no se dan argumentos, se muestran todos los alias.</p>
+<p>Los alias pueden anidarse y pueden contener cualquier cosa que se pueda teclear legalmente en el prompt de pdb.  Tenga en cuenta que los comandos internos de pdb <em>pueden</em> ser anulados por los alias.  Dicho comando se oculta hasta que se elimina el alias.  El alias se aplica de forma recursiva a la primera palabra de la línea de comandos; todas las demás palabras de la línea se dejan en paz.</p>
+<p>Como ejemplo, aquí hay dos alias útiles (especialmente cuando se colocan en el archivo <code class="file docutils literal notranslate"><span class="pre">.pdbrc</span></code>):</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print instance variables (usage &quot;pi classInst&quot;)</span>
+<span class="n">alias</span> <span class="n">pi</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="o">%</span><span class="mf">1.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%1.</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="o">%</span><span class="mf">1.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Print instance variables in self</span>
+<span class="n">alias</span> <span class="n">ps</span> <span class="n">pi</span> <span class="bp">self</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-unalias">
+<span class="sig-name descname"><span class="pre">unalias</span></span><span class="sig-prename descclassname"> <span class="pre">name</span></span><a class="headerlink" href="#pdbcommand-unalias" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Elimine el alias especificado.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-0">
+<span id="pdbcommand-!"></span><span class="sig-name descname"><span class="pre">!</span></span><span class="sig-prename descclassname"> <span class="pre">statement</span></span><a class="headerlink" href="#pdbcommand-0" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecute (una línea) <em>statement</em> en el contexto del marco de la pila actual. El signo de exclamación puede ser omitido a menos que la primera palabra de la declaración se parezca a un comando de depuración.  Para establecer una variable global, puede anteponer al comando de asignación una declaración <a class="reference internal" href="../reference/simple_stmts.html#global"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">global</span></code></a> en la misma línea, por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">Pdb</span><span class="p">)</span> <span class="k">global</span> <span class="n">list_options</span><span class="p">;</span> <span class="n">list_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-l&#39;</span><span class="p">]</span>
+<span class="p">(</span><span class="n">Pdb</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-prename descclassname"> <span class="pre">[args</span> <span class="pre">...]</span></span><a class="headerlink" href="#pdbcommand-run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object std" id="pdbcommand-restart">
+<span class="sig-name descname"><span class="pre">restart</span></span><span class="sig-prename descclassname"> <span class="pre">[args</span> <span class="pre">...]</span></span><a class="headerlink" href="#pdbcommand-restart" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Reinicie el programa Python depurado.  Si se suministra un argumento, se divide con <a class="reference internal" href="shlex.html#module-shlex" title="shlex: Simple lexical analysis for Unix shell-like languages."><code class="xref py py-mod docutils literal notranslate"><span class="pre">shlex</span></code></a> y el resultado se utiliza como el nuevo <a class="reference internal" href="sys.html#sys.argv" title="sys.argv"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.argv</span></code></a>. Se conservan el historial, los puntos de interrupción, las acciones y las opciones del depurador. <a class="reference internal" href="#pdbcommand-restart"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">restart</span></code></a> es un alias de <a class="reference internal" href="#pdbcommand-run"><code class="xref std std-pdbcmd docutils literal notranslate"><span class="pre">run</span></code></a>.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-quit">
+<span class="sig-name descname"><span class="pre">q(uit)</span></span><a class="headerlink" href="#pdbcommand-quit" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Salga del depurador.  El programa que se está ejecutando fue abortado.</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-prename descclassname"> <span class="pre">code</span></span><a class="headerlink" href="#pdbcommand-debug" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Introduce un depurador recursivo que pasa por el argumento del código (que es una expresión o declaración arbitraria que debe ejecutarse en el entorno actual).</p>
+</dd></dl>
+
+<dl class="std pdbcommand">
+<dt class="sig sig-object std" id="pdbcommand-retval">
+<span class="sig-name descname"><span class="pre">retval</span></span><a class="headerlink" href="#pdbcommand-retval" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime el valor de retorno para el último retorno de una función.</p>
+</dd></dl>
+
+<p class="rubric">Notas de pie de página</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Si se considera que un marco se origina en un determinado módulo se determina por el <code class="docutils literal notranslate"><span class="pre">__name__</span></code> en el marcos globales.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a><ul>
+<li><a class="reference internal" href="#debugger-commands">Comandos del depurador</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="faulthandler.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code> — Volcar el rastreo de Python</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="profile.html"
+                          title="próximo capítulo">Los perfiladores de Python</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/pdb.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="profile.html" title="Los perfiladores de Python"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="faulthandler.html" title="faulthandler — Volcar el rastreo de Python"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="debug.html" >Depuración y perfilado</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdb</span></code> — El Depurador de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

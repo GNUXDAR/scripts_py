@@ -1,0 +1,590 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="cgi — Soporte de Interfaz de Entrada Común (CGI)" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/cgi.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/cgi.py Módulo de soporte para scripts de la Interfaz de Entrada Común (CGI) Este módulo define una serie de utilidades para el uso de scripts CGI escritos en Python. La variable ..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/cgi.py Módulo de soporte para scripts de la Interfaz de Entrada Común (CGI) Este módulo define una serie de utilidades para el uso de scripts CGI escritos en Python. La variable ..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>cgi — Soporte de Interfaz de Entrada Común (CGI) &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="cgitb — Administrador traceback para scripts CGI." href="cgitb.html" />
+    <link rel="prev" title="audioop — Manipula datos de audio sin procesar" href="audioop.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/cgi.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code> — Soporte de Interfaz de Entrada Común (CGI)</a><ul>
+<li><a class="reference internal" href="#introduction">Introducción</a></li>
+<li><a class="reference internal" href="#using-the-cgi-module">Usando el módulo CGI</a></li>
+<li><a class="reference internal" href="#higher-level-interface">Interfaz de nivel superior</a></li>
+<li><a class="reference internal" href="#functions">Funciones</a></li>
+<li><a class="reference internal" href="#caring-about-security">Preocuparse por la seguridad</a></li>
+<li><a class="reference internal" href="#installing-your-cgi-script-on-a-unix-system">Instalando su script de CGI en un sistema Unix</a></li>
+<li><a class="reference internal" href="#testing-your-cgi-script">Probando su script de CGI</a></li>
+<li><a class="reference internal" href="#debugging-cgi-scripts">Depurando scripts de CGI</a></li>
+<li><a class="reference internal" href="#common-problems-and-solutions">Problemas comunes y soluciones</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="audioop.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audioop</span></code> — Manipula datos de audio sin procesar</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="cgitb.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgitb</span></code> — Administrador <em>traceback</em> para scripts CGI.</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/cgi.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="cgitb.html" title="cgitb — Administrador traceback para scripts CGI."
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="audioop.html" title="audioop — Manipula datos de audio sin procesar"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="superseded.html" accesskey="U">Módulos reemplazados</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code> — Soporte de Interfaz de Entrada Común (CGI)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-cgi">
+<span id="cgi-common-gateway-interface-support"></span><h1><a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a> — Soporte de Interfaz de Entrada Común (CGI)<a class="headerlink" href="#module-cgi" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/cgi.py">Lib/cgi.py</a></p>
+<div class="deprecated-removed" id="index-0">
+<p><span class="versionmodified">Obsoleto desde la versión 3.11, se eliminará en la versión 3.13: </span>El módulo <a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a> está obsoleto (vea <span class="target" id="index-11"></span><a class="pep reference external" href="https://peps.python.org/pep-0594/#cgi"><strong>PEP 594</strong></a> para más detalles y alternativas).</p>
+<p>La clase <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> puede ser típicamente reemplazada con <a class="reference internal" href="urllib.parse.html#urllib.parse.parse_qsl" title="urllib.parse.parse_qsl"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.parse_qsl()</span></code></a> para solicitudes <code class="docutils literal notranslate"><span class="pre">GET</span></code> y <code class="docutils literal notranslate"><span class="pre">HEAD</span></code>, y el módulo <a class="reference internal" href="email.message.html#module-email.message" title="email.message: The base class representing email messages."><code class="xref py py-mod docutils literal notranslate"><span class="pre">email.message</span></code></a> o <a class="reference external" href="https://pypi.org/project/multipart/">multipart</a> para <code class="docutils literal notranslate"><span class="pre">POST</span></code> y <code class="docutils literal notranslate"><span class="pre">PUT</span></code>. La mayoría de las <a class="reference internal" href="#functions-in-cgi-module"><span class="std std-ref">funciones de utilidad</span></a> tienen reemplazo.</p>
+</div>
+<hr class="docutils" />
+<p>Módulo de soporte para scripts de la Interfaz de Entrada Común (CGI)</p>
+<p>Este módulo define una serie de utilidades para el uso de scripts CGI escritos en Python.</p>
+<p>La variable global <code class="docutils literal notranslate"><span class="pre">maxlen</span></code> puede ser establecida en un entero indicando el tamaño máximo de una solicitud POST. Solicitudes POST más grandes que este tamaño resultarán en en lanzamiento de un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> durante el análisis. El valor por defecto de esta variable es <code class="docutils literal notranslate"><span class="pre">0</span></code>, lo que significa que el tamaño de las solicitudes es ilimitado.</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: not Emscripten, not WASI.</p>
+<p>Este módulo no funciona o no está disponible en plataformas WebAssembly <code class="docutils literal notranslate"><span class="pre">wasm32-emscripten</span></code> y <code class="docutils literal notranslate"><span class="pre">wasm32-wasi</span></code>. Vea <a class="reference internal" href="intro.html#wasm-availability"><span class="std std-ref">Plataformas WebAssembly</span></a> para más información.</p>
+</div>
+<section id="introduction">
+<h2>Introducción<a class="headerlink" href="#introduction" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="cgi-intro">Un script de CGI es invocado por un servidor HTTP, generalmente para procesar entradas de usuario entregadas mediante un elemento HTML <code class="docutils literal notranslate"><span class="pre">&lt;FORM&gt;</span></code> o <code class="docutils literal notranslate"><span class="pre">&lt;ISINDEX&gt;</span></code>.</p>
+<p>Muy a menudo, los scripts CGI viven en el directorio especial <code class="file docutils literal notranslate"><span class="pre">cgi-bin</span></code> del servidor. El servidor HTTP coloca todo tipo de información sobre la solicitud (como el nombre de host del cliente, la dirección URL solicitada, la cadena de búsqueda (query string) y muchas otras consultas) en el entorno de shell del script, ejecuta el script y envía la salida del script al cliente.</p>
+<p>La entrada del script también está conectada al cliente, y a veces los datos del formulario se leen de esta manera; en otras ocasiones los datos del formulario se pasan a través de la parte «cadena de caracteres de búsqueda (query string)» de la dirección URL.  Este módulo está diseñado para ocuparse de los diferentes casos y proporcionar una interfaz más simple al script de Python.  También proporciona una serie de utilidades que ayudan en la depuración de scripts, y la última adición es la compatibilidad con cargas de archivos desde un formulario (si el navegador lo admite).</p>
+<p>La salida de un script CGI debe constar de dos secciones, separadas por una línea en blanco.  La primera sección contiene una serie de encabezados, indicando al cliente qué tipo de datos sigue.  El código de Python para generar una sección de encabezado mínima tiene este aspecto:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Content-Type: text/html&quot;</span><span class="p">)</span>    <span class="c1"># HTML is following</span>
+<span class="nb">print</span><span class="p">()</span>                             <span class="c1"># blank line, end of headers</span>
+</pre></div>
+</div>
+<p>La segunda sección suele ser HTML, lo que permite al software cliente mostrar texto bien formateado con encabezado, imágenes en línea, etc. Aquí está el código Python que imprime una simple pieza de HTML:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;TITLE&gt;CGI script output&lt;/TITLE&gt;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;H1&gt;This is my first CGI script&lt;/H1&gt;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-the-cgi-module">
+<span id="id1"></span><h2>Usando el módulo CGI<a class="headerlink" href="#using-the-cgi-module" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Empieza escribiendo <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">cgi</span></code>.</p>
+<p>Cuando escribas un nuevo script, considera añadir estas líneas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cgitb</span>
+<span class="n">cgitb</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Esto activa un gestor de excepciones especial que mostrará informes detallados en el explorador web si se produce algún error.  Si prefiere no mostrar los detalles de su programa a los usuarios de su script, puede tener los informes guardados en archivos en su lugar, como se muestra en el siguiente código:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cgitb</span>
+<span class="n">cgitb</span><span class="o">.</span><span class="n">enable</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">logdir</span><span class="o">=</span><span class="s2">&quot;/path/to/logdir&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Es muy útil usar esta característica durante el desarrollo de scripts. Los informes producidos por <a class="reference internal" href="cgitb.html#module-cgitb" title="cgitb: Configurable traceback handler for CGI scripts. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgitb</span></code></a> proporcionan información que puede ahorrarle mucho tiempo en el seguimiento de errores.  Siempre puede eliminar la línea <code class="docutils literal notranslate"><span class="pre">cgitb</span></code> más adelante cuando haya probado su script y esté seguro de que funciona correctamente.</p>
+<p>Para llegar a los datos de formulario enviados usa la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code>. Si el formulario contiene caracteres que no sean ASCII, usa el parámetro de palabra clave <em>encoding</em> establecido en el valor del codificado definido para el documento. Éste está usualmente contenido en la etiqueta META en la sección HEAD del documento HTML, o en el encabezado <em class="mailheader">Content-Type</em>. Esto lee los contenidos del formulario desde la entrada estándar o el ambiente (dependiendo de los valores de varias variables de entorno establecidas de acuerdo del estándar CGI). Dado que podría consumir entrada estándar, sólo se debería instanciar una sola vez.</p>
+<p>La instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> puede ser indexada como un diccionario Python. Permite las pruebas de afiliación con el operador <a class="reference internal" href="../reference/expressions.html#in"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">in</span></code></a>, y también es compatible con el método de diccionario estándar <a class="reference internal" href="stdtypes.html#dict.keys" title="dict.keys"><code class="xref py py-meth docutils literal notranslate"><span class="pre">keys()</span></code></a> y la función incorporada <a class="reference internal" href="functions.html#len" title="len"><code class="xref py py-func docutils literal notranslate"><span class="pre">len()</span></code></a>.  Los campos de formulario que contienen cadenas de caracteres vacías son ignoradas y no aparecen en el diccionario; para mantener estos valores, proporciona un valor verdadero para el parámetro de palabra clave opcional <em>keep_blank_values</em> al crear la instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code>.</p>
+<p>Por ejemplo, el código siguiente (que supone que el encabezado <em class="mailheader">Content-Type</em> y la línea en blanco ya se han impreso) comprueba que los campos <code class="docutils literal notranslate"><span class="pre">name</span></code> y <code class="docutils literal notranslate"><span class="pre">addr</span></code> son ambos establecidos a una cadena de caracteres no vacía:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">form</span> <span class="o">=</span> <span class="n">cgi</span><span class="o">.</span><span class="n">FieldStorage</span><span class="p">()</span>
+<span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">form</span> <span class="ow">or</span> <span class="s2">&quot;addr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;H1&gt;Error&lt;/H1&gt;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please fill in the name and addr fields.&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;p&gt;name:&quot;</span><span class="p">,</span> <span class="n">form</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;p&gt;addr:&quot;</span><span class="p">,</span> <span class="n">form</span><span class="p">[</span><span class="s2">&quot;addr&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="o">...</span><span class="n">further</span> <span class="n">form</span> <span class="n">processing</span> <span class="n">here</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>Aquí los campos, a los que se accede a través de <code class="docutils literal notranslate"><span class="pre">form[key]</span></code>, son por sí mismos las instancias de <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> (o <code class="xref py py-class docutils literal notranslate"><span class="pre">MiniFieldStorage</span></code>, dependiendo de la codificación del formulario). El atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code> de la instancia produce el valor de cadena de caracteres del campo.  El método <code class="xref py py-meth docutils literal notranslate"><span class="pre">getvalue()</span></code> retorna este valor de cadena de caracteres directamente; también acepta un segundo argumento opcional como valor predeterminado para retornar si la clave solicitada no está presente.</p>
+<p>Si los datos del formulario enviados contienen más de un campo con el mismo nombre, el objeto recuperado por <code class="docutils literal notranslate"><span class="pre">form[key]</span></code> no es una instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> o <code class="xref py py-class docutils literal notranslate"><span class="pre">MiniFieldStorage</span></code>, sino una lista de dichas instancias.  De forma similar, en esta situación, <code class="docutils literal notranslate"><span class="pre">form.getvalue(key)</span></code> retornaría una lista de cadenas de caracteres. Si espera esta posibilidad (cuando su formulario HTML contiene múltiples campos con el mismo nombre), utilice el método <a class="reference internal" href="#cgi.FieldStorage.getlist" title="cgi.FieldStorage.getlist"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getlist()</span></code></a>, que siempre retorna una lista de valores (para que no sea necesario poner en mayúsculas y minúsculas en el caso de un solo elemento).  Por ejemplo, este código concatena cualquier número de campos de nombre de usuario, separados por comas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+<span class="n">usernames</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Si un campo representa un archivo cargado, el acceso al valor a través del atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code> o el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">getvalue()</span></code> lee todo el archivo en memoria como bytes.  Puede que esto no sea lo que quiera que ocurra.  Puede probar un archivo cargado probando el atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">filename</span></code> o el atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">file</span></code>.  Después, puede leer los datos del atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">file</span></code> antes de que se cierre automáticamente como parte de la recolección de elementos no utilizados de la instancia <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> (los métodos <a class="reference internal" href="io.html#io.RawIOBase.read" title="io.RawIOBase.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a> y <a class="reference internal" href="io.html#io.IOBase.readline" title="io.IOBase.readline"><code class="xref py py-func docutils literal notranslate"><span class="pre">readline()</span></code></a> retornarán bytes):</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">fileitem</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s2">&quot;userfile&quot;</span><span class="p">]</span>
+<span class="k">if</span> <span class="n">fileitem</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
+    <span class="c1"># It&#39;s an uploaded file; count lines</span>
+    <span class="n">linecount</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fileitem</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">break</span>
+        <span class="n">linecount</span> <span class="o">=</span> <span class="n">linecount</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Los objetos <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> también permiten ser usados en una sentencia <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a> , lo que automáticamente los cerrará cuando termine la sentencia.</p>
+<p>Si un error es encontrado al obtener el contenido de un archivo cargado (por ejemplo, cuando el usuario interrumpe el envío del formulario haciendo clic en un botón Atrás o Cancelar), el atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">done</span></code> del objeto para el campo se establecerá en el valor -1.</p>
+<p>El borrador de archivo de carga estándar presenta la posibilidad de cargar varios archivos desde un campo (utilizando una codificación recursiva <em class="mimetype">multipart/*</em>). Cuando esto ocurre, el elemento será un elemento similar a un diccionario <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code>. Esto se puede determinar probando su atributo <code class="xref py py-attr docutils literal notranslate"><span class="pre">type</span></code>, que debe ser <em class="mimetype">multipart/form-data</em> (o tal vez otro tipo MIME que coincida <em class="mimetype">multipart/*</em>).  En este caso, se puede iterar recursivamente al igual que el objeto de formulario de nivel superior.</p>
+<p>Cuando se envía un formulario en el formato «antiguo» (como la cadena de caracteres de consulta (query string) o como una sola parte de datos de tipo <em class="mimetype">application/x-www-form-urlencoded</em>), los elementos serán realmente instancias de la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">MiniFieldStorage</span></code>.  En este caso, los atributos <code class="xref py py-attr docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">file</span></code> y <code class="xref py py-attr docutils literal notranslate"><span class="pre">filename</span></code> siempre son <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Un formulario enviado a través de POST que también tiene una cadena de caracteres de consulta (query string) contendrá los elementos <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> y <code class="xref py py-class docutils literal notranslate"><span class="pre">MiniFieldStorage</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>El atributo  <code class="xref py py-attr docutils literal notranslate"><span class="pre">file</span></code> se cierra automáticamente con el recolector de basura de la instancia creada <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Agregado soporte para el protocolo de administrador de contexto a la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> .</p>
+</div>
+</section>
+<section id="higher-level-interface">
+<h2>Interfaz de nivel superior<a class="headerlink" href="#higher-level-interface" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La sección anterior explica cómo leer datos de un formulario CGI usando la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code>. Esta sección describe un nivel de interfaz superior que se añadió a esta clase para permitir que uno lo haga de una manera más legible e intuitiva. La interfaz no hace que las técnicas descritas en las secciones anteriores estén obsoletas – por ejemplo, siguen siendo útiles para procesar la carga de archivos de manera eficiente.</p>
+<p>La interfaz consiste en dos métodos simples. Usando los métodos puedes procesar datos de formulario de una manera genérica, sin la necesidad de preocuparte si solo se publicaron uno o más valores con un solo nombre.</p>
+<p>En la sección anterior, aprendiste a escribir el siguiente código cada vez que esperabas que un usuario publicara más de un valor con un nombre:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">item</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(</span><span class="s2">&quot;item&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="c1"># The user is requesting more than one item.</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># The user is requesting only one item.</span>
+</pre></div>
+</div>
+<p>Esta situación es común, por ejemplo, cuando un formulario contiene un grupo de múltiples casillas de verificación (checkboxes) con el mismo nombre:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">input</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;checkbox&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;item&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;1&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="nb">input</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;checkbox&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;item&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;2&quot;</span> <span class="o">/&gt;</span>
+</pre></div>
+</div>
+<p>En la mayoría de las situaciones, sin embargo, solo hay un control de formulario con un nombre determinado en un formulario y así, espera y solo necesita un valor asociado con este nombre.  Así que escribe un script que contiene, por ejemplo, este código:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El problema con el código es que nunca debe esperar que un cliente proporcione una entrada válida a los scripts.  Por ejemplo, si un usuario curioso anexa otro par <code class="docutils literal notranslate"><span class="pre">user=foo</span></code> a la cadena de caracteres de consulta (query string), el script se bloquearía, porque en esta situación la llamada al método <code class="docutils literal notranslate"><span class="pre">getvalue(&quot;user&quot;)</span></code> retorna una lista en lugar de una cadena de caracteres.  Llamar al método <a class="reference internal" href="stdtypes.html#str.upper" title="str.upper"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upper()</span></code></a> en una lista no es válido (ya que las listas no tienen un método con este nombre) y se produce una excepción <a class="reference internal" href="exceptions.html#AttributeError" title="AttributeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a>.</p>
+<p>Por lo tanto, la forma adecuada de leer los valores de datos de formulario era usar siempre el código que comprueba si el valor obtenido es un valor único o una lista de valores.  Eso es molesto y conduce a scripts menos legibles.</p>
+<p>Un enfoque más conveniente es utilizar los métodos <a class="reference internal" href="#cgi.FieldStorage.getfirst" title="cgi.FieldStorage.getfirst"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getfirst()</span></code></a> y <a class="reference internal" href="#cgi.FieldStorage.getlist" title="cgi.FieldStorage.getlist"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getlist()</span></code></a> proporcionados por esta interfaz de nivel superior.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cgi.FieldStorage.getfirst">
+<span class="sig-prename descclassname"><span class="pre">FieldStorage.</span></span><span class="sig-name descname"><span class="pre">getfirst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.FieldStorage.getfirst" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método siempre retorna solo un valor asociado con el campo de formulario <em>name</em>. El método retorna solo el primer valor en caso de que se registraran más valores con dicho nombre.  Tenga en cuenta que el orden en que se reciben los valores puede variar de un navegador a otro y no debe darse por sentado. <a class="footnote-reference brackets" href="#id3" id="id2">1</a>  Si no existe ningún campo o valor de formulario, el método retorna el valor especificado por el parámetro opcional <em>default</em>.  Este parámetro tiene como valor predeterminado <code class="docutils literal notranslate"><span class="pre">None</span></code> si no se especifica.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgi.FieldStorage.getlist">
+<span class="sig-prename descclassname"><span class="pre">FieldStorage.</span></span><span class="sig-name descname"><span class="pre">getlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.FieldStorage.getlist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este método siempre retorna una lista de valores asociados con el campo de formulario <em>name</em>. El método retorna una lista vacía si no existe tal campo o valor de formulario para <em>name</em>.  Retorna una lista que consta de un elemento si solo existe un valor de este tipo.</p>
+</dd></dl>
+
+<p>Usando estos métodos puede escribir código compacto agradable:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cgi</span>
+<span class="n">form</span> <span class="o">=</span> <span class="n">cgi</span><span class="o">.</span><span class="n">FieldStorage</span><span class="p">()</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">getfirst</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>    <span class="c1"># This way it&#39;s safe.</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;item&quot;</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="functions">
+<span id="functions-in-cgi-module"></span><h2>Funciones<a class="headerlink" href="#functions" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Estas son útiles si desea más control, o si desea emplear algunos de los algoritmos implementados en este módulo en otras circunstancias.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.parse">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">environ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">os.environ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_blank_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_parsing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&amp;'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.parse" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Analiza una consulta en el entorno o desde un archivo (el archivo predeterminado es <code class="docutils literal notranslate"><span class="pre">sys.stdin</span></code>). Los parámetros <em>keep_blank_values</em>, <em>strict_parsing</em> y <em>separator</em> se pasan a <a class="reference internal" href="urllib.parse.html#urllib.parse.parse_qs" title="urllib.parse.parse_qs"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.parse_qs()</span></code></a> sin cambios.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.11, se eliminará en la versión 3.13: </span>Esta función, como el resto del módulo <a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a>, está obsoleta. Puede ser reemplazada llamando directamente a <a class="reference internal" href="urllib.parse.html#urllib.parse.parse_qs" title="urllib.parse.parse_qs"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.parse_qs()</span></code></a> con la cadena de caracteres de la consulta (excepto para entradas <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code>, las cuales puede ser manejadas como se describe para <a class="reference internal" href="#cgi.parse_multipart" title="cgi.parse_multipart"><code class="xref py py-func docutils literal notranslate"><span class="pre">parse_multipart()</span></code></a>).</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.parse_multipart">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">parse_multipart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'replace'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&amp;'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.parse_multipart" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Analiza la entrada de tipo <em class="mimetype">multipart/form-data</em> (para  cargas de archivos). Los argumentos son <em>fp</em> para el archivo de entrada, <em>pdict</em> para un diccionario que contiene otros parámetros en el encabezado <em class="mailheader">Content-Type</em> y <em>encoding</em>, la codificación de la solicitud.</p>
+<p>Retorna un diccionario al igual que <a class="reference internal" href="urllib.parse.html#urllib.parse.parse_qs" title="urllib.parse.parse_qs"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.parse_qs()</span></code></a>: las claves son los nombres de campo, cada valor es una lista de valores para ese campo. Para los campos que no son de archivo, el valor es una lista de cadenas de caracteres.</p>
+<p>Esto es fácil de usar pero no muy bueno si espera que se carguen megabytes — en ese caso, utilice la clase <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldStorage</span></code> en su lugar, que es mucho más flexible.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Se agregaron los parámetros <em>encoding</em> y <em>errors</em>.  Para los campos que no son de archivo, el valor es ahora una lista de cadenas de caracteres, no bytes.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Agregado el parámetro <em>separator</em>.</p>
+</div>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.11, se eliminará en la versión 3.13: </span>Esta función, como el resto del módulo <a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a>, está obsoleta. Puede ser reemplazada con la funcionalidad del paquete <a class="reference internal" href="email.html#module-email" title="email: Package supporting the parsing, manipulating, and generating email messages."><code class="xref py py-mod docutils literal notranslate"><span class="pre">email</span></code></a> (por ejemplo, <a class="reference internal" href="email.message.html#email.message.EmailMessage" title="email.message.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">email.message.EmailMessage</span></code></a>/<a class="reference internal" href="email.compat32-message.html#email.message.Message" title="email.message.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">email.message.Message</span></code></a>) el cual implementa los mismos RFCs de MIME, o con el proyecto de PyPI <a class="reference external" href="https://pypi.org/project/multipart/">multipart</a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.parse_header">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">parse_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.parse_header" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Analiza un encabezado MIME (como <em class="mailheader">Content-Type</em>) en un valor principal y un diccionario de parámetros.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.11, se eliminará en la versión 3.13: </span>Esta función, como el resto del módulo <a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a>, está obsoleta. Puede ser reemplazada con la funcionalidad del paquete <a class="reference internal" href="email.html#module-email" title="email: Package supporting the parsing, manipulating, and generating email messages."><code class="xref py py-mod docutils literal notranslate"><span class="pre">email</span></code></a>, el cual implementa los mismos RFCs de MIME.</p>
+<p>Por ejemplo, con <a class="reference internal" href="email.message.html#email.message.EmailMessage" title="email.message.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">email.message.EmailMessage</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">email.message</span> <span class="kn">import</span> <span class="n">EmailMessage</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">()</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;application/json; charset=&quot;utf8&quot;&#39;</span>
+<span class="n">main</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">(),</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.test">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgi.test" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Script CGI de prueba robusto, usable como programa principal. Escribe encabezados HTTP mínimos y formatea toda la información proporcionada hacia el script en formato HTML.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.print_environ">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">print_environ</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgi.print_environ" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Da formato al entorno del shell en HTML.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.print_form">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">print_form</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgi.print_form" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Da formato a un formulario en HTML.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.print_directory">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">print_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgi.print_directory" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Da formato al directorio actual en HTML.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgi.print_environ_usage">
+<span class="sig-prename descclassname"><span class="pre">cgi.</span></span><span class="sig-name descname"><span class="pre">print_environ_usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgi.print_environ_usage" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime una lista de variables de entorno útiles (utilizadas por CGI) en HTML.</p>
+</dd></dl>
+
+</section>
+<section id="caring-about-security">
+<span id="cgi-security"></span><h2>Preocuparse por la seguridad<a class="headerlink" href="#caring-about-security" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="index-2">Hay una regla importante: si invoca un programa externo (a través de <a class="reference internal" href="os.html#os.system" title="os.system"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.system()</span></code></a>, <a class="reference internal" href="os.html#os.popen" title="os.popen"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.popen()</span></code></a> u otras funciones con una funcionalidad similar), asegúrese bien de no pasar strings arbitrarios recibidos desde el cliente hacia la shell.  Este es una brecha de seguridad muy conocida por la que los hackers inteligentes en cualquier lugar de la web pueden explotar un inocente script CGI para invocar comandos de shell arbitrarios.  Incluso partes de la URL o nombres de campo pueden no ser confiables, ya que la solicitud no tiene que venir de su formulario!</p>
+<p>Para estar en el lado seguro, si debe pasar una cadena de caracteres de un formulario a un comando de shell, debe asegurarse de que la cadena de caracteres contiene solo caracteres alfanuméricos, guiones, guiones bajos y puntos.</p>
+</section>
+<section id="installing-your-cgi-script-on-a-unix-system">
+<h2>Instalando su script de CGI en un sistema Unix<a class="headerlink" href="#installing-your-cgi-script-on-a-unix-system" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Lea la documentación del servidor HTTP y consulte con el administrador del sistema local para encontrar el directorio donde se deben instalar los scripts CGI; por lo general, esto se encuentra en un directorio <code class="file docutils literal notranslate"><span class="pre">cgi-bin</span></code> en el árbol del servidor.</p>
+<p>Asegúrese de que el script es legible y ejecutable por «otros»; el modo de archivo Unix debe ser octal <code class="docutils literal notranslate"><span class="pre">0o755</span></code> (utilice <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">0755</span> <span class="pre">filename</span></code>).  Asegúrese de que la primera línea del script contiene <code class="docutils literal notranslate"><span class="pre">#!</span></code> a partir de la columna 1 seguida del nombre de ruta del intérprete de Python, por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/local/bin/python</span>
+</pre></div>
+</div>
+<p>Asegúrese que el intérprete de Python exista y sea ejecutable por «otros».</p>
+<p>Asegúrese de que cualquier archivo que su script necesite leer o escribir sea legible o tenga permiso de escritura, respectivamente, por «otros» — su modo debe ser <code class="docutils literal notranslate"><span class="pre">0o644</span></code> para legible y <code class="docutils literal notranslate"><span class="pre">0o666</span></code> para escribir.  Esto se debe a que, por razones de seguridad, el servidor HTTP ejecuta el script como usuario «nadie», sin ningún privilegio especial.  Sólo puede leer (escribir, ejecutar) archivos que todo el mundo puede leer (escribir, ejecutar).  El directorio actual en tiempo de ejecución también es diferente (normalmente es el directorio cgi-bin del servidor) y el conjunto de variables de entorno también es diferente de lo que se obtiene al iniciar sesión.  En particular, no cuente con la ruta de búsqueda del shell para ejecutables (<span class="target" id="index-12"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code>) o la ruta de búsqueda del módulo Python (<span class="target" id="index-13"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONPATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></a>) que se establecerá en cualquier cosa interesante.</p>
+<p>Si necesita cargar módulos desde un directorio el cual no está en la ruta de búsqueda de módulos predeterminada de Python, puede cambiar la ruta en su script, antes de importar otros módulos.  Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;/usr/home/joe/lib/python&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;/usr/local/lib/python&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(¡De esta manera, el directorio insertado de último será buscado primero!)</p>
+<p>Las instrucciones para sistemas que no son Unix pueden variar; consulte la documentación de su servidor HTTP (usualmente tendrá una sección sobre scripts CGI).</p>
+</section>
+<section id="testing-your-cgi-script">
+<h2>Probando su script de CGI<a class="headerlink" href="#testing-your-cgi-script" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Desafortunadamente, un script CGI generalmente no se ejecutará cuando lo pruebe desde la línea de comandos, y un script que funcione perfectamente desde la línea de comandos puede fallar misteriosamente cuando se ejecuta desde el servidor.  Hay una razón por la que debe probar el script desde la línea de comandos: si contiene un error de sintaxis, el intérprete de Python no lo ejecutará en absoluto y lo más probable es que el servidor HTTP envíe un error críptico al cliente.</p>
+<p>Asumiendo que su script no tiene errores de sintaxis, pero este no funciona, no tiene más opción que leer la siguiente sección.</p>
+</section>
+<section id="debugging-cgi-scripts">
+<h2>Depurando scripts de CGI<a class="headerlink" href="#debugging-cgi-scripts" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="index-5">En primer lugar, compruebe si hay errores de instalación triviales — leer la sección anterior sobre la instalación cuidadosa de su script CGI puede ahorrarle mucho tiempo.  Si se pregunta si ha entendido correctamente el procedimiento de instalación, intente instalando una copia de este archivo de módulo (<code class="file docutils literal notranslate"><span class="pre">cgi.py</span></code>) como un script CGI.  Cuando se invoca como un script, el archivo cambiará su entorno y el contenido del formulario en formato HTML. Dele el modo correcto, etc., y envíe una solicitud.  Si está instalado en el directorio estándar <code class="file docutils literal notranslate"><span class="pre">cgi-bin</span></code>, debería ser posible enviarle una solicitud introduciendo una URL en su navegador de la forma:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://yourhostname/cgi-bin/cgi.py?name=Joe+Blow&amp;addr=At+Home
+</pre></div>
+</div>
+<p>Si esto da un error de tipo 404, el servidor no puede encontrar el script – quizás necesite instalarlo en un directorio diferente. Si este da otro error, hay un problema con la instalación que debería intentar solucionar antes de continuar. Si obtiene una lista bien formateada del entorno y el contenido del formulario (en este ejemplo, los campos deberían estar listados como «addr» con el valor «At Home» y «name» con el valor «Joe Blow»), el script <code class="file docutils literal notranslate"><span class="pre">cgi.py</span></code> ha sido instalado correctamente. Si sigue el mismo procedimiento para su propio script, ya debería poder depurarlo.</p>
+<p>El siguiente paso podría ser llamar a la función <a class="reference internal" href="test.html#module-test" title="test: Regression tests package containing the testing suite for Python."><code class="xref py py-func docutils literal notranslate"><span class="pre">test()</span></code></a> del módulo <a class="reference internal" href="#module-cgi" title="cgi: Helpers for running Python scripts via the Common Gateway Interface. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code></a> de su script: reemplace su código principal con la declaración única</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgi</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Esto debería producir los mismos resultados que los obtenidos al instalar el archivo <code class="file docutils literal notranslate"><span class="pre">cgi.py</span></code> en sí.</p>
+<p>Cuando un script de Python normal lanza una excepción no controlada (por cualquier razón: de un error tipográfico en un nombre de módulo, un archivo que no se puede abrir, etc.), el intérprete de Python imprime un traceback sutil y sale.  Aunque el intérprete de Python seguirá haciendo esto cuando el script CGI lance una excepción, lo más probable es que el traceback termine en uno de los archivos de registro del servidor HTTP o se descarte por completo.</p>
+<p>Afortunadamente, una vez que haya logrado que su script ejecute <em>algún</em> código, puede enviar fácilmente tracebacks al navegador web utilizando el módulo <a class="reference internal" href="cgitb.html#module-cgitb" title="cgitb: Configurable traceback handler for CGI scripts. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgitb</span></code></a>. Si aún no lo ha hecho, solo añada las líneas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cgitb</span>
+<span class="n">cgitb</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>al principio de su script. Luego intente ejecutarlo de nuevo; cuando un problema ocurra, debería ver un informe detallado que probablemente muestre la causa del error.</p>
+<p>Si sospecha que puede haber un problema al importar el módulo <a class="reference internal" href="cgitb.html#module-cgitb" title="cgitb: Configurable traceback handler for CGI scripts. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgitb</span></code></a>, puede usar un enfoque aún más robusto (que solo usa módulos integrados):</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Content-Type: text/plain&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="o">...</span><span class="n">your</span> <span class="n">code</span> <span class="n">here</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>Esto se basa en el intérprete de Python para imprimir el traceback.  El tipo de contenido de la salida se establece en texto plano, lo que deshabilita todo el procesamiento HTML.  Si el script funciona, el cliente mostrará el código HTML sin formato.  Si lanza una excepción, lo más probable es que después que se hayan impreso las dos primeras líneas, se mostrará un traceback. Dado que no se está realizando ninguna interpretación HTML, el traceback será legible.</p>
+</section>
+<section id="common-problems-and-solutions">
+<h2>Problemas comunes y soluciones<a class="headerlink" href="#common-problems-and-solutions" title="Enlazar permanentemente con este título">¶</a></h2>
+<ul class="simple">
+<li><p>La mayoría de servidores HTTP almacenan en búfer la salida de los scripts CGI hasta que el script esté completado. Esto significa que no es posible mostrar un reporte del progreso en la parte del cliente mientras que el script se esté ejecutando.</p></li>
+<li><p>Compruebe las instrucciones de instalación anteriores.</p></li>
+<li><p>Verifique los archivos de registro (logs) del servidor HTTP. (¡Usar <code class="docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-f</span> <span class="pre">logfile</span></code> en una ventana separada puede ser útil!)</p></li>
+<li><p>Siempre verifique un script para encontrar errores de sintaxis primero, haciendo algo como <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">script.py</span></code>.</p></li>
+<li><p>Si su script no tiene ningún error sintáctico, pruebe añadiendo <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">cgitb;</span> <span class="pre">cgitb.enable()</span></code> en la parte superior del script.</p></li>
+<li><p>Cuando se invoquen programas externos, asegúrese de que pueden ser encontrados. Generalmente esto significa usar nombres de ruta absolutos — <span class="target" id="index-14"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PATH</span></code> generalmente no se establece en un valor útil en un script CGI.</p></li>
+<li><p>Al leer o escribir archivos externos, asegúrese de que puedan ser leídas o escritas por el userid por el que su script CGI se va a ejecutar: es típico que esto sea el userid bajo el que el servidor web se está ejecutando, o algún userid especificado explícitamente por la función <code class="docutils literal notranslate"><span class="pre">suexec</span></code> del servidor web.</p></li>
+<li><p>No intente darle un modo set-uid a un script CGI. Esto no funciona en la mayoría de sistemas, además de ser un riesgo de seguridad.</p></li>
+</ul>
+<p class="rubric">Notas al pie</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p>Tenga en cuenta que algunas versiones recientes de las especificaciones de HTML establecen en qué orden se deben suministrar los valores de campo, pero saber si se recibió una solicitud de un navegador adaptado, o incluso desde un navegador siquiera, es tedioso y propenso a errores.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code> — Soporte de Interfaz de Entrada Común (CGI)</a><ul>
+<li><a class="reference internal" href="#introduction">Introducción</a></li>
+<li><a class="reference internal" href="#using-the-cgi-module">Usando el módulo CGI</a></li>
+<li><a class="reference internal" href="#higher-level-interface">Interfaz de nivel superior</a></li>
+<li><a class="reference internal" href="#functions">Funciones</a></li>
+<li><a class="reference internal" href="#caring-about-security">Preocuparse por la seguridad</a></li>
+<li><a class="reference internal" href="#installing-your-cgi-script-on-a-unix-system">Instalando su script de CGI en un sistema Unix</a></li>
+<li><a class="reference internal" href="#testing-your-cgi-script">Probando su script de CGI</a></li>
+<li><a class="reference internal" href="#debugging-cgi-scripts">Depurando scripts de CGI</a></li>
+<li><a class="reference internal" href="#common-problems-and-solutions">Problemas comunes y soluciones</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="audioop.html"
+                          title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audioop</span></code> — Manipula datos de audio sin procesar</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="cgitb.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgitb</span></code> — Administrador <em>traceback</em> para scripts CGI.</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/cgi.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="cgitb.html" title="cgitb — Administrador traceback para scripts CGI."
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="audioop.html" title="audioop — Manipula datos de audio sin procesar"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="superseded.html" >Módulos reemplazados</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgi</span></code> — Soporte de Interfaz de Entrada Común (CGI)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>

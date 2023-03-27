@@ -1,0 +1,1070 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="threading — Paralelismo basado en hilos" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.python.org/3/library/threading.html" />
+<meta property="og:site_name" content="Python documentation" />
+<meta property="og:description" content="Código fuente: Lib/threading.py This module constructs higher-level threading interfaces on top of the lower level_thread module. Detalles de implementación de CPython: En CPython, debido al Candad..." />
+<meta property="og:image" content="https://docs.python.org/3/_static/og-image.png" />
+<meta property="og:image:alt" content="Python documentation" />
+<meta name="description" content="Código fuente: Lib/threading.py This module constructs higher-level threading interfaces on top of the lower level_thread module. Detalles de implementación de CPython: En CPython, debido al Candad..." />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta name="theme-color" content="#3776ab" />
+
+    <title>threading — Paralelismo basado en hilos &#8212; documentación de Python - 3.11.2</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css?digest=2d3badd06fe70b34b68db01f99471ce1624ffe4a" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.11.2"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="multiprocessing — Paralelismo basado en procesos" href="multiprocessing.html" />
+    <link rel="prev" title="Ejecución concurrente" href="concurrency.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/threading.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code> — Paralelismo basado en hilos</a><ul>
+<li><a class="reference internal" href="#thread-local-data">Datos locales del hilo</a></li>
+<li><a class="reference internal" href="#thread-objects">Objetos tipo hilo</a></li>
+<li><a class="reference internal" href="#lock-objects">Objetos tipo <em>lock</em></a></li>
+<li><a class="reference internal" href="#rlock-objects">Objetos <em>Rlock</em></a></li>
+<li><a class="reference internal" href="#condition-objects">Objetos condicionales</a></li>
+<li><a class="reference internal" href="#semaphore-objects">Objetos semáforo</a><ul>
+<li><a class="reference internal" href="#semaphore-example">Ejemplo de <code class="xref py py-class docutils literal notranslate"><span class="pre">Semaphore</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#event-objects">Objetos de eventos</a></li>
+<li><a class="reference internal" href="#timer-objects">Objetos temporizadores</a></li>
+<li><a class="reference internal" href="#barrier-objects">Objetos de barrera</a></li>
+<li><a class="reference internal" href="#using-locks-conditions-and-semaphores-in-the-with-statement">Uso de <em>locks</em>, condiciones y semáforos en la declaración <code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="concurrency.html"
+                          title="capítulo anterior">Ejecución concurrente</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="multiprocessing.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code> — Paralelismo basado en procesos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/threading.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="multiprocessing.html" title="multiprocessing — Paralelismo basado en procesos"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="concurrency.html" title="Ejecución concurrente"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="concurrency.html" accesskey="U">Ejecución concurrente</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code> — Paralelismo basado en hilos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-threading">
+<span id="threading-thread-based-parallelism"></span><h1><a class="reference internal" href="#module-threading" title="threading: Thread-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code></a> — Paralelismo basado en hilos<a class="headerlink" href="#module-threading" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/threading.py">Lib/threading.py</a></p>
+<hr class="docutils" />
+<p>This module constructs higher-level threading interfaces on top of the lower
+level <a class="reference internal" href="_thread.html#module-_thread" title="_thread: Low-level threading API."><code class="xref py py-mod docutils literal notranslate"><span class="pre">_thread</span></code></a> module.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Este módulo solía ser opcional, ahora está siempre disponible.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference internal" href="concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="concurrent.futures.ThreadPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a>  ofrece una interfaz a mas alto nivel para enviar tareas a un hilo en segundo plano sin bloquear la ejecución del hilo de llamada, pero manteniendo la capacidad de recuperar sus resultados cuando sea necesario.</p>
+<p><a class="reference internal" href="queue.html#module-queue" title="queue: A synchronized queue class."><code class="xref py py-mod docutils literal notranslate"><span class="pre">queue</span></code></a>  proporciona una interfaz segura a nivel de hilos intercambiar datos entre hilos en ejecución.</p>
+<p><a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a> ofrece un enfoque alternativo para lograr la concurrencia a nivel de tarea sin requerir el uso de múltiples subprocesos del sistema operativo.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En la serie Python 2.x, este módulo contenía nombres <code class="docutils literal notranslate"><span class="pre">camelCase</span></code> para algunos métodos y funciones. Estos están obsoletos a partir de Python 3.10, pero aún son compatibles por compatibilidad con Python 2.5 y versiones anteriores.</p>
+</div>
+<div class="impl-detail compound">
+<p><strong>Detalles de implementación de CPython:</strong> En CPython, debido al <a class="reference internal" href="../glossary.html#term-global-interpreter-lock"><span class="xref std std-term">Candado de intérprete global</span></a>, solo un hilo puede ejecutar código Python a la vez (aunque ciertas bibliotecas orientadas al rendimiento pueden superar esta limitación). Si desea que su aplicación haga un mejor uso de los recursos computacionales de las máquinas multinúcleo, se recomienda utilizar <a class="reference internal" href="multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> o <a class="reference internal" href="concurrent.futures.html#concurrent.futures.ProcessPoolExecutor" title="concurrent.futures.ProcessPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code></a>. Sin embargo, el subproceso sigue siendo un modelo apropiado si desea ejecutar varias tareas vinculadas a E/S simultáneamente.</p>
+</div>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: not Emscripten, not WASI.</p>
+<p>Este módulo no funciona o no está disponible en las plataformas WebAssembly  <code class="docutils literal notranslate"><span class="pre">wasm32-emscripten</span></code>  y <code class="docutils literal notranslate"><span class="pre">wasm32-wasi</span></code>. Consulte <a class="reference internal" href="intro.html#wasm-availability"><span class="std std-ref">Plataformas WebAssembly</span></a> para obtener más información.</p>
+</div>
+<p>Este módulo define las siguientes funciones:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.active_count">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">active_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.active_count" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el número de objetos <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> actualmente con vida. La cuenta retornada es igual al largo de la lista retornada por <a class="reference internal" href="#threading.enumerate" title="threading.enumerate"><code class="xref py py-func docutils literal notranslate"><span class="pre">enumerate()</span></code></a>.</p>
+<p>La función <code class="docutils literal notranslate"><span class="pre">activeCount</span></code> es un alias obsoleto para esta función.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.current_thread">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">current_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.current_thread" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el objeto <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> actual, correspondiente al hilo de control del invocador. Si el hilo de control del invocador no fue creado a través del módulo <a class="reference internal" href="#module-threading" title="threading: Thread-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code></a>, se retorna un objeto hilo <em>dummy</em> con funcionalidad limitada.</p>
+<p>La función <code class="docutils literal notranslate"><span class="pre">currentThread</span></code> es un alias obsoleto para esta función.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.excepthook">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">excepthook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.excepthook" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Gestiona una excepción lanzada por <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">Thread.run()</span></code></a>.</p>
+<p>El argumento <em>args</em> posee los siguientes atributos:</p>
+<ul class="simple">
+<li><p><em>exc_type</em>: Tipo de la excepción.</p></li>
+<li><p><em>exc_value</em>: Valor de la excepción, puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><em>exc_traceback</em>: Rastreo de la excepción, puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><em>thread</em>: El hilo que ha lanzado la excepción, puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+<p>Si <em>exc_type</em> es <a class="reference internal" href="exceptions.html#SystemExit" title="SystemExit"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SystemExit</span></code></a>, la excepción es silenciosamente ignorada. De otro modo, la excepción se imprime en <a class="reference internal" href="sys.html#sys.stderr" title="sys.stderr"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stderr</span></code></a>.</p>
+<p>Si esta función lanza una excepción, se llama a <a class="reference internal" href="sys.html#sys.excepthook" title="sys.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.excepthook()</span></code></a> para manejarla.</p>
+<p><a class="reference internal" href="#threading.excepthook" title="threading.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">threading.excepthook()</span></code></a> se puede sobrescribir para controlar cómo se gestionan las excepciones levantadas por <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">Thread.run()</span></code></a>.</p>
+<p>Guarda <em>exc_value</em> usando un <em>hook</em> personalizado puede crear un ciclo de referencias. Debe ser aclarado explícitamente que se rompa el ciclo de referencias cuando la excepción ya no se necesite.</p>
+<p>Guarda <em>thread</em> usando un <em>hook</em> personalizado puede resucitarlo si se asigna a un objeto que esté siendo finalizado. Evítese que <em>thread</em> sea almacenado después de que el <em>hook</em> personalizado se complete para evitar resucitar objetos.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference internal" href="sys.html#sys.excepthook" title="sys.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.excepthook()</span></code></a> gestiona excepciones no capturadas.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="threading.__excepthook__">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">__excepthook__</span></span><a class="headerlink" href="#threading.__excepthook__" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Mantiene el valor original de <a class="reference internal" href="#threading.excepthook" title="threading.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">threading.excepthook()</span></code></a>. Se guarda para que se pueda restaurar el valor original en caso de que se reemplacen con objetos rotos o alternativos.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.get_ident">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">get_ident</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.get_ident" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el “identificador de hilo” del hilo actual. Éste es un entero distinto de cero. Su valor no tiene un significado directo; ha sido pensado como una <em>cookie</em> mágica para usarse, por ejemplo, en indexar un diccionario con datos específicos del hilo. Los identificadores de hilo pueden ser reciclados cuando se abandona un hilo y se crea otro hilo.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.get_native_id">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">get_native_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.get_native_id" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la ID de Hilo (<em>Thread ID</em>) nativo integral del hilo actual asignado por el <em>kernel</em>. Ella es un entero distinto de cero. Su valor puede utilizarse para identificar de forma única a este hilo en particular a través de todo el sistema (hasta que el hilo termine, luego de lo cual el valor puede ser reciclado por el SO).</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Windows, FreeBSD, Linux, macOS, OpenBSD, NetBSD, AIX.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.enumerate">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">enumerate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.enumerate" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una lista de todos los objetos <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> actualmente activos. La lista incluye subprocesos demoníacos y objetos de subprocesos ficticios creados por <a class="reference internal" href="#threading.current_thread" title="threading.current_thread"><code class="xref py py-func docutils literal notranslate"><span class="pre">current_thread()</span></code></a>. Excluye los subprocesos terminados y los subprocesos que aún no se han iniciado. Sin embargo, el hilo principal siempre es parte del resultado, incluso cuando se termina.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.main_thread">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">main_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.main_thread" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el objeto <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> principal. En condiciones normales, el hilo principal es el hilo desde el que fue inicializado el intérprete de Python.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.settrace">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">settrace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.settrace" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p id="index-0">Establece una función de traza para todos los hilos iniciados desde el módulo <a class="reference internal" href="#module-threading" title="threading: Thread-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code></a> . La <em>func</em> se pasará a <a class="reference internal" href="sys.html#sys.settrace" title="sys.settrace"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.settrace()</span></code></a> por cada hilo, antes de que su método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> sea llamado.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.gettrace">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">gettrace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.gettrace" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p id="index-1">Obtiene la función de rastreo según lo establecido por <a class="reference internal" href="#threading.settrace" title="threading.settrace"><code class="xref py py-func docutils literal notranslate"><span class="pre">settrace()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.setprofile">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">setprofile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.setprofile" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p id="index-2">Establece una función de perfil para todos los hilos iniciados desde el módulo <a class="reference internal" href="#module-threading" title="threading: Thread-based parallelism."><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code></a>. La <em>func</em> se pasará a <a class="reference internal" href="sys.html#sys.setprofile" title="sys.setprofile"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.setprofile()</span></code></a> por cada hilo, antes de que se llame a su método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.getprofile">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">getprofile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.getprofile" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p id="index-3">Obtiene la función de generador de perfiles establecida por <a class="reference internal" href="#threading.setprofile" title="threading.setprofile"><code class="xref py py-func docutils literal notranslate"><span class="pre">setprofile()</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="threading.stack_size">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">stack_size</span></span><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.stack_size" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el tamaño de pila usado para crear nuevos hilos. El argumento opcional <em>size</em> (tamaño) especifica el tamaño de pila a ser utilizado para hilos creados posteriormente, y debe ser 0 (usar el valor por defecto de la plataforma o el configurado) o un valor entero positivo de al menos 32.768 (32KiB). Si no se especifica <em>size</em>, se usará 0. Si no existe soporte para cambiar el tamaño de pila, se lanzará un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>. Si el tamaño de pila especificado es inválido, se lanzará un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> y el tamaño de pila no será modificado. El tamaño mínimo de pila actualmente soportado es de 32KiB para garantizar suficiente espacio de pila para el intérprete mismo. Nótese que algunas plataformas pueden tener restricciones particulares de valores para tamaños de pila, como requerir un tamaño de pila &gt; 32KiB, o requerir una asignación en múltiplos del tamaño de página de la memoria del sistema. Debe consultarse la documentación de cada plataforma para mayor información (páginas de 4KiB son comunes; se recomienda el uso de múltiplos de 4096 para el tamaño de pila en ausencia de información más específica)</p>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: Windows, pthreads.</p>
+<p>Plataformas Unix con soporte para subprocesos POSIX.</p>
+</div>
+</dd></dl>
+
+<p>Este módulo también define la siguiente constante:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="threading.TIMEOUT_MAX">
+<span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">TIMEOUT_MAX</span></span><a class="headerlink" href="#threading.TIMEOUT_MAX" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El máximo valor permitido para el parámetro <em>timeout</em> de las funciones bloqueantes (<a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Lock.acquire()</span></code></a>, <a class="reference internal" href="#threading.RLock.acquire" title="threading.RLock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RLock.acquire()</span></code></a>, <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Condition.wait()</span></code></a>, etc.). La especificación de un tiempo de espera mayor a este valor lanzará un <a class="reference internal" href="exceptions.html#OverflowError" title="OverflowError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OverflowError</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<p>Este módulo define un número de clases, las cuales son detalladas en las siguientes secciones.</p>
+<p>El diseño de este módulo está libremente basado en el modelo de <em>threading</em> de Java. Sin embargo, donde Java hace de <em>locks</em> y variables condicionales el comportamiento básico de cada objeto, éstos son objetos separados en Python. La clase de Python <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> soporta un subdominio del comportamiento de la clase <em>Thread</em> de Java; actualmente, no hay prioridades, ni grupos de hilos, y los hilos no pueden ser destruidos, detenidos, suspendidos, retomados o interrumpidos. Los métodos estáticos de la clase <em>Thread</em> de Java, cuando son implementados, son mapeados a funciones a nivel de módulo.</p>
+<p>Todos los métodos descritos abajo son ejecutados de manera atómica.</p>
+<section id="thread-local-data">
+<h2>Datos locales del hilo<a class="headerlink" href="#thread-local-data" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los datos locales de hilo son datos cuyos valores son específicos a cada hilo. Para manejar los datos locales de hilos, simplemente crear una instancia de <a class="reference internal" href="#threading.local" title="threading.local"><code class="xref py py-class docutils literal notranslate"><span class="pre">local</span></code></a> (o una subclase) y almacenar los atributos en ella:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">mydata</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+<span class="n">mydata</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Los valores de instancia serán diferentes para hilos distintos.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.local">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">local</span></span><a class="headerlink" href="#threading.local" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una clase que representa datos locales de hilo.</p>
+<p>For more details and extensive examples, see the documentation string of the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">_threading_local</span></code> module: <a class="reference external" href="https://github.com/python/cpython/tree/3.11/Lib/_threading_local.py">Lib/_threading_local.py</a>.</p>
+</dd></dl>
+
+</section>
+<section id="thread-objects">
+<span id="id1"></span><h2>Objetos tipo hilo<a class="headerlink" href="#thread-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La clase <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> representa una actividad que corre en un hilo de control separado. Hay dos manera de especificar la actividad: pasando un objeto invocable al constructor, o sobrescribiendo el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> en una subclase. Ningún otro método (a excepción del constructor) deberá ser sobrescrito en una subclase. En otras palabras, <em>solo</em> sobrescribir los métodos  <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code> y <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>  de esta clase.</p>
+<p>Una vez que un objeto <em>thread</em> es creado, su actividad debe ser iniciada llamando al método <a class="reference internal" href="#threading.Thread.start" title="threading.Thread.start"><code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code></a> del hilo. Ésto invoca el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> en un hilo de control separado.</p>
+<p>Una vez que la actividad del hilo ha sido iniciada, el hilo se considerará “vivo”. Deja de estar vivo cuando su método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> termina – ya sea normalmente, o por lanzar una excepción no manejada. El método  <a class="reference internal" href="#threading.Thread.is_alive" title="threading.Thread.is_alive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_alive()</span></code></a> verifica si acaso el hilo está vivo.</p>
+<p>Otros hilos pueden llamar al método <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> de un hilo. Esto bloquea el hilo llamador hasta que el hilo cuyo método <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> ha sido llamado termine.</p>
+<p>Un hilo tiene un nombre. El nombre puede ser pasado al constructor y leído o cambiado a través del atributo <a class="reference internal" href="#threading.Thread.name" title="threading.Thread.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a>.</p>
+<p>Si el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> lanza una excepción, se llama a <a class="reference internal" href="#threading.excepthook" title="threading.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">threading.excepthook()</span></code></a> para gestionarla. Por defecto, <a class="reference internal" href="#threading.excepthook" title="threading.excepthook"><code class="xref py py-func docutils literal notranslate"><span class="pre">threading.excepthook()</span></code></a> ignora silenciosamente a <a class="reference internal" href="exceptions.html#SystemExit" title="SystemExit"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SystemExit</span></code></a>.</p>
+<p>Un hilo puede ser marcado como un «hilo demonio». El significado de esta marca es que la totalidad del programa de Python finalizará cuando solo queden hilos demonio. El valor inicial es heredado del hilo creador. La marca puede ser establecida a través de la propiedad <a class="reference internal" href="#threading.Thread.daemon" title="threading.Thread.daemon"><code class="xref py py-attr docutils literal notranslate"><span class="pre">daemon</span></code></a> o del argumento <em>daemon</em> en el constructor.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Los hilos demonio son detenidos abruptamente al momento del cierre. Sus recursos (tales como archivos abiertos, transacciones con bases de datos, etc.) pueden no ser liberados adecuadamente. Si se requiere que los hilos se detengan con gracia, háganse no-demoníacos y úsese un mecanismo de señalización adecuado tal como un <a class="reference internal" href="#threading.Event" title="threading.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a>.</p>
+</div>
+<p>Existe un objeto «hilo principal»; éste corresponde al hilo de control inicial del programa de Python. No es un hilo demonio.</p>
+<p>There is the possibility that «dummy thread objects» are created. These are
+thread objects corresponding to «alien threads», which are threads of control
+started outside the threading module, such as directly from C code.  Dummy
+thread objects have limited functionality; they are always considered alive and
+daemonic, and cannot be <a class="reference internal" href="#meth-thread-join"><span class="std std-ref">joined</span></a>.  They are never deleted,
+since it is impossible to detect the termination of alien threads.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Thread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daemon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Este constructor siempre debe ser llamado con argumentos de palabra clave. Los argumentos son:</p>
+<p><em>group</em> debe ser <cite>None</cite>; reservado para una futura extensión cuando se implemente una clase <code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadGroup</span></code>.</p>
+<p><em>target</em> es el objeto invocable a ser invocado por el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>. Por defecto es <code class="docutils literal notranslate"><span class="pre">None</span></code>, lo que significa que nada es llamado.</p>
+<p><em>name</em> es el nombre del hilo. De forma predeterminada, se construye un nombre único con el formato «Hilo-<em>N</em>», donde <em>N</em> es un número decimal pequeño, o «Hilo-<em>N</em> (target)» donde «target» es <code class="docutils literal notranslate"><span class="pre">target.__name__</span></code> si se especifica el argumento <em>target</em>.</p>
+<p><em>args</em> is a list or tuple of arguments for the target invocation.  Defaults to <code class="docutils literal notranslate"><span class="pre">()</span></code>.</p>
+<p><em>kwargs</em> es un diccionario de argumentos de palabra clave para la invocación objetivo. Por defecto es <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
+<p>Si no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, <em>daemon</em> establece explícitamente si el hilo es demoníaco. Si es <code class="docutils literal notranslate"><span class="pre">None</span></code> (el valor por defecto), la propiedad demoníaca es heredada del hilo actual.</p>
+<p>Si la subclase sobrescribe el constructor, debe asegurarse de invocar al constructor de la clase base (<code class="docutils literal notranslate"><span class="pre">Thread.__init__()</span></code>) antes de hacer cualquier otra cosa al hilo.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Utilice el nombre <em>target</em> si se omite el argumento <em>name</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Se agregó el argumento <em>daemon</em>.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.start" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Inicia la actividad del hilo.</p>
+<p>Debe ser llamada máximo una vez por objeto hilo. Se encarga de que el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> del objeto sea invocado en un hilo de control separado.</p>
+<p>Este método lanzará un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> si se llama más de una vez en el mismo objeto hilo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Método que representa la actividad del hilo.</p>
+<p>Se puede sobrescribir este método en una subclase. El método estándar <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> invoca el objeto invocable pasado al constructor del objeto como argumento <em>target</em>, si lo hay, con argumentos posicionales y de palabra clave tomados de los argumentos <em>args</em> y <em>kwargs</em>, respectivamente.</p>
+<p>Usar una lista o tupla como el argumento <em>args</em> que se pasa a <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> podría lograr el mismo efecto.</p>
+<p>Example:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="nb">print</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="nb">print</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="meth-thread-join"></span><dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.join" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Espera a que el hilo termine. Esto bloquea el hilo llamador hasta que el hilo cuyo método <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> es llamado finalice – ya sea normalmente o a través de una excepción no gestionada – o hasta que el tiempo de espera opcional caduque.</p>
+<p>Cuando se presenta un argumento <em>timeout</em> y no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, debe ser un número de punto flotante que especifique un tiempo de espera en segundos (o en fracciones de segundo) para la operación . Ya que <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> siempre retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>, se debe llamar a <a class="reference internal" href="#threading.Thread.is_alive" title="threading.Thread.is_alive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_alive()</span></code></a> después de <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> para decidir si acaso caducó el tiempo de espera – si el hilo todavía está vivo, la llamada a <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> caducó.</p>
+<p>Cuando el argumento <em>timeout</em> no se presenta o es <code class="docutils literal notranslate"><span class="pre">None</span></code>, la operación bloqueará hasta que el hilo termine.</p>
+<p>A thread can be joined many times.</p>
+<p><a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> si se intenta unir el hilo actual ya que ello generaría un punto muerto. También es un error aplicar <a class="reference internal" href="#threading.Thread.join" title="threading.Thread.join"><code class="xref py py-meth docutils literal notranslate"><span class="pre">join()</span></code></a> a un hilo antes de que haya sido iniciado y los intentos de hacerlo lanzaran la misma excepción.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Thread.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#threading.Thread.name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un <em>string</em> utilizado con propósitos de identificación. No posee semántica. Se puede dar el mismo nombre a múltiples hilos. El nombre inicial es establecido por el constructor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.getName">
+<span class="sig-name descname"><span class="pre">getName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.getName" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="threading.Thread.setName">
+<span class="sig-name descname"><span class="pre">setName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.setName" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>API getter/setter obsoleta para <a class="reference internal" href="#threading.Thread.name" title="threading.Thread.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a>; utilícelo directamente como una propiedad en su lugar.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Thread.ident">
+<span class="sig-name descname"><span class="pre">ident</span></span><a class="headerlink" href="#threading.Thread.ident" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El “identificador de hilo” de este hilo o <code class="docutils literal notranslate"><span class="pre">None</span></code> si el hilo no ha sido iniciado. Es un entero distinto de cero. Ver la función <a class="reference internal" href="#threading.get_ident" title="threading.get_ident"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ident()</span></code></a>. Los identificadores de hilos pueden ser reciclados cuando un hilo finaliza y otro hilo es creado. El identificador está disponible incuso después de que el hilo ha abandonado.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Thread.native_id">
+<span class="sig-name descname"><span class="pre">native_id</span></span><a class="headerlink" href="#threading.Thread.native_id" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El ID de subproceso (<code class="docutils literal notranslate"><span class="pre">TID</span></code>) de este subproceso, según lo asignado por el sistema operativo (kernel). Este es un número entero no negativo, o <code class="docutils literal notranslate"><span class="pre">None</span></code> si el hilo no se ha iniciado. Consulte la función <a class="reference internal" href="#threading.get_native_id" title="threading.get_native_id"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_native_id()</span></code></a>. Este valor se puede usar para identificar de forma única este hilo en particular en todo el sistema (hasta que el hilo termine, después de lo cual el sistema operativo puede reciclar el valor).</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Similar a las <em>Process IDs</em>, las <em>Thread IDs</em> sólo son válidas (garantizadas como únicas a través de todo el sistema) desde el momento en que se crea el hilo hasta que el hilo es finalizado.</p>
+</div>
+<div class="availability docutils container">
+<p><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Availability</span></a>: Windows, FreeBSD, Linux, macOS, OpenBSD, NetBSD, AIX, DragonFlyBSD.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.is_alive">
+<span class="sig-name descname"><span class="pre">is_alive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.is_alive" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retornar si acaso el hilo está vivo.</p>
+<p>Este método retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> desde justo antes de que el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> inicie hasta junto antes de que el método <a class="reference internal" href="#threading.Thread.run" title="threading.Thread.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> termine. La función <a class="reference internal" href="#threading.enumerate" title="threading.enumerate"><code class="xref py py-func docutils literal notranslate"><span class="pre">enumerate()</span></code></a> del módulo retorna una lista de todos los hilos vivos.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Thread.daemon">
+<span class="sig-name descname"><span class="pre">daemon</span></span><a class="headerlink" href="#threading.Thread.daemon" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>A boolean value indicating whether this thread is a daemon thread (<code class="docutils literal notranslate"><span class="pre">True</span></code>)
+or not (<code class="docutils literal notranslate"><span class="pre">False</span></code>).  This must be set before <a class="reference internal" href="#threading.Thread.start" title="threading.Thread.start"><code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code></a> is called,
+otherwise <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> is raised.  Its initial value is inherited
+from the creating thread; the main thread is not a daemon thread and
+therefore all threads created in the main thread default to
+<a class="reference internal" href="#threading.Thread.daemon" title="threading.Thread.daemon"><code class="xref py py-attr docutils literal notranslate"><span class="pre">daemon</span></code></a> = <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>El programa de Python en su totalidad finaliza cuando no queda ningún hilo no-demonio vivo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Thread.isDaemon">
+<span class="sig-name descname"><span class="pre">isDaemon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.isDaemon" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dt class="sig sig-object py" id="threading.Thread.setDaemon">
+<span class="sig-name descname"><span class="pre">setDaemon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Thread.setDaemon" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>API getter/setter obsoleta para <a class="reference internal" href="#threading.Thread.daemon" title="threading.Thread.daemon"><code class="xref py py-attr docutils literal notranslate"><span class="pre">daemon</span></code></a>; utilícelo directamente como una propiedad en su lugar.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="lock-objects">
+<span id="id2"></span><h2>Objetos tipo <em>lock</em><a class="headerlink" href="#lock-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una primitiva <em>lock</em>, es una primitiva de sincronización que no pertenece a ningún hilo en particular cuando está cerrado. En Python, es la primitiva de sincronización de más bajo nivel actualmente disponible, implementado directamente por el módulo de extensión <a class="reference internal" href="_thread.html#module-_thread" title="_thread: Low-level threading API."><code class="xref py py-mod docutils literal notranslate"><span class="pre">_thread</span></code></a>.</p>
+<p>Una primitiva <em>lock</em> está en uno de dos estados, «cerrado» o «abierto» (<em>locked</em>/<em>unlocked</em>). Se crea en estado abierto. Tiene dos métodos básicos, <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> (adquirir) y <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> (liberar). Cuando el estado es <em>abierto</em>, <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> cambia el estado a cerrado y retorna inmediatamente. Cuando el estado es <em>cerrado</em>, <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> bloquea hasta que una llamada a <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> en otro hilo lo cambie a abierto, luego la llamada a <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> lo restablece a cerrado y retorna. El método <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> sólo debe ser llamado en el estado cerrado; cambia el estado a abierto y retorna inmediatamente. Si se realiza un intento de liberar un <em>lock</em> abierto, se lanzará un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>.</p>
+<p>Los <em>locks</em> también soportan el <a class="reference internal" href="#with-locks"><span class="std std-ref">protocolo de gestión de contexto</span></a>.</p>
+<p>Cuando más de un hilo está bloqueado en <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> esperando que el estado sea abierto, sólo un hilo procederá cuando una llamada a <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> restablezca el estado a abierto; cuál de los hilos en espera procederá no está definido, y puede variar a través de las implementaciones.</p>
+<p>Todos los métodos se ejecutan de manera atómica.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Lock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Lock</span></span><a class="headerlink" href="#threading.Lock" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase que implemente los objetos de la primitiva <em>lock</em>. Una vez que un hilo ha adquirido un <em>lock</em>, intentos subsecuentes por adquirirlo bloquearán, hasta que sea liberado; cualquier hilo puede liberarlo.</p>
+<p>Nótese que <code class="docutils literal notranslate"><span class="pre">Lock</span></code> es una función de fábrica que retorna una instancia de la versión más eficiente de la clase <em>Lock</em> concreta soportada por la plataforma.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Lock.acquire">
+<span class="sig-name descname"><span class="pre">acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Lock.acquire" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Adquirir un <em>lock</em>, bloqueante o no bloqueante.</p>
+<p>Cuando se invoca con el argumento <em>blocking</em> establecido como <code class="docutils literal notranslate"><span class="pre">True</span></code> (el valor por defecto), bloquea hasta que el <em>lock</em> se abra, luego lo establece como cerrado y retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>Cuando es invocado con el argumento <em>blocking</em> como <code class="docutils literal notranslate"><span class="pre">False</span></code>, no bloquea. Si una llamada con <em>blocking</em> establecido como <code class="docutils literal notranslate"><span class="pre">True</span></code> bloqueara, retorna <code class="docutils literal notranslate"><span class="pre">Falso</span></code> inmediatamente; de otro modo, cierra el <em>lock</em> y retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>When invoked with the floating-point <em>timeout</em> argument set to a positive
+value, block for at most the number of seconds specified by <em>timeout</em>
+and as long as the lock cannot be acquired.  A <em>timeout</em> argument of <code class="docutils literal notranslate"><span class="pre">-1</span></code>
+specifies an unbounded wait.  It is forbidden to specify a <em>timeout</em>
+when <em>blocking</em> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>El valor de retorno es <code class="docutils literal notranslate"><span class="pre">True</span></code> si el <em>lock</em> es adquirido con éxito, <code class="docutils literal notranslate"><span class="pre">Falso</span></code> si no (por ejemplo si <em>timeout</em> expiró).</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>El parámetro <em>timeout</em> es nuevo.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>La adquisición de un <em>lock</em> ahora puede ser interrumpida por señales en POSIX si la implementación de hilado subyacente lo soporta.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Lock.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Lock.release" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Libera un <em>lock</em>. Puede ser llamado desde cualquier hilo, no solo el hilo que ha adquirido el <em>lock</em>.</p>
+<p>Cuando el <em>lock</em> está cerrado, lo restablece a abierto, y retorna. Si cualquier otro hilo está bloqueado esperando que el <em>lock</em> se abra, permite que exactamente uno de ellos proceda.</p>
+<p>Cuando se invoca en un <em>lock</em> abierto, se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>.</p>
+<p>No hay valor de retorno.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Lock.locked">
+<span class="sig-name descname"><span class="pre">locked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Lock.locked" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the lock is acquired.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="rlock-objects">
+<span id="id3"></span><h2>Objetos <em>Rlock</em><a class="headerlink" href="#rlock-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Un <em>lock</em> reentrante es una primitiva de sincronización que puede ser adquirido múltiples veces por el mismo hilo. Internamente, utiliza el concepto de «hilo dueño» y «nivel de recursividad» además del estado abierto/cerrado utilizado por las primitivas <em>locks</em>. Si está en estado cerrado, algún hilo es dueño del <em>lock</em>; si está en estado abierto, ningún hilo es dueño.</p>
+<p>Para cerrar el <em>lock</em>, un hilo llama a su método <a class="reference internal" href="#threading.RLock.acquire" title="threading.RLock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a>; esto retorna una vez que el hilo se ha adueñado del <em>lock</em>. Para abrir el <em>lock</em>, un hilo llama a su método <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>. Pares de llamadas <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a>/<a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> pueden anidarse; sólo el <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> final (el <a class="reference internal" href="#threading.Lock.release" title="threading.Lock.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> del par más externo) restablece el <em>lock</em> a abierto y permite que otro hilo bloqueado en <a class="reference internal" href="#threading.Lock.acquire" title="threading.Lock.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> proceda.</p>
+<p>Los <em>locks</em> reentrantes también soportan el <a class="reference internal" href="#with-locks"><span class="std std-ref">protocolo de manejo de contextos</span></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.RLock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">RLock</span></span><a class="headerlink" href="#threading.RLock" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta clase implementa objetos tipo <em>lock</em> reentrantes. Un <em>lock</em> reentrante debe ser liberado por el hilo que lo adquirió. Una vez que un hilo ha adquirido un <em>lock</em> reentrante, el mismo hilo puede adquirirlo otra vez sin bloquearse; el hilo debe liberarlo una vez por vez que lo adquiere.</p>
+<p>Nótese que <code class="docutils literal notranslate"><span class="pre">RLock</span></code> en realidad es una función fábrica que retorna una instancia de la versión más eficiente de la clase RLock concreta que sea soportada por la plataforma.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.RLock.acquire">
+<span class="sig-name descname"><span class="pre">acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.RLock.acquire" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Adquirir un <em>lock</em>, bloqueante o no bloqueante.</p>
+<p>Cuando se invoca sin argumentos: si este hilo ya es dueño del <em>lock</em>, incrementa el nivel de recursividad en uno, y retorna inmediatamente. De otro modo, si otro hilo es dueño del <em>lock</em>, bloquea hasta que se abra el <em>lock</em>. Una vez que el <em>lock</em> se abra (ningún hilo sea su dueño), se adueña, establece el nivel de recursividad en uno, y retorna. Si más de un hilo está bloqueado esperando que sea abra el <em>lock</em>, solo uno a la vez podrá apoderarse del <em>lock</em>. No hay valor de retorno en este caso.</p>
+<p>When invoked with the <em>blocking</em> argument set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, do the same thing as when
+called without arguments, and return <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>When invoked with the <em>blocking</em> argument set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, do not block.  If a call
+without an argument would block, return <code class="docutils literal notranslate"><span class="pre">False</span></code> immediately; otherwise, do the
+same thing as when called without arguments, and return <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>When invoked with the floating-point <em>timeout</em> argument set to a positive
+value, block for at most the number of seconds specified by <em>timeout</em>
+and as long as the lock cannot be acquired.  Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the lock has
+been acquired, <code class="docutils literal notranslate"><span class="pre">False</span></code> if the timeout has elapsed.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>El parámetro <em>timeout</em> es nuevo.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.RLock.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.RLock.release" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Libera un <em>lock</em>, disminuyendo el nivel de recursividad. Si después de la disminución es cero, restablece el <em>lock</em> a abierto (no perteneciente a ningún hilo), y si cualquier otro hilo está bloqueado esperando que se abra el <em>lock</em>, permite que exactamente uno de ellos proceda. Si luego de la disminución el nivel de recursividad todavía no es cero, el <em>lock</em> permanece cerrado y perteneciente al hilo llamador.</p>
+<p>Solo llámese este método cuando el hilo llamador sea dueño del <em>lock</em>. Se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> si se llama este método cuando el <em>lock</em> esta abierto.</p>
+<p>No hay valor de retorno.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="condition-objects">
+<span id="id4"></span><h2>Objetos condicionales<a class="headerlink" href="#condition-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una condición variable siempre va asociada a algún tipo de <em>lock</em>. éste puede ser provisto o se creará uno por defecto. Proveer uno es útil cuando varias variables de condición deben compartir el mismo <em>lock</em>. El <em>lock</em> es parte del objeto condicional: no es necesario rastrearlo por separado.</p>
+<p>Una condición variable obedece el <a class="reference internal" href="#with-locks"><span class="std std-ref">protocolo de gestión de contexto</span></a>: al usar la declaración <code class="docutils literal notranslate"><span class="pre">with</span></code> se adquiere el <em>lock</em> asociado por la duración del bloque contenido. Los métodos <a class="reference internal" href="#threading.Condition.acquire" title="threading.Condition.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> y <a class="reference internal" href="#threading.Condition.release" title="threading.Condition.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> también llaman los métodos correspondientes del <em>lock</em> asociado.</p>
+<p>Otros métodos deben llamarse con el <em>lock</em> asociado conservado. El método <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> libera el <em>lock</em>, y luego bloquea hasta que otro hilo lo despierte llamando <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> o <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a>. Una vez que ha sido despertado, <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> re-adquiere el <em>lock</em> y retorna. También es posible especificar un tiempo de espera.</p>
+<p>El método <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> despierta a uno de los hilos que esperan a la condición variable, si es que alguno espera. El método <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a> despierta a todos los hilos que estén esperando a la condición variable.</p>
+<p>Nota: Los métodos <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> y <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a> no liberan el <em>lock</em>; esto significa que el hilo o los hilos que han sido despertados no retornaran de su llamada de <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> inmediatamente, sino solo una vez que el hilo que haya llamado a <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> o <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a> renuncie finalmente a la propiedad del <em>lock</em>.</p>
+<p>El estilo típico de programación con variables condicionales utiliza el <em>lock</em> para sincronizar el acceso a algún estado compartido; hilos que estén interesados en un cambio de estado en particular llamarán a <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> reiteradamente hasta que vean el estado deseado, mientras que los hilos que modifiquen el estado llamarán a <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> o a <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a> cuando cambien el estado de modo que pudiera ser que el el estado sea el deseado por alguno de los hilos en espera. Por ejemplo, el siguiente código es una situación genérica de productor-consumidor con capacidad de búfer ilimitada:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Consume one item</span>
+<span class="k">with</span> <span class="n">cv</span><span class="p">:</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">an_item_is_available</span><span class="p">():</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="n">get_an_available_item</span><span class="p">()</span>
+
+<span class="c1"># Produce one item</span>
+<span class="k">with</span> <span class="n">cv</span><span class="p">:</span>
+    <span class="n">make_an_item_available</span><span class="p">()</span>
+    <span class="n">cv</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El bucle <code class="docutils literal notranslate"><span class="pre">while</span></code> que verifica la condición de la aplicación es necesario porque <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> puede retornar después de una cantidad arbitraria de tiempo, y la condición que dio pie a la llamada de <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> puede ya no ser verdadera. Esto es inherente a la programación multi-hilo. El método <a class="reference internal" href="#threading.Condition.wait_for" title="threading.Condition.wait_for"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait_for()</span></code></a> puede usarse para automatizar la revisión de condiciones, y facilita la computación de tiempos de espera:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Consume an item</span>
+<span class="k">with</span> <span class="n">cv</span><span class="p">:</span>
+    <span class="n">cv</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">an_item_is_available</span><span class="p">)</span>
+    <span class="n">get_an_available_item</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Para elegir entre <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> y <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a>, considérese si un cambio de estado puede ser interesante para uno o varios hilos en espera. Por ejemplo en una típica situación productor-consumidor, agregar un elemento al búfer sólo necesita despertar un hilo consumidor.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Condition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta clase implementa objetos de condición variable. Una condición variable permite que uno o más hilos esperen hasta que sean notificados por otro hilo.</p>
+<p>Si se provee un argumento <em>lock</em> distinto de <code class="docutils literal notranslate"><span class="pre">None</span></code>, debe ser un objeto <a class="reference internal" href="#threading.Lock" title="threading.Lock"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lock</span></code></a> o <a class="reference internal" href="#threading.RLock" title="threading.RLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLock</span></code></a>, y se utiliza como el <em>lock</em> subyacente. De otro modo, se crea un nuevo objeto <a class="reference internal" href="#threading.RLock" title="threading.RLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLock</span></code></a> y se utiliza como el <em>lock</em> subyacente.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>cambiado de función de fábrica a una clase.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.acquire">
+<span class="sig-name descname"><span class="pre">acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.acquire" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Adquiere el <em>lock</em> subyacente. Este método llama al método correspondiente sobre el <em>lock</em> subyacente; el valor de retorno es lo que retorne aquel método.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.release" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Libera el <em>lock</em> subyacente. Este método llama al método correspondiente en el <em>lock</em> subyacente; no tiene valor de retorno.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.wait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Espera hasta ser notificado o hasta que el tiempo de espera caduque. Si el hilo invocador no ha adquirido el <em>lock</em> cuando este método es llamado, se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>.</p>
+<p>Este método libera el <em>lock</em> subyacente, y luego bloquea hasta ser despertado por una llamada a <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> o <a class="reference internal" href="#threading.Condition.notify_all" title="threading.Condition.notify_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify_all()</span></code></a> para la misma condición variable en otro hilo, o hasta que el tiempo de espera opcional se cumpla. Una vez que ha sido despertado o el tiempo de espera ha pasado, re-adquiere el <em>lock</em> y retorna.</p>
+<p>Cuando haya un argumento <em>timeout</em> presente y no sea <code class="docutils literal notranslate"><span class="pre">None</span></code>, debe ser un número de punto flotante que especifique un tiempo de espera para la operación en segundos (o fracciones de segundo).</p>
+<p>Cuando el <em>lock</em> subyacente es un  <a class="reference internal" href="#threading.RLock" title="threading.RLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLock</span></code></a>, no se libera utilizando su método <a class="reference internal" href="#threading.Condition.release" title="threading.Condition.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>, ya que esto podría no abrir realmente el <em>lock</em> cuando haya sido adquirido múltiples veces recursivamente. En cambio, se usa una interfaz interna de la clase <a class="reference internal" href="#threading.RLock" title="threading.RLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLock</span></code></a>, que lo abre realmente incluso cuando haya sido adquirido múltiples veces recursivamente. Otra interfaz interna se usa luego para restablecer el nivel de recursividad cuando el <em>lock</em> es readquirido.</p>
+<p>El valor de retorno es <code class="docutils literal notranslate"><span class="pre">True</span></code> a menos que un <em>timeout</em> dado haya expirado, en cuyo caso será <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>Previamente, el método siempre retornaba <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.wait_for">
+<span class="sig-name descname"><span class="pre">wait_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.wait_for" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Espera a que una condición se evalúe como verdadera. <em>predicate</em> debe ser un invocable cuyo resultado se interpretará como un valor booleano. Se puede proveer un <em>timeout</em> que especifique el máximo tiempo de espera.</p>
+<p>Este método utilitario puede llamar a <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> reiteradas veces hasta que se satisfaga el predicado, o hasta que la espera caduque. El valor de retorno es el último valor de retorno del predicado y se evaluará a <code class="docutils literal notranslate"><span class="pre">False</span></code> si el método ha caducado.</p>
+<p>Al ignorar la propiedad <em>feature</em>, llamar a este método equivale vagamente a escribir:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="ow">not</span> <span class="n">predicate</span><span class="p">():</span>
+    <span class="n">cv</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Por ende, aplican las mismas reglas que con <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a>: El <em>lock</em> debe ser conservado cuando se llame y es re-adquirido al momento del retorno. El predicado se evalúa con el <em>lock</em> conservado.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.notify">
+<span class="sig-name descname"><span class="pre">notify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.notify" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Por defecto, despierta a un hilo que esté esperando por esta condición, si lo existe. Si el hilo llamador no ha adquirido el <em>lock</em> cuando se llama este método, se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>.</p>
+<p>Este método despierta como máximo <em>n</em> de los hilos que estén esperando por la condición variable; no es una opción si no hay hilos esperando.</p>
+<p>La implementación actual despierta exactamente <em>n</em> hilos, si hay por lo menos <em>n</em> hilos esperando. Sin embargo, no es seguro apoyarse en este comportamiento. A futuro, una implementación optimizada podría ocasionalmente despertar a más de <em>n</em> hilos.</p>
+<p>Nota: un hilo que ha sido despertado no retorna realmente de su llamada a <a class="reference internal" href="#threading.Condition.wait" title="threading.Condition.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> hasta que pueda readquirir el <em>lock</em>. Ya que <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a> no libera el <em>lock</em>, su llamador debiera hacerlo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Condition.notify_all">
+<span class="sig-name descname"><span class="pre">notify_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Condition.notify_all" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Despierta a todos los hilos que esperen por esta condición. Este método actúa como <a class="reference internal" href="#threading.Condition.notify" title="threading.Condition.notify"><code class="xref py py-meth docutils literal notranslate"><span class="pre">notify()</span></code></a>, pero despierta a todos los hilos en espera en vez de a uno. Si el hilo llamador no ha adquirido el <em>lock</em> cuando se llama a este método, se lanza un <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>.</p>
+<p>El método <code class="docutils literal notranslate"><span class="pre">notifyAll</span></code> es un alias obsoleto para este método.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="semaphore-objects">
+<span id="id5"></span><h2>Objetos semáforo<a class="headerlink" href="#semaphore-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Éste es uno de las primitivas de sincronización más antiguos en la historia de las ciencias de la computación, inventado por el pionero en ciencias de la computación holandés Edsger W. Dijkstra (él utilizó los nombres <code class="docutils literal notranslate"><span class="pre">P()</span></code> y <code class="docutils literal notranslate"><span class="pre">V()</span></code> en lugar de <a class="reference internal" href="#threading.Semaphore.acquire" title="threading.Semaphore.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> y <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>)</p>
+<p>Un semáforo administra un contador interno que se disminuye por cada llamada a <a class="reference internal" href="#threading.Semaphore.acquire" title="threading.Semaphore.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> y se incrementa por cada llamada a <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>. El contador no puede bajar de cero; cuando <a class="reference internal" href="#threading.Semaphore.acquire" title="threading.Semaphore.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> lo encuentra en cero, bloquea, esperando hasta que otro hilo llame <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>.</p>
+<p>Los semáforos también tienen soporte para el <a class="reference internal" href="#with-locks"><span class="std std-ref">protocolo de gestión de contexto</span></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Semaphore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Semaphore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Semaphore" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta clase implementa los objetos semáforo. Un semáforo gestiona un contador atómico que representa el número de llamadas a <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> menos el número de llamadas a <a class="reference internal" href="#threading.Semaphore.acquire" title="threading.Semaphore.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a>, más un valor inicial. El método <a class="reference internal" href="#threading.Semaphore.acquire" title="threading.Semaphore.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> bloquea si es necesario, hasta que pueda retornar sin volver el contador negativo. Si no es provisto, el valor por defecto de <em>value</em> será 1.</p>
+<p>El argumento opcional da el <em>value</em> inicial al contador interno; por defecto es <code class="docutils literal notranslate"><span class="pre">1</span></code>. Si el <em>value</em> provisto es menor a 0; se lanza un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>cambiado de función de fábrica a una clase.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Semaphore.acquire">
+<span class="sig-name descname"><span class="pre">acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Semaphore.acquire" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Adquirir un semáforo.</p>
+<p>Cuando se invoca sin argumentos:</p>
+<ul class="simple">
+<li><p>Si el contador interno es mayor a cero de entrada, lo disminuye en uno y retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> inmediatamente.</p></li>
+<li><p>Si el contador interno es cero de entrada, bloquea hasta ser despertado por una llamada a <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>. Una vez despierto (y el contador sea mayor a 0), disminuye el contador en 1 y retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>. Se despertará exactamente un hilo por cada llamada a <a class="reference internal" href="#threading.Semaphore.release" title="threading.Semaphore.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a>. No debiese confiarse en el orden en que los hilos sean despertados.</p></li>
+</ul>
+<p>When invoked with <em>blocking</em> set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, do not block.  If a call
+without an argument would block, return <code class="docutils literal notranslate"><span class="pre">False</span></code> immediately; otherwise, do
+the same thing as when called without arguments, and return <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>Cuando se invoca con <em>timeout</em> distinto de <code class="docutils literal notranslate"><span class="pre">None</span></code>, bloqueará por un tiempo máximo en segundos fijados en <em>timeout</em>. Si <em>acquire</em> no se completa exitosamente en ese intervalo, retorna <code class="docutils literal notranslate"><span class="pre">False</span></code>. De otro modo retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.2: </span>El parámetro <em>timeout</em> es nuevo.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Semaphore.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Semaphore.release" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Suelta un semáforo, incrementando el contador interno por <em>n</em>. Cuando era cero en la entrada y otros subprocesos están esperando que vuelva a ser mayor que cero, active <em>n</em> de esos subprocesos.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Se agregó el parámetro <em>n</em> para liberar varios subprocesos en espera a la vez.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.BoundedSemaphore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">BoundedSemaphore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.BoundedSemaphore" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase que implementa objetos de semáforo delimitados. Un semáforo delimitado verifica que su valor actual no exceda su valor inicial. Si lo hace, se lanza un <a class="reference internal" href="exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>. En la mayoría de las situaciones se utilizan los semáforos para cuidar recursos con capacidad limitada. Si se libera el semáforo demasiadas veces es signo de un <em>bug</em>. Si no se provee, el valor por defecto de <em>value</em> será 1.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>cambiado de función de fábrica a una clase.</p>
+</div>
+</dd></dl>
+
+<section id="semaphore-example">
+<span id="semaphore-examples"></span><h3>Ejemplo de <a class="reference internal" href="#threading.Semaphore" title="threading.Semaphore"><code class="xref py py-class docutils literal notranslate"><span class="pre">Semaphore</span></code></a><a class="headerlink" href="#semaphore-example" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los semáforos suelen utilizarse para cuidar recursos con capacidad limitada, por ejemplo, un servidor de base de datos. En cualquier situación en que el tamaño de los recursos sea fijo, se debe usar un semáforo delimitado. Antes de generar cualquier hilo de trabajo, tu hilo principal debe inicializar el semáforo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">maxconnections</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># ...</span>
+<span class="n">pool_sema</span> <span class="o">=</span> <span class="n">BoundedSemaphore</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">maxconnections</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Una vez que han sido generados, los hilos de trabajo llaman a los métodos <em>acquire</em> y <em>release</em> cuando necesitan conectarse al servidor:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pool_sema</span><span class="p">:</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">connectdb</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># ... use connection ...</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>El uso de semáforos delimitados reduce la posibilidad de que pase inadvertido un error de programación que cause que el semáforo sea liberado más veces de las que sea adquirido.</p>
+</section>
+</section>
+<section id="event-objects">
+<span id="id6"></span><h2>Objetos de eventos<a class="headerlink" href="#event-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Éste es uno de los mecanismos más simples de comunicación entre hilos: un hilo señala un evento y otro hilo lo espera.</p>
+<p>Un objeto de evento maneja una marca interna que puede ser establecida como verdadera mediante el método <a class="reference internal" href="#threading.Event.set" title="threading.Event.set"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set()</span></code></a> y restablecida a falsa mediante el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">clear()</span></code>. El método <code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code> bloquea hasta que la marca sea <em>true</em>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Event">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><a class="headerlink" href="#threading.Event" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase que implementa los objetos de evento. Un evento gestiona un indicador que puede ser establecido a verdadero mediante el método <a class="reference internal" href="#threading.Event.set" title="threading.Event.set"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set()</span></code></a> y restablecido a falso con el método <a class="reference internal" href="#threading.Event.clear" title="threading.Event.clear"><code class="xref py py-meth docutils literal notranslate"><span class="pre">clear()</span></code></a>. El método <a class="reference internal" href="#threading.Event.wait" title="threading.Event.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> bloquea hasta que el indicador sea verdadero. El indicador es inicialmente falso.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>cambiado de función de fábrica a una clase.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Event.is_set">
+<span class="sig-name descname"><span class="pre">is_set</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Event.is_set" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> exclusivamente si el indicador interno es verdadero.</p>
+<p>El método <code class="docutils literal notranslate"><span class="pre">isSet</span></code> es un alias obsoleto para este método.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Event.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Event.set" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el indicador interno a verdadero. Todos los hilos que estén esperando que se vuelva verdadero serán despertados. Los hilos que llaman a <a class="reference internal" href="#threading.Event.wait" title="threading.Event.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> una vez que el indicador marca verdadero no bloquearán.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Event.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Event.clear" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Restablece el indicador a falso. Posteriormente, los hilos que llamen a <a class="reference internal" href="#threading.Event.wait" title="threading.Event.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> bloquearán hasta que se llame a <a class="reference internal" href="#threading.Event.set" title="threading.Event.set"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set()</span></code></a> para establecer el indicador interno a verdadero nuevamente.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Event.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Event.wait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Bloquea hasta que el indicador interno sea verdadero. Si el indicador interno es verdadero de entrada, retorna inmediatamente. De otro modo, bloquea hasta que otro hilo llame a <a class="reference internal" href="#threading.Event.set" title="threading.Event.set"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set()</span></code></a> para establecer el indicador a verdadero, o hasta que el tiempo de espera opcional caduque.</p>
+<p>Cuando se presenta un argumento para el tiempo de espera <em>timeout</em> distinto de <code class="docutils literal notranslate"><span class="pre">None</span></code>, debe ser un número de punto flotante que especifique un tiempo de espera para la operación en segundos (o fracciones en su defecto).</p>
+<p>Este método retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> exclusivamente si el indicador interno ha sido establecido a verdadero, ya sea antes de la llamada a la espera o después de que la espera inicie, por lo que siempre retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> excepto si se provee un tiempo de espera máximo y la operación caduca.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span>Previamente, el método siempre retornaba <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="timer-objects">
+<span id="id7"></span><h2>Objetos temporizadores<a class="headerlink" href="#timer-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Esta clase representa una acción que sólo debe ejecutarse luego de que una cierta cantidad de tiempo transcurra — un temporizador. <a class="reference internal" href="#threading.Timer" title="threading.Timer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timer</span></code></a> es una subclase de <a class="reference internal" href="#threading.Thread" title="threading.Thread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a> y en tanto tal también funciona como un ejemplo de creación de hilos personalizados.</p>
+<p>Los temporizadores son iniciados, tal como los hilos, al llamarse su método <code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code>. El temporizador puede ser detenido (antes de que su acción haya comenzado) al llamar al método <a class="reference internal" href="#threading.Timer.cancel" title="threading.Timer.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancel()</span></code></a>. El intervalo que el temporizador esperará antes de ejecutar su acción puede no ser exactamente el mismo que el intervalo especificado por el usuario.</p>
+<p>Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello, world&quot;</span><span class="p">)</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">hello</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>  <span class="c1"># after 30 seconds, &quot;hello, world&quot; will be printed</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Timer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Timer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Timer" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crear un temporizador que ejecutará <em>function</em> con los argumentos <em>args</em> y los argumentos de palabra clave <em>kwargs</em>, luego de que una cantidad <em>interval</em> de segundos hayan transcurrido. Si <em>args</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> (por defecto) se utilizará una lista vacía. Si <em>kwargs</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> (por defecto) se utilizará un <em>dict</em> vacío.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>cambiado de función de fábrica a una clase.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Timer.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Timer.cancel" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Detiene el temporizador, y cancela la ejecución de la acción del temporizador. Esto sólo funcionará si el temporizador está en etapa de espera.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="barrier-objects">
+<h2>Objetos de barrera<a class="headerlink" href="#barrier-objects" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+<p>Esta clase provee una primitiva de sincronización simple para ser usado por un número fijo de hilos que necesitan esperarse entre ellos. Cada uno de los hilos intenta pasar la barrera llamando al método <a class="reference internal" href="#threading.Barrier.wait" title="threading.Barrier.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> y bloqueará hasta que todos los hilos hayan hecho sus respectivas llamadas a <a class="reference internal" href="#threading.Barrier.wait" title="threading.Barrier.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a>. En este punto, los hilos son liberados simultáneamente.</p>
+<p>La barrera puede ser reutilizada cualquier número de veces para el mismo número de hilos.</p>
+<p>Como ejemplo, aquí hay una manera simple de sincronizar un hilo cliente con uno servidor:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">server</span><span class="p">():</span>
+    <span class="n">start_server</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">accept_connection</span><span class="p">()</span>
+        <span class="n">process_server_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">client</span><span class="p">():</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">make_connection</span><span class="p">()</span>
+        <span class="n">process_client_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="threading.Barrier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">Barrier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Barrier" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Crear un objeto de barrera para un número <em>parties</em> de hilos. Una <em>action</em>, si es provista, es un invocable a ser llamado por uno de los hilos cuando sean liberados. <em>timeout</em> es el valor de tiempo de espera máximo por defecto si no se especifica uno en el método <a class="reference internal" href="#threading.Barrier.wait" title="threading.Barrier.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Barrier.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#threading.Barrier.wait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Pasa la barrera. Cuando todos los hilos involucrados en el objeto barrera han llamado esta función, se liberan todos simultáneamente. Si se provee un valor <em>timeout</em>, se utilizará con preferencia sobre cualquiera que haya sido suministrado al constructor de la clase.</p>
+<p>El valor de retorno es un entero en el rango desde 0 hasta <em>parties</em> – 1, diferente para cada hilo. Puede ser utilizado para seleccionar a un hilo para que haga alguna limpieza especial, por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="n">barrier</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c1"># Only one thread needs to print this</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;passed the barrier&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Se se provee una <em>action</em> al constructor, uno de los hilos la habrá llamado antes de ser liberado. Si acaso esta llamada lanzara un error, la barrera entra en estado <em>broken</em> (roto).</p>
+<p>Si la llamada caduca, la barrera entra en estado <em>broken</em>.</p>
+<p>Este método podría lanzar una excepción <a class="reference internal" href="#threading.BrokenBarrierError" title="threading.BrokenBarrierError"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrokenBarrierError</span></code></a> si la barrera está rota o si se reinicia mientras el hilo está esperando.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Barrier.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Barrier.reset" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la barrera al estado por defecto, vacío. Cualquier hilo que esté a su espera recibirá la excepción <a class="reference internal" href="#threading.BrokenBarrierError" title="threading.BrokenBarrierError"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrokenBarrierError</span></code></a>.</p>
+<p>Nótese que utilizar esta función podría requerir alguna sincronización externa si existen otros hilos cuyos estados sean desconocidos. Si una barrera se rompe puede ser mejor abandonarla y crear una nueva.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threading.Barrier.abort">
+<span class="sig-name descname"><span class="pre">abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#threading.Barrier.abort" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Coloca la barrera en estado roto. Esto causa que cualquier llamada activa o futura a <a class="reference internal" href="#threading.Barrier.wait" title="threading.Barrier.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a> falle con el error <a class="reference internal" href="#threading.BrokenBarrierError" title="threading.BrokenBarrierError"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrokenBarrierError</span></code></a>. Úsese por ejemplo si uno de los hilos necesita abortar, para evitar que la aplicación quede en punto muerto.</p>
+<p>Puede ser preferible simplemente crear la barrera con un valor <em>timeout</em> sensato para cuidarse automáticamente de que uno de los hilos falle.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Barrier.parties">
+<span class="sig-name descname"><span class="pre">parties</span></span><a class="headerlink" href="#threading.Barrier.parties" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El número de hilos requeridos para pasar la barrera.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Barrier.n_waiting">
+<span class="sig-name descname"><span class="pre">n_waiting</span></span><a class="headerlink" href="#threading.Barrier.n_waiting" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El número de hilos actualmente esperando en la barrera.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threading.Barrier.broken">
+<span class="sig-name descname"><span class="pre">broken</span></span><a class="headerlink" href="#threading.Barrier.broken" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un valor booleano que será <code class="docutils literal notranslate"><span class="pre">True</span></code> si la barrera está en el estado roto.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="threading.BrokenBarrierError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threading.</span></span><span class="sig-name descname"><span class="pre">BrokenBarrierError</span></span><a class="headerlink" href="#threading.BrokenBarrierError" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta excepción, una subclase de <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a>, se lanza cuando el objeto <a class="reference internal" href="#threading.Barrier" title="threading.Barrier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Barrier</span></code></a> se restablece o se rompe.</p>
+</dd></dl>
+
+</section>
+<section id="using-locks-conditions-and-semaphores-in-the-with-statement">
+<span id="with-locks"></span><h2>Uso de <em>locks</em>, condiciones y semáforos en la declaración <code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code><a class="headerlink" href="#using-locks-conditions-and-semaphores-in-the-with-statement" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Todos los objetos provistos por este módulo que tienen métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code> pueden ser utilizados como administradores de contexto para una declaración <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a>. El método <code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code> será llamado cuando se ingresa al bloque y el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code> será llamado cuando se abandona el bloque. De ahí que, el siguiente fragmento:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">some_lock</span><span class="p">:</span>
+    <span class="c1"># do something...</span>
+</pre></div>
+</div>
+<p>sea equivalente a:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">some_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># do something...</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">some_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Actualmente, los objetos <a class="reference internal" href="#threading.Lock" title="threading.Lock"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lock</span></code></a>, <a class="reference internal" href="#threading.RLock" title="threading.RLock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLock</span></code></a>, <a class="reference internal" href="#threading.Condition" title="threading.Condition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Condition</span></code></a>, <a class="reference internal" href="#threading.Semaphore" title="threading.Semaphore"><code class="xref py py-class docutils literal notranslate"><span class="pre">Semaphore</span></code></a>, y <a class="reference internal" href="#threading.BoundedSemaphore" title="threading.BoundedSemaphore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedSemaphore</span></code></a> pueden ser utilizados como gestores de contexto con declaraciones <a class="reference internal" href="../reference/compound_stmts.html#with"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code> — Paralelismo basado en hilos</a><ul>
+<li><a class="reference internal" href="#thread-local-data">Datos locales del hilo</a></li>
+<li><a class="reference internal" href="#thread-objects">Objetos tipo hilo</a></li>
+<li><a class="reference internal" href="#lock-objects">Objetos tipo <em>lock</em></a></li>
+<li><a class="reference internal" href="#rlock-objects">Objetos <em>Rlock</em></a></li>
+<li><a class="reference internal" href="#condition-objects">Objetos condicionales</a></li>
+<li><a class="reference internal" href="#semaphore-objects">Objetos semáforo</a><ul>
+<li><a class="reference internal" href="#semaphore-example">Ejemplo de <code class="xref py py-class docutils literal notranslate"><span class="pre">Semaphore</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#event-objects">Objetos de eventos</a></li>
+<li><a class="reference internal" href="#timer-objects">Objetos temporizadores</a></li>
+<li><a class="reference internal" href="#barrier-objects">Objetos de barrera</a></li>
+<li><a class="reference internal" href="#using-locks-conditions-and-semaphores-in-the-with-statement">Uso de <em>locks</em>, condiciones y semáforos en la declaración <code class="xref std std-keyword docutils literal notranslate"><span class="pre">with</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="concurrency.html"
+                          title="capítulo anterior">Ejecución concurrente</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="multiprocessing.html"
+                          title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code> — Paralelismo basado en procesos</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.11/Doc/library/threading.rst"
+            rel="nofollow">Ver fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="multiprocessing.html" title="multiprocessing — Paralelismo basado en procesos"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="concurrency.html" title="Ejecución concurrente"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.11.2 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La biblioteca estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="concurrency.html" >Ejecución concurrente</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">threading</span></code> — Paralelismo basado en hilos</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 23, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+
+  </body>
+</html>
