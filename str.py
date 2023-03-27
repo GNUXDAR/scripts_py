@@ -37,14 +37,32 @@ print(refran[-10:]) # los 10 ultimos caracteres
 print(refran.upper())
 refran.lower()                  #todas a minusculas
 refran.upper()                  #todas a mayusculas
-refran.capitalize()             #la primera letra de la cadena
-refran.replace('no', 'si')      #remplazar todo del primer parametro por l segundo
+refran.capitalize()             #la primera letra de la cadena en mayuscula
+refran.replace('no', 'si')      #remplazar todo del primer parametro por el segundo
 refran.find('Roque')            #busca una palabra o un caracter e indica en que posicion esta
 refran.find('roque')            #-1 si no la encuentra, distingue mayuscula de minuscula
 refran.lower().find('roque')    #pasar a minuscula y buscar la palabra o letra
-refran.strip()                  #elimina los espacios del rpincio y del final
+refran.strip()                  #elimina los espacios del princio y del final
 refran.split()                  #crea uan lista con cada elemento de la cadena de texto
 refran.split('no')              #parte la cadena en las veces que exista esa palabra o letra, quitando la palabra o letra que se pase por parametro
+refran.isupper()                #para determinar si una letra está en mayúscula
+refran.islower()                #para determinar si una letra está en minuscula
+
+## Ejemplo: de isupper y islower
+def cambiaMayus(cadena):
+    # cambia mayusculas por minusculas y viceversa
+    resultado = ""
+    for letra in cadena:
+        if letra.isupper():
+            resultado += letra.lower()
+        elif letra.islower():
+            resultado += letra.upper()
+        else:
+            resultado += letra
+    print(resultado) 
+
+cambiaMayus('Castilla')
+
 
 # Extraer trosos de una cadena
 
