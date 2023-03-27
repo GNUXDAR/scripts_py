@@ -2,7 +2,7 @@
 # cada uno de los archivos .py que generamos en python se denominan modulos, y son considerados contenedores para organizar nuestro codigo
 
 #paquetes
-# un pauqete es un modulo que sirve para contener otros modulos y paquetes, en la practica es un directorio que contiene un archivo '__init__.py
+# un paquete es un modulo que sirve para contener otros modulos y paquetes, en la practica es un directorio que contiene un archivo '__init__.py
 # dentro de dicho directorio podremos tener almacenados otros modulos o paquetes
 # .
 # |-- modulo1.py
