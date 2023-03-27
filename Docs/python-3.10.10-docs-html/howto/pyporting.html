@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Portando código de Python 2 a Python 3 &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Portar módulos de extensión a Python 3" href="cporting.html" />
+    <link rel="prev" title="Comos (HOWTOs) de Python" href="index.html" />
+    <link rel="canonical" href="https://docs.python.org/3/howto/pyporting.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Portando código de Python 2 a Python 3</a><ul>
+<li><a class="reference internal" href="#the-short-explanation">La breve explicación</a></li>
+<li><a class="reference internal" href="#details">Detalles</a><ul>
+<li><a class="reference internal" href="#drop-support-for-python-2-6-and-older">Compatibilidad con Python 2.6 y versiones anteriores</a></li>
+<li><a class="reference internal" href="#make-sure-you-specify-the-proper-version-support-in-your-setup-py-file">Asegúrese de especificar el soporte de versión adecuado en su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code></a></li>
+<li><a class="reference internal" href="#have-good-test-coverage">Tener una buena cobertura de prueba</a></li>
+<li><a class="reference internal" href="#learn-the-differences-between-python-2-3">Aprende las diferencias entre Python 2 &amp; 3</a></li>
+<li><a class="reference internal" href="#update-your-code">Actualiza tu código</a><ul>
+<li><a class="reference internal" href="#division">División</a></li>
+<li><a class="reference internal" href="#text-versus-binary-data">Texto frente a datos binarios</a></li>
+<li><a class="reference internal" href="#use-feature-detection-instead-of-version-detection">Utilice la detección de funciones en lugar de la detección de versiones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prevent-compatibility-regressions">Evitar regresiones de compatibilidad</a></li>
+<li><a class="reference internal" href="#check-which-dependencies-block-your-transition">Compruebe qué dependencias bloquean la transición</a></li>
+<li><a class="reference internal" href="#update-your-setup-py-file-to-denote-python-3-compatibility">Actualice su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> para denotar compatibilidad con Python 3</a></li>
+<li><a class="reference internal" href="#use-continuous-integration-to-stay-compatible">Utilice la integración continua para seguir siendo compatible</a></li>
+<li><a class="reference internal" href="#consider-using-optional-static-type-checking">Considere la posibilidad de usar la comprobación de tipos estáticos opcionales</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="index.html"
+                        title="capítulo anterior">Comos (<em>HOWTOs</em>) de Python</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="cporting.html"
+                        title="próximo capítulo">Portar módulos de extensión a Python 3</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/pyporting.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="Portar módulos de extensión a Python 3"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Comos (HOWTOs) de Python"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Portando código de Python 2 a Python 3</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="porting-python-2-code-to-python-3">
+<span id="pyporting-howto"></span><h1>Portando código de Python 2 a Python 3<a class="headerlink" href="#porting-python-2-code-to-python-3" title="Enlazar permanentemente con este título">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">autor</dt>
+<dd class="field-odd"><p>Brett Cannon</p>
+</dd>
+</dl>
+<div class="topic">
+<p class="topic-title">Resumen</p>
+<p>Dado que Python 3 es el futuro de Python mientras Python 2 todavía está en uso activo, es bueno tener su proyecto disponible para ambas versiones principales de Python. Esta guía está diseñada para ayudarle a averiguar la mejor manera de admitir Python 2 y 3 simultáneamente.</p>
+<p>Si está buscando portar un módulo de extensión en lugar de código Python puro, consulte <a class="reference internal" href="cporting.html#cporting-howto"><span class="std std-ref">Portar módulos de extensión a Python 3</span></a>.</p>
+<p>Si desea leer la opinión de un desarrollador central de Python sobre por qué Python 3 nació, puede leer las <a class="reference external" href="https://ncoghlan-devs-python-notes.readthedocs.io/en/latest/python3/questions_and_answers.html">Python 3 Q &amp; A</a> de Nick Coghlan o el artículo de Brett Cannon <a class="reference external" href="https://snarky.ca/why-python-3-exists">Why Python 3 exists</a>.</p>
+<p>Para obtener ayuda con la portabilidad, puede ver la lista de correo archivada de <a class="reference external" href="https://mail.python.org/pipermail/python-porting/">python-porting</a>.</p>
+</div>
+<section id="the-short-explanation">
+<h2>La breve explicación<a class="headerlink" href="#the-short-explanation" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Para que su proyecto sea compatible con Python 2/3 de una sola fuente, los pasos básicos son:</p>
+<ol class="arabic simple">
+<li><p>Sólo preocúpate por admitir Python 2.7</p></li>
+<li><p>Asegúrese de tener una buena cobertura de prueba (<a class="reference external" href="https://pypi.org/project/coverage">coberturas.py</a> puede ayudar; <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">coverage</span></code>)</p></li>
+<li><p>Aprende las diferencias entre Python 2 &amp; 3</p></li>
+<li><p>Utilice <a class="reference external" href="https://python-future.org/automatic_conversion.html">Futurize</a> (o <a class="reference external" href="https://python-modernize.readthedocs.io/">Modernize</a>) para actualizar su código (por ejemplo, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">future</span></code>)</p></li>
+<li><p>Use <a class="reference external" href="https://pypi.org/project/pylint">Pylint</a> para asegurarse de que no retrocede en su compatibilidad con Python 3 (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pylint</span></code>)</p></li>
+<li><p>Use <a class="reference external" href="https://pypi.org/project/caniusepython3">caniusepython3</a> para averiguar cuáles de sus dependencias están bloqueando el uso de Python 3 (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">caniusepython3</span></code>)</p></li>
+<li><p>Una vez que sus dependencias ya no lo bloqueen, use la integración continua para asegurarse de que sigue siendo compatible con Python 2 y 3 (<a class="reference external" href="https://pypi.org/project/tox">tox</a> puede ayudar a probar contra múltiples versiones de Python; <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">tox</span></code>)</p></li>
+<li><p>Considere usar la verificación de tipo estática opcional para asegurarse de que su uso de tipo funcione tanto en Python 2 como en 3 (por ejemplo, use <a class="reference external" href="http://mypy-lang.org/">mypy</a> para verificar su escritura en Python 2 y Python 3; <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mypy</span></code>).</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Nota: El uso de <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span></code> garantiza que el <code class="docutils literal notranslate"><span class="pre">pip</span></code> que invoca es el que está instalado para el Python actualmente en uso, ya sea un <code class="docutils literal notranslate"><span class="pre">pip</span></code> de todo el sistema o uno instalado dentro de un <a class="reference internal" href="../tutorial/venv.html#tut-venv"><span class="std std-ref">entorno virtual</span></a>.</p>
+</div>
+</section>
+<section id="details">
+<h2>Detalles<a class="headerlink" href="#details" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Un punto clave sobre el soporte de Python 2 &amp; 3 simultáneamente es que se puede empezar <strong>hoy</strong>! Incluso si sus dependencias no son compatibles con Python 3 todavía eso no significa que no puede modernizar el código <strong>ahora</strong> para admitir Python 3. La mayoría de los cambios necesarios para admitir Python 3 conducen a código más limpio utilizando prácticas más recientes incluso en código Python 2.</p>
+<p>Otro punto clave es que la modernización del código de Python 2 para que también admita Python 3 está en gran medida automatizada para usted. Si bien es posible que tenga que tomar algunas decisiones de API gracias a python 3 aclarando los datos de texto frente a los datos binarios, el trabajo de nivel inferior ahora se realiza principalmente por usted y, por lo tanto, al menos puede beneficiarse de los cambios automatizados inmediatamente.</p>
+<p>Tenga en cuenta esos puntos clave mientras lee sobre los detalles de la migración del código para admitir Python 2 &amp; 3 simultáneamente.</p>
+<section id="drop-support-for-python-2-6-and-older">
+<h3>Compatibilidad con Python 2.6 y versiones anteriores<a class="headerlink" href="#drop-support-for-python-2-6-and-older" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Si bien puede hacer que Python 2.5 funcione con Python 3, es <strong>mucho</strong> más fácil si solo tiene que trabajar con Python 2.7. Si eliminar Python 2.5 no es una opción, entonces el proyecto <a class="reference external" href="https://pypi.org/project/six">six</a> puede ayudarlo a admitir Python 2.5 y 3 simultáneamente (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">six</span></code>). Sin embargo, tenga en cuenta que casi todos los proyectos enumerados en este COMO no estarán disponibles para usted.</p>
+<p>Si puede omitir Python 2.5 y versiones anteriores, los cambios necesarios en el código deben seguir pareciendo código Python idiomático. En el peor de los casos tendrá que utilizar una función en lugar de un método en algunos casos o tendrá que importar una función en lugar de usar una integrada, pero de lo contrario la transformación general no debería sentirse ajena a usted.</p>
+<p>Pero usted debe apuntar a sólo apoyar Python 2.7. Python 2.6 ya no se admite libremente y, por lo tanto, no recibe correcciones de errores. Esto significa que <strong>usted</strong> tendrá que solucionar cualquier problema que encuentre con Python 2.6. También hay algunas herramientas mencionadas en este HOWTO que no son compatibles con Python 2.6 (por ejemplo, <a class="reference external" href="https://pypi.org/project/pylint">Pylint</a>), y esto se volverá más común a medida que pasa el tiempo. Simplemente será más fácil para usted si sólo admite las versiones de Python que tiene que admitir.</p>
+</section>
+<section id="make-sure-you-specify-the-proper-version-support-in-your-setup-py-file">
+<h3>Asegúrese de especificar el soporte de versión adecuado en su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code><a class="headerlink" href="#make-sure-you-specify-the-proper-version-support-in-your-setup-py-file" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>En su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> debe tener el <a class="reference external" href="https://pypi.org/classifiers">trove classifier</a> adecuado especificando qué versiones de Python admite. Como su proyecto no es compatible con Python 3, al menos debe tener <code class="docutils literal notranslate"><span class="pre">Programming</span> <span class="pre">Language</span> <span class="pre">::</span> <span class="pre">Python</span> <span class="pre">::</span> <span class="pre">2</span> <span class="pre">::</span> <span class="pre">Only</span></code> especificado. Idealmente también debe especificar cada versión principal/menor de Python que admita, por ejemplo, <code class="docutils literal notranslate"><span class="pre">Programming</span> <span class="pre">Language</span> <span class="pre">::</span> <span class="pre">Python</span> <span class="pre">::</span> <span class="pre">2.7</span></code>.</p>
+</section>
+<section id="have-good-test-coverage">
+<h3>Tener una buena cobertura de prueba<a class="headerlink" href="#have-good-test-coverage" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que tenga su código compatible con la versión más antigua de Python 2 que desee, querrá asegurarse de que su conjunto de pruebas tenga una buena cobertura. Una buena regla general es que si desea tener la suficiente confianza en su conjunto de pruebas, cualquier falla que aparezca después de que las herramientas reescriban su código son errores reales en las herramientas y no en su código. Si desea un número al que apuntar, intente obtener una cobertura superior al 80% (y no se sienta mal si le resulta difícil obtener una cobertura superior al 90%). Si aún no tiene una herramienta para medir la cobertura de la prueba, se recomienda <a class="reference external" href="https://pypi.org/project/coverage">cover.py</a>.</p>
+</section>
+<section id="learn-the-differences-between-python-2-3">
+<h3>Aprende las diferencias entre Python 2 &amp; 3<a class="headerlink" href="#learn-the-differences-between-python-2-3" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que tenga su código bien probado, ¡está listo para comenzar a migrar su código a Python 3! Pero para comprender completamente cómo va a cambiar el código y qué desea tener en cuenta mientras codifica, querrá aprender qué cambios produce Python 3 en términos de Python 2. Típicamente las dos mejores maneras de hacer eso es leer la documentación <a class="reference internal" href="../whatsnew/index.html#whatsnew-index"><span class="std std-ref">«What’s New»</span></a> para cada versión de Python 3 y el libro <a class="reference external" href="http://python3porting.com/">Porting to Python 3</a> (que es gratis en línea). También hay una práctica <a class="reference external" href="https://python-future.org/compatible_idioms.html">cheat sheet</a> del proyecto Python-Future.&lt;/whatsnew-index&gt;.</p>
+</section>
+<section id="update-your-code">
+<h3>Actualiza tu código<a class="headerlink" href="#update-your-code" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que sientas que sabes lo que es diferente en Python 3 en comparación con Python 2, ¡es hora de actualizar tu código! Puede elegir entre dos herramientas para migrar el código automáticamente: <a class="reference external" href="https://python-future.org/automatic_conversion.html">Futurize</a> y <a class="reference external" href="https://python-modernize.readthedocs.io/">Modernize</a>. La herramienta que elija dependerá de la cantidad similar a Python 3 que desea que sea el código. <a class="reference external" href="https://python-future.org/automatic_conversion.html">Futurize</a> hace todo lo posible para que Python 3 modismos y prácticas existan en Python 2, por ejemplo, backporting el tipo <code class="docutils literal notranslate"><span class="pre">bytes</span></code> de Python 3 para que tenga paridad semántica entre las versiones principales de Python. <a class="reference external" href="https://python-modernize.readthedocs.io/">Modernize</a>, por otro lado, es más conservador y se dirige a un subconjunto de Python 2/3 de Python, basándose directamente en <a class="reference external" href="https://pypi.org/project/six">six</a> para ayudar a proporcionar compatibilidad. Como Python 3 es el futuro, podría ser mejor considerar Futurize para comenzar a adaptarse a cualquier nueva práctica que Python 3 introduce a la que aún no está acostumbrado.</p>
+<p>Independientemente de la herramienta que elija, actualizarán el código para que se ejecute en Python 3 mientras se mantienen compatibles con la versión de Python 2 con la que comenzó. Dependiendo de lo conservador que desee ser, es posible que desee ejecutar la herramienta sobre el conjunto de pruebas primero e inspeccionar visualmente la diferencia para asegurarse de que la transformación es precisa. Después de transformar el conjunto de pruebas y comprobar que todas las pruebas siguen pasando según lo esperado, puede transformar el código de la aplicación sabiendo que cualquier prueba que falle es un error de traducción.</p>
+<p>Desafortunadamente, las herramientas no pueden automatizar todo para que su código funcione bajo Python 3 y por lo que hay un puñado de cosas que tendrá que actualizar manualmente para obtener soporte completo de Python 3 (cuáles de estos pasos son necesarios varían entre las herramientas). Lea la documentación de la herramienta que elige utilizar para ver lo que corrige de forma predeterminada y lo que puede hacer opcionalmente para saber lo que (no) se fijará para usted y lo que puede tener que corregir por su cuenta (por ejemplo, usando <code class="docutils literal notranslate"><span class="pre">io.open()</span></code> sobre la función incorporada <code class="docutils literal notranslate"><span class="pre">open()</span></code> está desactivada por defecto en Modernizar). Afortunadamente, sin embargo, sólo hay un par de cosas a tener en cuenta por las cuales se pueden considerar grandes problemas que pueden ser difíciles de depurar si no se observan.</p>
+<section id="division">
+<h4>División<a class="headerlink" href="#division" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>En Python 3, <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">==</span> <span class="pre">2.5</span></code> y no <code class="docutils literal notranslate"><span class="pre">2</span></code>; toda división entre los valores <code class="docutils literal notranslate"><span class="pre">int</span></code> da lugar a un <code class="docutils literal notranslate"><span class="pre">float</span></code>. Este cambio ha sido planeado desde Python 2.2, que fue lanzado en 2002. Desde entonces, se ha alentado a los usuarios a añadir <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></code> a todos y cada uno de los archivos que utilizan los operadores <code class="docutils literal notranslate"><span class="pre">/</span></code> y <code class="docutils literal notranslate"><span class="pre">//</span></code> o que ejecuten el intérprete con el indicador <code class="docutils literal notranslate"><span class="pre">-Q</span></code>. Si no ha estado haciendo esto, entonces tendrá que ir a través de su código y hacer dos cosas:</p>
+<ol class="arabic simple">
+<li><p>Añadir <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></code> a sus archivos</p></li>
+<li><p>Actualice cualquier operador de división según sea necesario para utilizar <code class="docutils literal notranslate"><span class="pre">//</span></code> para usar la división de suelo o continuar usando <code class="docutils literal notranslate"><span class="pre">/</span></code> y esperar un número flotante</p></li>
+</ol>
+<p>La razón por la que <code class="docutils literal notranslate"><span class="pre">/</span></code> no se traduce simplemente a <code class="docutils literal notranslate"><span class="pre">//</span></code> automáticamente es que si un objeto define un método <code class="docutils literal notranslate"><span class="pre">__truediv__</span></code> pero no <code class="docutils literal notranslate"><span class="pre">__floordiv__</span></code> entonces su código comenzaría a fallar (por ejemplo, una clase definida por el usuario que utiliza <code class="docutils literal notranslate"><span class="pre">/</span></code> para significar alguna operación pero no <code class="docutils literal notranslate"><span class="pre">//</span></code> para la misma cosa o en absoluto).</p>
+</section>
+<section id="text-versus-binary-data">
+<h4>Texto frente a datos binarios<a class="headerlink" href="#text-versus-binary-data" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>En Python 2 puede usar el tipo <code class="docutils literal notranslate"><span class="pre">str</span></code> tanto para texto como para datos binarios. Desafortunadamente, esta confluencia de dos conceptos diferentes podría conducir a código frágil que a veces funcionaba para cualquier tipo de datos, a veces no. También podría dar lugar a API confusas si las personas no declaraban explícitamente que algo que aceptaba <code class="docutils literal notranslate"><span class="pre">str</span></code> aceptaba datos binarios o de texto en lugar de un tipo específico. Esto complicó la situación especialmente para cualquier persona que admita varios idiomas, ya que las API no se molestarían explícitamente en admitir explícitamente <code class="docutils literal notranslate"><span class="pre">Unicode</span></code> cuando reclamaban compatibilidad con datos de texto.</p>
+<p>Para hacer la distinción entre texto y datos binarios más claros y pronunciados, Python 3 hizo lo que la mayoría de los lenguajes creados en la era de Internet han hecho y ha hecho texto y datos binarios distintos tipos que no se pueden mezclar ciegamente (Python es anterior al acceso generalizado a Internet). Para cualquier código que se ocupe solo de texto o solo de datos binarios, esta separación no plantea un problema. Pero para el código que tiene que lidiar con ambos, significa que es posible que tenga que preocuparse ahora cuando está utilizando texto en comparación con los datos binarios, por lo que esto no se puede automatizar por completo.</p>
+<p>Para empezar, tendrá que decidir qué API toman texto y cuáles toman binario (es <strong>altamente</strong> recomendado no diseñar API que pueden tomar ambos debido a la dificultad de mantener el código funcionando; como se indicó anteriormente es difícil hacerlo bien). En Python 2 esto significa asegurarse de que las API que toman texto pueden trabajar con <code class="docutils literal notranslate"><span class="pre">unicode</span></code> y las que funcionan con datos binarios funcionan con el tipo <code class="docutils literal notranslate"><span class="pre">bytes</span></code> de Python 3 (que es un subconjunto de <code class="docutils literal notranslate"><span class="pre">str</span></code> en Python 2 y actúa como un alias para <code class="docutils literal notranslate"><span class="pre">bytes</span></code> tipo en Python 2). Por lo general, el mayor problema es darse cuenta de qué métodos existen en qué tipos en Python 2 y 3 simultáneamente (para el texto que es <code class="docutils literal notranslate"><span class="pre">Unicode</span></code> en Python 2 y <code class="docutils literal notranslate"><span class="pre">str</span></code> en Python 3, para binario que es <code class="docutils literal notranslate"><span class="pre">str</span></code>/<code class="docutils literal notranslate"><span class="pre">bytes</span></code> en Python 2 y <code class="docutils literal notranslate"><span class="pre">bytes</span></code> en Python 3). En la tabla siguiente se enumeran los métodos <strong>unicos</strong> de cada tipo de datos en Python 2 y 3 (por ejemplo, el método <code class="docutils literal notranslate"><span class="pre">decode()</span></code> se puede utilizar en el tipo de datos binarios equivalente en Python 2 o 3, pero no puede ser utilizado por el tipo de datos textuales consistentemente entre Python 2 y 3 porque <code class="docutils literal notranslate"><span class="pre">str</span></code> en Python 3 no tiene el método). Tenga en cuenta que a partir de Python 3.5 se agregó el método <code class="docutils literal notranslate"><span class="pre">__mod__</span></code> al tipo bytes.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 47%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Datos de texto</strong></p></td>
+<td><p><strong>Datos binarios</strong></p></td>
+</tr>
+<tr class="row-even"><td><p></p></td>
+<td><p>decode</p></td>
+</tr>
+<tr class="row-odd"><td><p>encode</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>isdecimal</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>isnumeric</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>La creación de la distinción más fácil de controlar se puede realizar mediante la codificación y descodificación entre datos binarios y texto en el borde del código. Esto significa que cuando reciba texto en datos binarios, debe descodificarlo inmediatamente. Y si el código necesita enviar texto como datos binarios, codificarlo lo más tarde posible. Esto permite que el código funcione solo con texto internamente y, por lo tanto, elimina tener que realizar un seguimiento del tipo de datos con los que está trabajando.</p>
+<p>El siguiente problema es asegurarse de saber si los literales de cadena en el código representan texto o datos binarios. Debe agregar un prefijo <code class="docutils literal notranslate"><span class="pre">b</span></code> a cualquier literal que presente datos binarios. Para el texto debe agregar un prefijo <code class="docutils literal notranslate"><span class="pre">u</span></code> al literal de texto. (hay una importación <a class="reference internal" href="../library/__future__.html#module-__future__" title="__future__: Future statement definitions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">__future__</span></code></a> para forzar que todos los literales no especificados sean Unicode, pero el uso ha demostrado que no es tan eficaz como agregar un prefijo <code class="docutils literal notranslate"><span class="pre">b</span></code> o <code class="docutils literal notranslate"><span class="pre">u</span></code> a todos los literales explícitamente)</p>
+<p>Como parte de esta dicotomía también hay que tener cuidado con la apertura de archivos. A menos que haya estado trabajando en Windows, existe la posibilidad de que no siempre se haya molestado en agregar el modo <code class="docutils literal notranslate"><span class="pre">b</span></code> al abrir un archivo binario (por ejemplo, <code class="docutils literal notranslate"><span class="pre">rb</span></code> para la lectura binaria).  En Python 3, los archivos binarios y los archivos de texto son claramente distintos y mutuamente incompatibles; ver el módulo <a class="reference internal" href="../library/io.html#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> para más detalles. Por lo tanto, <strong>debe</strong> tomar una decisión de si un archivo se utilizará para el acceso binario (permitiendo que los datos binarios se lean y/o escriban) o el acceso textual (permitiendo que los datos de texto sean leídos y/o escritos). También debe utilizar <a class="reference internal" href="../library/io.html#io.open" title="io.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a> para abrir archivos en lugar de la función incorporada <a class="reference internal" href="../library/functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> como el módulo <a class="reference internal" href="../library/io.html#module-io" title="io: Core tools for working with streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a> es consistente de Python 2 a 3, mientras que la función incorporada <a class="reference internal" href="../library/functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> no es (en Python 3 es en realidad <a class="reference internal" href="../library/io.html#io.open" title="io.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a>). No se moleste con la práctica obsoleta de usar <a class="reference internal" href="../library/codecs.html#codecs.open" title="codecs.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">codecs.open()</span></code></a> ya que sólo es necesario para mantener la compatibilidad con Python 2.5.</p>
+<p>Los constructores de <code class="docutils literal notranslate"><span class="pre">str</span></code> y <code class="docutils literal notranslate"><span class="pre">bytes</span></code> tienen una semántica diferente para los mismos argumentos entre Python 2 y 3. Pasar un entero a <code class="docutils literal notranslate"><span class="pre">bytes</span></code> en Python 2 le dará la representación de cadena de texto del entero: <code class="docutils literal notranslate"><span class="pre">bytes(3)</span> <span class="pre">==</span> <span class="pre">'3'</span></code>. Pero en Python 3, un argumento entero para “”bytes”” le dará un objeto bytes siempre y cuando el entero especificado, lleno de bytes nulos: <code class="docutils literal notranslate"><span class="pre">bytes(3)</span> <span class="pre">==</span> <span class="pre">b'\x00\x00\x00'</span></code>. Una preocupación similar es necesaria cuando se pasa un objeto bytes a <code class="docutils literal notranslate"><span class="pre">str</span></code>. En Python 2, solo se obtiene el objeto bytes: <code class="docutils literal notranslate"><span class="pre">str(b'3')</span> <span class="pre">==</span> <span class="pre">b'3'</span></code>. Pero en Python 3 se obtiene la representación de cadena de texto del objeto bytes: <code class="docutils literal notranslate"><span class="pre">str(b'3')</span> <span class="pre">==</span> <span class="pre">&quot;b'3'&quot;</span></code>.</p>
+<p>Por último, la indexación de datos binarios requiere un control cuidadoso (el corte <strong>no</strong> requiere ningún control especial). En Python 2, <code class="docutils literal notranslate"><span class="pre">b'123'[1]</span> <span class="pre">==</span> <span class="pre">b'2'</span></code> mientras que en Python 3 <code class="docutils literal notranslate"><span class="pre">b'123'[1]</span> <span class="pre">==</span> <span class="pre">50</span></code>. Dado que los datos binarios son simplemente una colección de números binarios, Python 3 retorna el valor entero para el byte en el que indexa. Pero en Python 2, ya que <code class="docutils literal notranslate"><span class="pre">bytes</span> <span class="pre">==</span> <span class="pre">str</span></code>, la indexación retorna un segmento de bytes de un solo elemento. El proyecto <a class="reference external" href="https://pypi.org/project/six">six</a> tiene una función denominada <code class="docutils literal notranslate"><span class="pre">six.indexbytes()</span></code> que devolverá un entero como en Python 3: <code class="docutils literal notranslate"><span class="pre">six.indexbytes(b'123',</span> <span class="pre">1)</span></code>.</p>
+<p>Para resumir:</p>
+<ol class="arabic simple">
+<li><p>Decida cuál de sus API toma texto y cuáles toman datos binarios</p></li>
+<li><p>Asegúrese de que el código que funciona con texto también funciona con <code class="docutils literal notranslate"><span class="pre">unicode</span></code> y el código para datos binarios funciona con <code class="docutils literal notranslate"><span class="pre">bytes</span></code> en Python 2 (consulte la tabla anterior para los métodos que no puede usar para cada tipo)</p></li>
+<li><p>Marque todos los literales binarios con un prefijo <code class="docutils literal notranslate"><span class="pre">b</span></code>, literales textuales con un prefijo <code class="docutils literal notranslate"><span class="pre">u</span></code></p></li>
+<li><p>Descodificar datos binarios en texto tan pronto como sea posible, codificar texto como datos binarios tan tarde como sea posible</p></li>
+<li><p>Abra los archivos con <a class="reference internal" href="../library/io.html#io.open" title="io.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.open()</span></code></a> y asegúrese de especificar el modo <code class="docutils literal notranslate"><span class="pre">b</span></code> cuando sea apropiado</p></li>
+<li><p>Tenga cuidado al indexar en datos binarios</p></li>
+</ol>
+</section>
+<section id="use-feature-detection-instead-of-version-detection">
+<h4>Utilice la detección de funciones en lugar de la detección de versiones<a class="headerlink" href="#use-feature-detection-instead-of-version-detection" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>Inevitablemente tendrá código que tiene que elegir qué hacer en función de qué versión de Python se está ejecutando. La mejor manera de hacerlo es con la detección de características de si la versión de Python en la que se ejecuta es compatible con lo que necesita. Si por alguna razón eso no funciona, entonces usted debe hacer que la comprobación de la versión sea contra Python 2 y no Python 3. Para ayudar a explicar esto, veamos un ejemplo.</p>
+<p>Supongamos que necesita acceso a una característica de <a class="reference internal" href="../library/importlib.html#module-importlib" title="importlib: The implementation of the import machinery."><code class="xref py py-mod docutils literal notranslate"><span class="pre">importlib</span></code></a> que está disponible en la biblioteca estándar de Python desde Python 3.3 y disponible para Python 2 a través de <a class="reference external" href="https://pypi.org/project/importlib2">importlib2</a> en PyPI. Es posible que tenga la tentación de escribir código para acceder, por ejemplo, al módulo <a class="reference internal" href="../library/importlib.html#module-importlib.abc" title="importlib.abc: Abstract base classes related to import"><code class="xref py py-mod docutils literal notranslate"><span class="pre">importlib.abc</span></code></a> haciendo lo siguiente:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">abc</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib2</span> <span class="kn">import</span> <span class="n">abc</span>
+</pre></div>
+</div>
+<p>El problema con este código es ¿qué sucede cuando sale Python 4? Sería mejor tratar Python 2 como el caso excepcional en lugar de Python 3 y asumir que las futuras versiones de Python serán más compatibles con Python 3 que Python 2:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">abc</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib2</span> <span class="kn">import</span> <span class="n">abc</span>
+</pre></div>
+</div>
+<p>La mejor solución, sin embargo, es no hacer ninguna detección de versiones en absoluto y en su lugar confiar en la detección de características. Esto evita cualquier problema potencial de conseguir la detección de la versión incorrecta y le ayuda a mantenerse compatible con el futuro:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">abc</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">importlib2</span> <span class="kn">import</span> <span class="n">abc</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="prevent-compatibility-regressions">
+<h3>Evitar regresiones de compatibilidad<a class="headerlink" href="#prevent-compatibility-regressions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que haya traducido completamente el código para que sea compatible con Python 3, querrá asegurarse de que el código no retroceda y deje de funcionar bajo Python 3. Esto es especialmente cierto si tiene una dependencia que le está bloqueando para que no se ejecute realmente en Python 3 en este momento.</p>
+<p>Para ayudar a mantenerse compatible, los módulos nuevos que cree deben tener al menos el siguiente bloque de código en la parte superior del misma:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+</pre></div>
+</div>
+<p>También puede ejecutar Python 2 con el indicador <code class="docutils literal notranslate"><span class="pre">-3</span></code> para recibir una advertencia sobre varios problemas de compatibilidad que el código desencadena durante la ejecución. Si convierte las advertencias en errores con <code class="docutils literal notranslate"><span class="pre">-Werror</span></code>, puede asegurarse de que no se pierda accidentalmente una advertencia.</p>
+<p>También puede usar el proyecto de <a class="reference external" href="https://pypi.org/project/pylint">Pylint</a> y su indicador <code class="docutils literal notranslate"><span class="pre">--py3k</span></code> para lintar el código para recibir advertencias cuando el código comienza a desviarse de la compatibilidad con Python 3. Esto también evita que tenga que ejecutar <a class="reference external" href="https://python-modernize.readthedocs.io/">Modernize</a> o <a class="reference external" href="https://python-future.org/automatic_conversion.html">Futurize</a> sobre el código con regularidad para detectar las regresiones de compatibilidad. Esto requiere que solo admita Python 2.7 y Python 3.4 o posterior, ya que es la compatibilidad mínima de la versión mínima de Python de Pylint.</p>
+</section>
+<section id="check-which-dependencies-block-your-transition">
+<h3>Compruebe qué dependencias bloquean la transición<a class="headerlink" href="#check-which-dependencies-block-your-transition" title="Enlazar permanentemente con este título">¶</a></h3>
+<p><strong>Después</strong> de que haya hecho que su código sea compatible con Python 3, debe empezar a preocuparse por si sus dependencias también se han portado. El proyecto <a class="reference external" href="https://pypi.org/project/caniusepython3">caniusepython3</a> se creó para ayudarle a determinar qué proyectos – directa o indirectamente – le impiden admitir Python 3. Hay una herramienta de línea de comandos, así como una interfaz web en <a class="reference external" href="https://caniusepython3.com">https://caniusepython3.com</a>.</p>
+<p>El proyecto también proporciona código que puede integrar en el conjunto de pruebas para que tenga una prueba con errores cuando ya no tenga dependencias que le impidan usar Python 3. Esto le permite evitar tener que comprobar manualmente sus dependencias y recibir notificaciones rápidamente cuando puede empezar a ejecutarse en Python 3.</p>
+</section>
+<section id="update-your-setup-py-file-to-denote-python-3-compatibility">
+<h3>Actualice su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> para denotar compatibilidad con Python 3<a class="headerlink" href="#update-your-setup-py-file-to-denote-python-3-compatibility" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que el código funciona en Python 3, debe actualizar los clasificadores en su <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> para que contenga <code class="docutils literal notranslate"><span class="pre">Programming</span> <span class="pre">Language</span> <span class="pre">::</span> <span class="pre">Python</span> <span class="pre">::</span> <span class="pre">3</span></code> y no especificar solo compatibilidad con Python 2. Esto le dirá a cualquier persona que use su código que admite Python 2 <strong>y</strong> 3. Lo ideal es que también desee agregar clasificadores para cada versión principal/menor de Python que ahora admita.</p>
+</section>
+<section id="use-continuous-integration-to-stay-compatible">
+<h3>Utilice la integración continua para seguir siendo compatible<a class="headerlink" href="#use-continuous-integration-to-stay-compatible" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que pueda ejecutar completamente bajo Python 3, querrá asegurarse de que el código siempre funciona en Python 2 y 3. Probablemente la mejor herramienta para ejecutar las pruebas en varios intérpretes de Python es <a class="reference external" href="https://pypi.org/project/tox">tox</a>. A continuación, puede integrar tox con su sistema de integración continua para que nunca interrumpa accidentalmente la compatibilidad con Python 2 o 3.</p>
+<p>También es posible que desee utilizar el indicador <code class="docutils literal notranslate"><span class="pre">-bb</span></code> con el intérprete de Python 3 para desencadenar una excepción cuando se comparan bytes con cadenas o bytes con un int (este último está disponible a partir de Python 3.5). De forma predeterminada, las comparaciones de tipos diferentes simplemente retornan <code class="docutils literal notranslate"><span class="pre">False</span></code>, pero si cometió un error en la separación del control de datos de texto/binario o la indexación en bytes, no encontraría fácilmente el error. Esta marca lanzará una excepción cuando se produzcan este tipo de comparaciones, lo que hace que el error sea mucho más fácil de rastrear.</p>
+<p>¡Y eso es sobre todo! En este punto, la base de código es compatible con Python 2 y 3 simultáneamente. Las pruebas también se configurarán para que no interrumpa accidentalmente la compatibilidad de Python 2 o 3, independientemente de la versión en la que ejecute normalmente las pruebas durante el desarrollo.</p>
+</section>
+<section id="consider-using-optional-static-type-checking">
+<h3>Considere la posibilidad de usar la comprobación de tipos estáticos opcionales<a class="headerlink" href="#consider-using-optional-static-type-checking" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Otra forma de ayudar a transferir el código es usar un comprobador de tipos estáticos como <a class="reference external" href="http://mypy-lang.org/">mypy</a> o <a class="reference external" href="https://github.com/google/pytype">pytype</a> en el código. Estas herramientas se pueden utilizar para analizar el código como si se estuviera ejecutando en Python 2, puede ejecutar la herramienta por segunda vez como si el código se ejecutara en Python 3. Al ejecutar un comprobador de tipos estáticos dos veces como este, puede descubrir si, por ejemplo, está usando incorrectamente el tipo de datos binarios en una versión de Python en comparación con otra. Si agrega sugerencias de tipo opcionales al código, también puede indicar explícitamente si las API usan datos textuales o binarios, lo que ayuda a asegurarse de que todo funciona según lo esperado en ambas versiones de Python.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Portando código de Python 2 a Python 3</a><ul>
+<li><a class="reference internal" href="#the-short-explanation">La breve explicación</a></li>
+<li><a class="reference internal" href="#details">Detalles</a><ul>
+<li><a class="reference internal" href="#drop-support-for-python-2-6-and-older">Compatibilidad con Python 2.6 y versiones anteriores</a></li>
+<li><a class="reference internal" href="#make-sure-you-specify-the-proper-version-support-in-your-setup-py-file">Asegúrese de especificar el soporte de versión adecuado en su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code></a></li>
+<li><a class="reference internal" href="#have-good-test-coverage">Tener una buena cobertura de prueba</a></li>
+<li><a class="reference internal" href="#learn-the-differences-between-python-2-3">Aprende las diferencias entre Python 2 &amp; 3</a></li>
+<li><a class="reference internal" href="#update-your-code">Actualiza tu código</a><ul>
+<li><a class="reference internal" href="#division">División</a></li>
+<li><a class="reference internal" href="#text-versus-binary-data">Texto frente a datos binarios</a></li>
+<li><a class="reference internal" href="#use-feature-detection-instead-of-version-detection">Utilice la detección de funciones en lugar de la detección de versiones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prevent-compatibility-regressions">Evitar regresiones de compatibilidad</a></li>
+<li><a class="reference internal" href="#check-which-dependencies-block-your-transition">Compruebe qué dependencias bloquean la transición</a></li>
+<li><a class="reference internal" href="#update-your-setup-py-file-to-denote-python-3-compatibility">Actualice su archivo <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> para denotar compatibilidad con Python 3</a></li>
+<li><a class="reference internal" href="#use-continuous-integration-to-stay-compatible">Utilice la integración continua para seguir siendo compatible</a></li>
+<li><a class="reference internal" href="#consider-using-optional-static-type-checking">Considere la posibilidad de usar la comprobación de tipos estáticos opcionales</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="index.html"
+                        title="capítulo anterior">Comos (<em>HOWTOs</em>) de Python</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="cporting.html"
+                        title="próximo capítulo">Portar módulos de extensión a Python 3</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/pyporting.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="Portar módulos de extensión a Python 3"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Comos (HOWTOs) de Python"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Portando código de Python 2 a Python 3</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

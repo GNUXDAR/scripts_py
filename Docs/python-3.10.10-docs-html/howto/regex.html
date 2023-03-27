@@ -1,0 +1,1152 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Expresiones regulares COMOS (HOWTO) &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="HOW TO - Programación con sockets" href="sockets.html" />
+    <link rel="prev" title="Libro de recetas de Logging" href="logging-cookbook.html" />
+    <link rel="canonical" href="https://docs.python.org/3/howto/regex.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Expresiones regulares COMOS (<em>HOWTO</em>)</a><ul>
+<li><a class="reference internal" href="#introduction">Introducción</a></li>
+<li><a class="reference internal" href="#simple-patterns">Patrones simples</a><ul>
+<li><a class="reference internal" href="#matching-characters">Coincidencia de Caracteres (<em>Matching Characters</em>)</a></li>
+<li><a class="reference internal" href="#repeating-things">Repitiendo cosas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-regular-expressions">Usando Expresiones Regulares</a><ul>
+<li><a class="reference internal" href="#compiling-regular-expressions">Compilando Expresiones regulares</a></li>
+<li><a class="reference internal" href="#the-backslash-plague">La plaga de la barra invertida (<em>The Backslash Plague</em>)</a></li>
+<li><a class="reference internal" href="#performing-matches">Realizando coincidencias</a></li>
+<li><a class="reference internal" href="#module-level-functions">Funciones a nivel de módulo</a></li>
+<li><a class="reference internal" href="#compilation-flags">Los Flags de compilación</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-pattern-power">Más poder de patrones</a><ul>
+<li><a class="reference internal" href="#more-metacharacters">Más metacarácteres</a></li>
+<li><a class="reference internal" href="#grouping">Agrupando</a></li>
+<li><a class="reference internal" href="#non-capturing-and-named-groups">Grupos con nombre y sin captura</a></li>
+<li><a class="reference internal" href="#lookahead-assertions">Aserciones Anticipadas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modifying-strings">Modificando cadenas de caracteres</a><ul>
+<li><a class="reference internal" href="#splitting-strings">Separando cadenas de caracteres</a></li>
+<li><a class="reference internal" href="#search-and-replace">Búsqueda y Remplazo</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-problems">Problemas comunes</a><ul>
+<li><a class="reference internal" href="#use-string-methods">Uso de métodos de cadenas de caracteres</a></li>
+<li><a class="reference internal" href="#match-versus-search"><em>match() versus search()</em></a></li>
+<li><a class="reference internal" href="#greedy-versus-non-greedy">Codiciosa versus no codiciosa (<em>Greedy versus Non-Greedy</em>)</a></li>
+<li><a class="reference internal" href="#using-re-verbose">Usando re.VERBOSE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#feedback">Feedback</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="logging-cookbook.html"
+                        title="capítulo anterior">Libro de recetas de Logging</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="sockets.html"
+                        title="próximo capítulo">HOW TO - Programación con sockets</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/regex.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="sockets.html" title="HOW TO - Programación con sockets"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="logging-cookbook.html" title="Libro de recetas de Logging"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Expresiones regulares COMOS (<em>HOWTO</em>)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="regular-expression-howto">
+<span id="regex-howto"></span><h1>Expresiones regulares COMOS (<em>HOWTO</em>)<a class="headerlink" href="#regular-expression-howto" title="Enlazar permanentemente con este título">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Autor</dt>
+<dd class="field-odd"><p><em>A.M. Kuchling &lt;amk&#64;amk.ca&gt;</em></p>
+</dd>
+</dl>
+<div class="topic">
+<p class="topic-title">Resumen</p>
+<p>Este documento es un tutorial de introducción al uso de expresiones regulares en Python con el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a>. Proporciona una introducción más apacible que la sección correspondiente en la Referencia de la Biblioteca.</p>
+</div>
+<section id="introduction">
+<h2>Introducción<a class="headerlink" href="#introduction" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las expresiones regulares (llamadas RE, o regex, o patrones de regex) son esencialmente en un lenguaje de programación diminuto y altamente especializado incrustado dentro de Python y disponible a través del módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a>. Usando este pequeño lenguaje, especificas las reglas para el conjunto de cadenas de caracteres posibles que deseas hacer coincidir; este conjunto puede contener frases en inglés, o direcciones de correo electrónico, o comandos TeX, o cualquier cosa que desee. A continuación, puede hacer preguntas como «¿Coincide esta cadena con el patrón?» o «¿Hay alguna coincidencia con el patrón en alguna parte de esta cadena?». También puede utilizar RE para modificar una cadena de caracteres o dividirla de varias formas.</p>
+<p>Los patrones de expresiones regulares se compilan en una serie de códigos de bytes que luego son ejecutados por un motor de coincidencia escrito en C. Para un uso avanzado, puede ser necesario prestar mucha atención a cómo el motor ejecutará una RE dado y escribir la RE en un de cierta manera para producir un código de bytes que se ejecute más rápido. La optimización no se trata en este documento, porque requiere que tenga un buen conocimiento de los componentes internos del motor de coincidencia.</p>
+<p>El lenguaje de expresiones regulares es relativamente pequeño y restringido, por lo que no todas las posibles tareas de procesamiento de cadenas de caracteres se pueden realizar utilizando expresiones regulares. También hay tareas que <em>se pueden</em> hacer con expresiones regulares, pero las expresiones resultan ser muy complicadas. En estos casos, es mejor que escriba código Python para realizar el procesamiento; Si bien el código Python será más lento que una expresión regular elaborada, probablemente también será más comprensible.</p>
+</section>
+<section id="simple-patterns">
+<h2>Patrones simples<a class="headerlink" href="#simple-patterns" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Comenzaremos aprendiendo sobre las expresiones regulares más simples posibles. Dado que las expresiones regulares se utilizan para operar en cadenas de caracteres, comenzaremos con la tarea más común: hacer coincidir caracteres.</p>
+<p>Para obtener una explicación detallada de la informática que subyace a las expresiones regulares (autómatas finitos deterministas y no deterministas), puede consultar casi cualquier libro de texto sobre la escritura de compiladores.</p>
+<section id="matching-characters">
+<h3>Coincidencia de Caracteres (<em>Matching Characters</em>)<a class="headerlink" href="#matching-characters" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La mayoría de letras y caracteres simplemente coincidirán. Por ejemplo, la expresión regular <code class="docutils literal notranslate"><span class="pre">test</span></code> coincidirá exactamente con la cadena <code class="docutils literal notranslate"><span class="pre">test</span></code>. (Puede habilitar un modo que no distinga entre mayúsculas y minúsculas que permitiría que este RE coincida con <code class="docutils literal notranslate"><span class="pre">test</span></code> o <code class="docutils literal notranslate"><span class="pre">TEST</span></code> también; más sobre esto más adelante.)</p>
+<p>Hay excepciones a esta regla; algunos caracteres son especiales <em class="dfn">metacharacters</em>, y no coinciden. En cambio, señalan que debe coincidir con algo fuera de lo común, o afectan otras partes de la RE repitiéndolos o cambiando su significado. Gran parte de este documento está dedicado a discutir varios metacarácteres y lo que hacen.</p>
+<p>Aquí hay una lista completa de los metacarácteres; sus significados se discutirán en el resto de este COMO (<em>HOWTO</em>).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>. ^ $ * + ? { } [ ] \ | ( )
+</pre></div>
+</div>
+<p>Los primeros metacarácteres que veremos son <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code>. Se utilizan para especificar una clase de carácter, que es un conjunto de caracteres que desea hacer coincidir. Los caracteres se pueden enumerar individualmente, o se puede indicar un rango de caracteres dando dos caracteres y separándolos con un  <code class="docutils literal notranslate"><span class="pre">'-'</span></code>. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">[abc]</span></code> coincidirá con cualquiera de los caracteres <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> o <code class="docutils literal notranslate"><span class="pre">c</span></code>; esto es lo mismo que <code class="docutils literal notranslate"><span class="pre">[a-c]</span></code>, que usa un rango para expresar el mismo conjunto de caracteres. Si quisiera hacer coincidir solo letras minúsculas, su RE sería <code class="docutils literal notranslate"><span class="pre">[a-c]</span></code>.</p>
+<p>Metacharacters (except <code class="docutils literal notranslate"><span class="pre">\</span></code>) are not active inside classes.  For example, <code class="docutils literal notranslate"><span class="pre">[akm$]</span></code> will
+match any of the characters <code class="docutils literal notranslate"><span class="pre">'a'</span></code>, <code class="docutils literal notranslate"><span class="pre">'k'</span></code>, <code class="docutils literal notranslate"><span class="pre">'m'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'$'</span></code>; <code class="docutils literal notranslate"><span class="pre">'$'</span></code> is
+usually a metacharacter, but inside a character class it’s stripped of its
+special nature.</p>
+<p>Puede hacer coincidir los caracteres que no figuran en la clase mediante el conjunto <em class="dfn">complementing</em>. Esto se indica mediante la inclusión de un <code class="docutils literal notranslate"><span class="pre">'^'</span></code> como primer carácter de la clase. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">[^5]</span></code> coincidirá con cualquier carácter excepto con <code class="docutils literal notranslate"><span class="pre">'5'</span></code>. Si el símbolo de intercalación aparece en otra parte de una clase de caracter, no tiene un significado especial. Por ejemplo: <code class="docutils literal notranslate"><span class="pre">[5^]</span> <span class="pre">``</span> <span class="pre">coincidirá</span> <span class="pre">con</span> <span class="pre">un</span> <span class="pre">``'5'</span></code> o un <code class="docutils literal notranslate"><span class="pre">'^'</span></code>.</p>
+<p>Quizás el metacarácter más importante es la barra invertida, <code class="docutils literal notranslate"><span class="pre">\</span></code>. Al igual que en los literales de cadena de Python, la barra invertida puede ir seguida de varios caracteres para señalar varias secuencias especiales. También se usa para escapar de todos los metacarácteres, de modo que aún pueda emparejarlos en patrones; por ejemplo, si necesita hacer coincidir un <code class="docutils literal notranslate"><span class="pre">[</span></code> o <code class="docutils literal notranslate"><span class="pre">\</span></code>, puede precederlos con una barra invertida para eliminar su significado especial: <code class="docutils literal notranslate"><span class="pre">\[</span></code> o <code class="docutils literal notranslate"><span class="pre">\\</span></code>.</p>
+<p>Algunas de las secuencias especiales que comienzan con <code class="docutils literal notranslate"><span class="pre">'\'</span></code> representan conjuntos predefinidos de caracteres que a menudo son útiles, como el conjunto de dígitos, el conjunto de letras o el conjunto de cualquier cosa que no sea un espacio en blanco.</p>
+<p>Tomemos un ejemplo: <code class="docutils literal notranslate"><span class="pre">\w</span></code> coincide con cualquier carácter alfanumérico. Si el patrón de expresiones regulares se expresa en bytes, esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[a-zA-Z0-9_]</span></code>. Si el patrón de expresiones regulares es una cadena de caracteres, <code class="docutils literal notranslate"><span class="pre">\w</span></code> coincidirá con todos los caracteres marcados como letras en la base de datos Unicode proporcionada por el módulo <a class="reference internal" href="../library/unicodedata.html#module-unicodedata" title="unicodedata: Access the Unicode Database."><code class="xref py py-mod docutils literal notranslate"><span class="pre">unicodedata</span></code></a>. Puede usar la definición más restringida de <code class="docutils literal notranslate"><span class="pre">\w</span></code> en un patrón de cadena proporcionando el indicador <a class="reference internal" href="../library/re.html#re.ASCII" title="re.ASCII"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.ASCII</span></code></a> al compilar la expresión regular.</p>
+<p>La siguiente lista de secuencias especiales no está completa. Para obtener una lista completa de secuencias y definiciones de clases expandidas para patrones de cadenas Unicode, consulte la última parte de <a class="reference internal" href="../library/re.html#re-syntax"><span class="std std-ref">Regular Expression Syntax</span></a> en la referencia de la biblioteca estándar. En general, las versiones Unicode coinciden con cualquier carácter que esté en la categoría apropiada en la base de datos Unicode.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">\d</span></code></dt><dd><p>Coincide con cualquier dígito decimal; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[0-9]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\D</span></code></dt><dd><p>Coincide con cualquier carácter que no sea un dígito; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[^0-9]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\s</span></code></dt><dd><p>Coincide con cualquier carácter de espacio en blanco; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">\t\n\r\f\v]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\S</span></code></dt><dd><p>Coincide con cualquier carácter que no sea un espacio en blanco; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[^</span> <span class="pre">\t\n\r\f\v]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\w</span></code></dt><dd><p>Coincide con cualquier carácter alfanumérico; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[a-zA-Z0-9_]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\W</span></code></dt><dd><p>Coincide con cualquier carácter no alfanumérico; esto es equivalente a la clase <code class="docutils literal notranslate"><span class="pre">[^a-zA-Z0-9_]</span></code>.</p>
+</dd>
+</dl>
+<p>Estas secuencias se pueden incluir dentro de una clase de carácter. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">[\s,.]</span></code> es una clase de carácter que coincidirá con cualquier carácter de espacio en blanco, o <code class="docutils literal notranslate"><span class="pre">','</span></code> o <code class="docutils literal notranslate"><span class="pre">'.'</span></code>.</p>
+<p>El metacarácter final en esta sección es <code class="docutils literal notranslate"><span class="pre">.</span></code>. Coincide con cualquier cosa excepto un carácter de nueva línea, y hay un modo alternativo (<a class="reference internal" href="../library/re.html#re.DOTALL" title="re.DOTALL"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.DOTALL</span></code></a>) donde coincidirá incluso con una nueva línea. <code class="docutils literal notranslate"><span class="pre">.</span></code> se usa a menudo cuando se desea hacer coincidir «cualquier carácter».</p>
+</section>
+<section id="repeating-things">
+<h3>Repitiendo cosas<a class="headerlink" href="#repeating-things" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Ser capaz de hacer coincidir diferentes conjuntos de caracteres es lo primero que pueden hacer las expresiones regulares que ya no es posible con los métodos disponibles en cadenas de caracteres. Sin embargo, si esa fuera la única capacidad adicional de las expresiones regulares, no serían un gran avance. Otra capacidad es que puede especificar que partes de la RE deben repetirse un cierto número de veces.</p>
+<p>El primer metacarácter para repetir cosas que veremos es <code class="docutils literal notranslate"><span class="pre">*</span></code>. <code class="docutils literal notranslate"><span class="pre">*</span></code> no coincide con el carácter literal <code class="docutils literal notranslate"><span class="pre">'*'</span></code>; en cambio, especifica que el carácter anterior puede coincidir cero o más veces, en lugar de exactamente una vez.</p>
+<p>Por ejemplo, <code class="docutils literal notranslate"><span class="pre">ca*t</span></code> coincidirá con <code class="docutils literal notranslate"><span class="pre">'ct'</span></code> (0 <code class="docutils literal notranslate"><span class="pre">'a'</span></code> caracteres), <code class="docutils literal notranslate"><span class="pre">'cat'</span></code> (1 <code class="docutils literal notranslate"><span class="pre">'a'</span></code>), <code class="docutils literal notranslate"><span class="pre">'caaat'</span></code> (3 <code class="docutils literal notranslate"><span class="pre">'a'</span></code> caracteres), etc.</p>
+<p>Las repeticiones como <code class="docutils literal notranslate"><span class="pre">*</span></code> son <em class="dfn">greedy</em>; al repetir una RE, el motor de emparejamiento intentará repetirlo tantas veces como sea posible. Si las partes posteriores del patrón no coinciden, el motor de coincidencia hará una copia de seguridad y volverá a intentarlo con menos repeticiones.</p>
+<p>Un ejemplo paso a paso hará que esto sea más obvio. Consideremos la expresión <code class="docutils literal notranslate"><span class="pre">a[bcd]*b</span></code>. Esto coincide con la letra <code class="docutils literal notranslate"><span class="pre">'a'</span></code>, cero o más letras de la clase <code class="docutils literal notranslate"><span class="pre">[bcd]</span></code>, y finalmente termina con una <code class="docutils literal notranslate"><span class="pre">'b'</span></code>. Ahora imagina hacer coincidir este RE con la cadena de caracteres <code class="docutils literal notranslate"><span class="pre">'abcbd'</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 22%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Pasos</p></th>
+<th class="head"><p>Coincidencias</p></th>
+<th class="head"><p>Explicación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">a</span></code></p></td>
+<td><p>La <code class="docutils literal notranslate"><span class="pre">a</span></code> en las RE coincide.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">abcbd</span></code></p></td>
+<td><p>El motor coincide con <code class="docutils literal notranslate"><span class="pre">[bcd]*</span></code>, yendo tan lejos como puede, que es hasta el final de la cadena de caracteres.</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><em>Failure</em></p></td>
+<td><p>El motor intenta hacer coincidir <code class="docutils literal notranslate"><span class="pre">b</span></code>, pero la posición actual está al final de la cadena de caracteres, por lo que falla.</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">abcb</span></code></p></td>
+<td><p>Hace una copia de seguridad para que <code class="docutils literal notranslate"><span class="pre">[bcd]*</span></code> coincida con un carácter menos.</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><em>Failure</em></p></td>
+<td><p>Intente <code class="docutils literal notranslate"><span class="pre">b</span></code> de nuevo, pero la posición actual está en el último caracter, que es un <code class="docutils literal notranslate"><span class="pre">'d'</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">abc</span></code></p></td>
+<td><p>Haga una copia de seguridad de nuevo, de modo que <code class="docutils literal notranslate"><span class="pre">[bcd]*</span></code> solo coincida con <code class="docutils literal notranslate"><span class="pre">bc</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">abcb</span></code></p></td>
+<td><p>Intente <code class="docutils literal notranslate"><span class="pre">b</span></code> de nuevo. Esta vez, el carácter en la posición actual es <code class="docutils literal notranslate"><span class="pre">'b'</span></code>, por lo que tiene éxito.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Se ha alcanzado el final de la RE y ha coincidido con <code class="docutils literal notranslate"><span class="pre">'abcb'</span></code>. Esto demuestra cómo el motor de coincidencias llega tan lejos como puede al principio, y si no se encuentra ninguna coincidencia, retrocederá progresivamente y volverá a intentar de la RE una y otra vez. Hará una copia de seguridad hasta que haya probado cero coincidencias para <code class="docutils literal notranslate"><span class="pre">[bcd]*</span></code>, y si eso falla posteriormente, el motor concluirá que la cadena no coincide con la RE en absoluto.</p>
+<p>Otro metacarácter que se repite es <code class="docutils literal notranslate"><span class="pre">+</span></code>, que coincide una o más veces. Preste especial atención a la diferencia entre <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">+</span></code>; coincide con <em>cero</em> o más veces, por lo que cualquier cosa que se repita puede no estar presente en absoluto, mientras que <code class="docutils literal notranslate"><span class="pre">+</span></code> requiere al menos <em>one</em> aparición. Para usar un ejemplo similar, <code class="docutils literal notranslate"><span class="pre">'cat'</span></code> (1 <code class="docutils literal notranslate"><span class="pre">'a'</span></code>), <code class="docutils literal notranslate"><span class="pre">'caaat'</span></code> (3 <code class="docutils literal notranslate"><span class="pre">'a'</span></code>s), pero no coincidirá con <code class="docutils literal notranslate"><span class="pre">'ct'</span></code>.</p>
+<p>Hay dos calificadores más que se repiten. El carácter de signo de interrogación, <code class="docutils literal notranslate"><span class="pre">?</span></code>, Coincide una vez o cero veces; puede pensar en ello como si marcara algo como opcional. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">home-?brew</span></code> coincide con <code class="docutils literal notranslate"><span class="pre">'homebrew'</span></code> o <code class="docutils literal notranslate"><span class="pre">'home-brew'</span></code>.</p>
+<p>El calificador repetido más complicado es <code class="docutils literal notranslate"><span class="pre">{m,n}</span></code>, donde <em>m</em> y <em>n</em> son enteros decimales. Este calificador significa que debe haber al menos <em>m</em> repeticiones y como máximo <em>n</em>. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">a/{1,3}b</span></code> coincidirá con``”a/b”<code class="docutils literal notranslate"><span class="pre">,</span> <span class="pre">``'a//b'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'a///b'</span></code>. No coincidirá con `` “ab” “, que no tiene barras, ni con <code class="docutils literal notranslate"><span class="pre">'a////b'</span></code>, que tiene cuatro.</p>
+<p>Puede omitir <em>m</em> o <em>n</em>; en ese caso, se asume un valor razonable para el valor faltante. Omitir <em>m</em> se interpreta como un límite inferior de 0, mientras que omitir <em>n</em> da como resultado un límite superior de infinito.</p>
+<p>Los lectores de una inclinación reduccionista pueden notar que los otros tres calificativos pueden expresarse usando esta notación. <code class="docutils literal notranslate"><span class="pre">{0,}</span></code> es lo mismo que <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">{1,}</span></code> es equivalente a <code class="docutils literal notranslate"><span class="pre">+</span></code>, y <code class="docutils literal notranslate"><span class="pre">{0,1}</span></code> es lo mismo que <code class="docutils literal notranslate"><span class="pre">?</span></code>. Es mejor usar <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">+</span></code>, o <code class="docutils literal notranslate"><span class="pre">?</span></code> cuando pueda, simplemente porque son más cortos y fáciles de leer.</p>
+</section>
+</section>
+<section id="using-regular-expressions">
+<h2>Usando Expresiones Regulares<a class="headerlink" href="#using-regular-expressions" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Ahora que hemos visto algunas expresiones regulares simples, ¿cómo las usamos realmente en Python? El módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> proporciona una interfaz para el motor de expresiones regulares, lo que le permite compilar RE en objetos y luego realizar coincidencias con ellos.</p>
+<section id="compiling-regular-expressions">
+<h3>Compilando Expresiones regulares<a class="headerlink" href="#compiling-regular-expressions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las expresiones regulares se compilan en objetos de patrón, que tienen métodos para diversas operaciones, como buscar coincidencias de patrones o realizar sustituciones de cadenas de caracteres.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">re</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;ab*&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
+<span class="go">re.compile(&#39;ab*&#39;)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.compile()</span></code></a> también acepta un argumento opcional <em>flags</em>, usado para habilitar varias características especiales y variaciones de sintaxis. Repasaremos las configuraciones disponibles más adelante, pero por ahora un solo ejemplo servirá:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;ab*&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>La RE se pasa a <a class="reference internal" href="../library/re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.compile()</span></code></a> como una cadena de caracteres. Las RE se manejan como cadenas de caracteres porque las expresiones regulares no son parte del lenguaje central de Python y no se creó una sintaxis especial para expresarlas. (Hay aplicaciones que no necesitan RE en absoluto, por lo que no hay necesidad de aumentar la especificación del lenguaje incluyéndolas). En cambio, el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> es simplemente un módulo de extensión C incluido en Python, al igual que los módulos <a class="reference internal" href="../library/socket.html#module-socket" title="socket: Low-level networking interface."><code class="xref py py-mod docutils literal notranslate"><span class="pre">socket</span></code></a> o <a class="reference internal" href="../library/zlib.html#module-zlib" title="zlib: Low-level interface to compression and decompression routines compatible with gzip."><code class="xref py py-mod docutils literal notranslate"><span class="pre">zlib</span></code></a>.</p>
+<p>Poner RE en cadenas de caracteres mantiene el lenguaje Python más simple, pero tiene una desventaja que es el tema de la siguiente sección.</p>
+</section>
+<section id="the-backslash-plague">
+<span id="id1"></span><h3>La plaga de la barra invertida (<em>The Backslash Plague</em>)<a class="headerlink" href="#the-backslash-plague" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Como se indicó anteriormente, las expresiones regulares usan el carácter de barra invertida (<code class="docutils literal notranslate"><span class="pre">'\'</span></code>) para indicar formas especiales o para permitir que se usen caracteres especiales sin invocar su significado especial. Esto entra en conflicto con el uso de Python del mismo carácter para el mismo propósito en cadenas literales.</p>
+<p>Supongamos que desea escribir una RE que coincida con la cadena de caracteres <code class="docutils literal notranslate"><span class="pre">\section</span></code>, que podría encontrarse en un archivo LaTeX. Para averiguar qué escribir en el código del programa, comience con la cadena deseada para que coincida. A continuación, debe escapar de las barras invertidas y otros metacarácteres precediéndolos con una barra invertida, lo que da como resultado la cadena <code class="docutils literal notranslate"><span class="pre">\\section</span></code>. La cadena resultante que debe pasarse a <a class="reference internal" href="../library/re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.compile()</span></code></a> debe ser <code class="docutils literal notranslate"><span class="pre">\\section</span></code>. Sin embargo, para expresar esto como una cadena literal de Python, ambas barras invertidas deben escaparse <em>nuevamente</em>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 69%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Caracteres</p></th>
+<th class="head"><p>Explicación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">\section</span></code></p></td>
+<td><p>Cadena de texto que debe coincidir</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">\\section</span></code></p></td>
+<td><p>Barra invertida de escape para <a class="reference internal" href="../library/re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.compile()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;\\\\section&quot;</span></code></p></td>
+<td><p>Barra invertida de escape para un literal de cadena de caracteres</p></td>
+</tr>
+</tbody>
+</table>
+<p>En resumen, para hacer coincidir una barra invertida literal, uno tiene que escribir <code class="docutils literal notranslate"><span class="pre">'\\\\'</span></code> como la cadena RE, porque la expresión regular debe ser <code class="docutils literal notranslate"><span class="pre">\\</span></code>, y cada barra invertida debe expresarse como <code class="docutils literal notranslate"><span class="pre">\\</span></code> dentro de un literal de cadena Python normal. En las RE que presentan barras invertidas repetidamente, esto genera muchas barras invertidas repetidas y dificulta la comprensión de las cadenas resultantes.</p>
+<p>La solución es utilizar la notación de cadena de caracteres sin formato de Python para expresiones regulares; las barras invertidas no se manejan de ninguna manera especial en una cadena literal con el prefijo <code class="docutils literal notranslate"><span class="pre">'r'</span></code>, por lo que <code class="docutils literal notranslate"><span class="pre">r&quot;\n&quot;</span></code> es una cadena de dos caracteres que contiene <code class="docutils literal notranslate"><span class="pre">'\'</span></code> y <code class="docutils literal notranslate"><span class="pre">'n'</span></code>, mientras que <code class="docutils literal notranslate"><span class="pre">&quot;\n&quot;</span></code> es una cadena de un carácter que contiene una nueva línea. Las expresiones regulares a menudo se escribirán en código Python utilizando esta notación de cadena sin formato.</p>
+<p>Además, las secuencias de escape especiales que son válidas en expresiones regulares, pero no válidas como literales de cadena de Python, ahora dan como resultado <a class="reference internal" href="../library/exceptions.html#DeprecationWarning" title="DeprecationWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DeprecationWarning</span></code></a> y eventualmente se convertirán en <a class="reference internal" href="../library/exceptions.html#SyntaxError" title="SyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SyntaxError</span></code></a>, lo que significa que las secuencias no serán válidas. si no se utiliza la notación de cadena sin formato o el escape de las barras invertidas.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 49%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Cadena de caracteres regulares</p></th>
+<th class="head"><p>Cadena de caracteres crudas (<em>Raw string</em>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;ab*&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r&quot;ab*&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;\\\\section&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r&quot;\\section&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;\\w+\\s+\\1&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r&quot;\w+\s+\1&quot;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="performing-matches">
+<h3>Realizando coincidencias<a class="headerlink" href="#performing-matches" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Una vez que tiene un objeto que representa una expresión regular compilada, ¿qué hace con él? Los objetos de patrón tienen varios métodos y atributos. Aquí solo se cubrirán los más importantes; consulte los documentos <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> para obtener una lista completa.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Método/atributo</p></th>
+<th class="head"><p>Objetivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">match()</span></code></p></td>
+<td><p>Determina si la RE coincide con el comienzo de la cadena de caracteres.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">search()</span></code></p></td>
+<td><p>Escanea una cadena, buscando cualquier ubicación donde coincida este RE.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">findall()</span></code></p></td>
+<td><p>Encuentra todas las subcadenas de caracteres donde coincide la RE y las retorna como una lista.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">finditer()</span></code></p></td>
+<td><p>Encuentra todas las subcadenas donde la RE coincide y las retorna como un término iterado <a class="reference internal" href="../glossary.html#term-iterator"><span class="xref std std-term">iterator</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="../library/re.html#re.Pattern.match" title="re.Pattern.match"><code class="xref py py-meth docutils literal notranslate"><span class="pre">match()</span></code></a> y <a class="reference internal" href="../library/re.html#re.Pattern.search" title="re.Pattern.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a> retornan <code class="docutils literal notranslate"><span class="pre">None</span></code> si la coincidencia no puede ser encontrada. Si tienen éxito, se retorna una instancia <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a>, que contiene información sobre la coincidencia: dónde comienza y termina, la subcadena de caracteres con la que coincidió, y más.</p>
+<p>Puede aprender sobre esto experimentando interactivamente con el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a>. Si tiene <a class="reference internal" href="../library/tkinter.html#module-tkinter" title="tkinter: Interface to Tcl/Tk for graphical user interfaces"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tkinter</span></code></a> disponible, también puede consultar <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Tools/demo/redemo.py">Tools/demo/redemo.py</a>, un programa de demostración incluido con la distribución de Python. Le permite ingresar RE y cadenas de caracteres, y muestra si la RE coincide o falla. <code class="file docutils literal notranslate"><span class="pre">redemo.py</span></code> puede ser bastante útil cuando se intenta depurar una RE complicado.</p>
+<p>Este CÓMO (<em>HOWTO</em>) utiliza el intérprete estándar de Python para sus ejemplos. Primero, ejecute el intérprete de Python, importe el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> y compile en RE:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">re</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[a-z]+&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>
+<span class="go">re.compile(&#39;[a-z]+&#39;)</span>
+</pre></div>
+</div>
+<p>Ahora, puede intentar hacer coincidir varias cadenas con la RE <code class="docutils literal notranslate"><span class="pre">[a-z]+</span></code>. Una cadena de caracteres vacía no debería coincidir en absoluto, ya que <code class="docutils literal notranslate"><span class="pre">+</span></code> significa que “una o más repeticiones”. <a class="reference internal" href="../library/re.html#re.Pattern.match" title="re.Pattern.match"><code class="xref py py-meth docutils literal notranslate"><span class="pre">match()</span></code></a> debería retornar <code class="docutils literal notranslate"><span class="pre">None</span></code> en este caso, lo que hará que el intérprete no imprima ningún resultado. Puede imprimir explícitamente el resultado de <code class="xref py py-meth docutils literal notranslate"><span class="pre">match()</span></code> para aclarar esto.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>Ahora, intentémoslo en una cadena de caracteres que debería coincidir, como <code class="docutils literal notranslate"><span class="pre">tempo</span></code>.En este caso , <a class="reference internal" href="../library/re.html#re.Pattern.match" title="re.Pattern.match"><code class="xref py py-meth docutils literal notranslate"><span class="pre">match()</span></code></a> retornará un <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a>, por lo que debe almacenar el resultado en una variable para su posterior uso.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;tempo&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">&lt;re.Match object; span=(0, 5), match=&#39;tempo&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Ahora puede consultar <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> para obtener información sobre la cadena coincidente. Las instancias de objetos coincidentes también tienen varios métodos y atributos; los más importantes son:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Método/atributo</p></th>
+<th class="head"><p>Objetivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">group()</span></code></p></td>
+<td><p>Retorna la cadena de caracteres que coincide con la RE</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">start()</span></code></p></td>
+<td><p>Retorna la posición de inicio de la coincidencia</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">end()</span></code></p></td>
+<td><p>Retorna la posición final de la coincidencia</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">span()</span></code></p></td>
+<td><p>Retorna una tupla que contiene (inicio, final) las posiciones de coincidencia</p></td>
+</tr>
+</tbody>
+</table>
+<p>Probando estos métodos pronto aclarará sus significados:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="go">&#39;tempo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span> <span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+<span class="go">(0, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+<span class="go">(0, 5)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/re.html#re.Match.group" title="re.Match.group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">group()</span></code></a> retorna la subcadena de caracteres que coincide con la RE. <a class="reference internal" href="../library/re.html#re.Match.start" title="re.Match.start"><code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code></a> y <a class="reference internal" href="../library/re.html#re.Match.end" title="re.Match.end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end()</span></code></a> retornan el índice inicial y final de la coincidencia. <a class="reference internal" href="../library/re.html#re.Match.span" title="re.Match.span"><code class="xref py py-meth docutils literal notranslate"><span class="pre">span()</span></code></a> retorna el índice inicial y final en una única tupla. Dado que el método <a class="reference internal" href="../library/re.html#re.Pattern.match" title="re.Pattern.match"><code class="xref py py-meth docutils literal notranslate"><span class="pre">match()</span></code></a> solo verifica si la RE coincide al comienzo de una cadena de caracteres, <code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code> siempre será cero. Sin embargo, el método de patrones <a class="reference internal" href="../library/re.html#re.Pattern.search" title="re.Pattern.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a> escanea a través de la cadena de caracteres, por lo que es posible que la coincidencia no comience en cero en ese caso.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;::: message&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;::: message&#39;</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="go">&lt;re.Match object; span=(4, 11), match=&#39;message&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="go">&#39;message&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+<span class="go">(4, 11)</span>
+</pre></div>
+</div>
+<p>En programas reales, el estilo más común es almacenar <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> en una variable, y luego verificar si era <code class="docutils literal notranslate"><span class="pre">None</span></code>. Esto generalmente se ve así:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span> <span class="s1">&#39;string goes here&#39;</span> <span class="p">)</span>
+<span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Match found: &#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No match&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Dos métodos de patrón retornan todas las coincidencias de un patrón. <a class="reference internal" href="../library/re.html#re.Pattern.findall" title="re.Pattern.findall"><code class="xref py py-meth docutils literal notranslate"><span class="pre">findall()</span></code></a> retorna una lista de cadenas de caracteres coincidentes:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;12 drummers drumming, 11 pipers piping, 10 lords a-leaping&#39;</span><span class="p">)</span>
+<span class="go">[&#39;12&#39;, &#39;11&#39;, &#39;10&#39;]</span>
+</pre></div>
+</div>
+<p>El prefijo <code class="docutils literal notranslate"><span class="pre">r</span></code>, que convierte al literal en una cadena de caracteres literal sin formato, es necesario en este ejemplo porque las secuencias de escape en un cadena de caracteres literal «cocinado» normal que no son reconocidas por Python, a diferencia de las expresiones regulares, ahora dan como resultado <a class="reference internal" href="../library/exceptions.html#DeprecationWarning" title="DeprecationWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DeprecationWarning</span></code></a> y eventualmente se convertirá en <a class="reference internal" href="../library/exceptions.html#SyntaxError" title="SyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SyntaxError</span></code></a>. Ver <a class="reference internal" href="#the-backslash-plague"><span class="std std-ref">La plaga de la barra invertida (The Backslash Plague)</span></a>.</p>
+<p><a class="reference internal" href="../library/re.html#re.Pattern.findall" title="re.Pattern.findall"><code class="xref py py-meth docutils literal notranslate"><span class="pre">findall()</span></code></a> tiene que crear la lista completa antes de que pueda retornarse como resultado. El método <a class="reference internal" href="../library/re.html#re.Pattern.finditer" title="re.Pattern.finditer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finditer()</span></code></a> retorna una secuencia de <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> instancias como iterados <a class="reference internal" href="../glossary.html#term-iterator"><span class="xref std std-term">iterator</span></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="s1">&#39;12 drummers drumming, 11 ... 10 ...&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span>  
+<span class="go">&lt;callable_iterator object at 0x...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="go">(0, 2)</span>
+<span class="go">(22, 24)</span>
+<span class="go">(29, 31)</span>
+</pre></div>
+</div>
+</section>
+<section id="module-level-functions">
+<h3>Funciones a nivel de módulo<a class="headerlink" href="#module-level-functions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>No es necesario crear un objeto patrón y llamar a sus métodos; el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> también proporciona funciones de nivel superior llamadas <a class="reference internal" href="../library/re.html#re.match" title="re.match"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> , <a class="reference internal" href="../library/re.html#re.search" title="re.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> , <a class="reference internal" href="../library/re.html#re.findall" title="re.findall"><code class="xref py py-func docutils literal notranslate"><span class="pre">findall()</span></code></a> , <a class="reference internal" href="../library/re.html#re.sub" title="re.sub"><code class="xref py py-func docutils literal notranslate"><span class="pre">sub()</span></code></a>, y así sucesivamente. Estas funciones toman los mismos argumentos que el método de patrón correspondiente con la cadena de RE agregada como primer argumento, y aún así retornan una instancia de <code class="docutils literal notranslate"><span class="pre">None</span></code> o <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a>.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;From\s+&#39;</span><span class="p">,</span> <span class="s1">&#39;Fromage amk&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;From\s+&#39;</span><span class="p">,</span> <span class="s1">&#39;From amk Thu May 14 19:12:10 1998&#39;</span><span class="p">)</span>  
+<span class="go">&lt;re.Match object; span=(0, 5), match=&#39;From &#39;&gt;</span>
+</pre></div>
+</div>
+<p>Bajo el capó (<em>hood</em>), estas funciones simplemente crean un objeto patrón para usted y llaman al método apropiado en él. También almacenan el objeto compilado en un caché, por lo que las futuras llamadas que usen el mismo RE no necesitarán analizar el patrón una y otra vez.</p>
+<p>¿Debería utilizar estas funciones a nivel de módulo o debería obtener el patrón y llamar a sus métodos usted mismo? Si está accediendo a una expresión regular dentro de un bucle, la compilación previa guardará algunas llamadas a funciones. Fuera de los bucles, no hay mucha diferencia gracias al caché interno.</p>
+</section>
+<section id="compilation-flags">
+<h3>Los Flags de compilación<a class="headerlink" href="#compilation-flags" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las flags de compilación le permiten modificar algunos aspectos de cómo funcionan las expresiones regulares. Las flags están disponibles en el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> con dos nombres, un nombre largo como <code class="xref py py-const docutils literal notranslate"><span class="pre">IGNORECASE</span></code> y una forma corta de una letra como <code class="xref py py-const docutils literal notranslate"><span class="pre">I</span></code>. (Si está familiarizado con los modificadores de patrones de Perl, las formas de una letra usan las mismas letras; la forma corta de <a class="reference internal" href="../library/re.html#re.VERBOSE" title="re.VERBOSE"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.VERBOSE</span></code></a> es <a class="reference internal" href="../library/re.html#re.X" title="re.X"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.X</span></code></a>, por ejemplo).Se pueden especificar varios indicadores uniéndolos con <em>OR</em> bit a bit; <code class="docutils literal notranslate"><span class="pre">re.I</span> <span class="pre">|</span> <span class="pre">re.M</span></code> establece los flags <code class="xref py py-const docutils literal notranslate"><span class="pre">I</span></code> and <code class="xref py py-const docutils literal notranslate"><span class="pre">M</span></code>, por ejemplo.</p>
+<p>Aquí hay una tabla de las flags disponibles, seguida de una explicación más detallada de cada una.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">ASCII</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p>Hace que varios escapes como <code class="docutils literal notranslate"><span class="pre">\w</span></code>, <code class="docutils literal notranslate"><span class="pre">\b</span></code>, <code class="docutils literal notranslate"><span class="pre">\s</span></code> y <code class="docutils literal notranslate"><span class="pre">\d</span></code> coincidan solo en caracteres ASCII con la propiedad respectiva.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">DOTALL</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">S</span></code></p></td>
+<td><p>Hace que <code class="docutils literal notranslate"><span class="pre">.</span></code> coincida con cualquier caracter, incluidas las nuevas líneas.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">IGNORECASE</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">I</span></code></p></td>
+<td><p>Hace coincidencias que no distingan entre mayúsculas y minúsculas.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">LOCALE</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">L</span></code></p></td>
+<td><p>Hace una coincidencia con reconocimiento de configuración regional.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">MULTILINE</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">M</span></code></p></td>
+<td><p>Coincidencia de varias líneas, que afecta a <code class="docutils literal notranslate"><span class="pre">^</span></code> y <code class="docutils literal notranslate"><span class="pre">$</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">VERBOSE</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">X</span></code>
+(for “extended”)</p></td>
+<td><p>Habilite RE detallados, que se pueden organizar de manera más limpia y comprensible.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt>
+<code class="sig-name descname">I</code></dt>
+<dt>
+<code class="sig-name descname">IGNORECASE</code></dt>
+<dd><p>Realiza una coincidencia que no distinga entre mayúsculas y minúsculas; la clase de caracteres y las cadenas de caracteres literales coincidirán con las letras ignorando las mayúsculas. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">[A-Z]</span></code> también coincidirá con letras minúsculas. La coincidencia completa de Unicode también funciona a menos que se utilice la flag <code class="xref py py-const docutils literal notranslate"><span class="pre">ASCII</span></code> para deshabilitar las coincidencias que no sean ASCII. Cuando los patrones Unicode <code class="docutils literal notranslate"><span class="pre">[a-z]</span></code> o <code class="docutils literal notranslate"><span class="pre">[A-Z]</span></code> se utilizan en combinación con el indicador <code class="xref py py-const docutils literal notranslate"><span class="pre">IGNORECASE</span></code> , coincidirán con las 52 letras ASCII y 4 letras adicionales no ASCII “İ” (U+0130, letra mayúscula latina I con un punto arriba), “ı” (U+0131, letra minúscula latina sin punto i),”ſ” (U+017F, letra minúscula latina larga s) y “K” (U+212A, signo de Kelvin). <code class="docutils literal notranslate"><span class="pre">Spam</span></code> coincidirá <code class="docutils literal notranslate"><span class="pre">'Spam'</span></code>, <code class="docutils literal notranslate"><span class="pre">'spam'</span></code>, <code class="docutils literal notranslate"><span class="pre">'spAM'</span></code>, o <code class="docutils literal notranslate"><span class="pre">'ſpam'</span></code> (este último solo coincide en modo Unicode). Estas minúsculas no tiene en cuenta la configuración regional actual; lo hará si también establece la flag <code class="xref py py-const docutils literal notranslate"><span class="pre">LOCALE</span></code> .</p>
+</dd></dl>
+
+<dl class="py data">
+<dt>
+<code class="sig-name descname">L</code></dt>
+<dt>
+<code class="sig-name descname">LOCALE</code></dt>
+<dd><p>Hace que <code class="docutils literal notranslate"><span class="pre">\w</span></code>, <code class="docutils literal notranslate"><span class="pre">\W</span></code>, <code class="docutils literal notranslate"><span class="pre">\b</span></code>, <code class="docutils literal notranslate"><span class="pre">\B</span></code> y la coincidencia que no distinga entre mayúsculas y minúsculas dependan de la configuración regional actual en lugar de la base de datos Unicode.</p>
+<p>Las configuraciones regionales son una característica de la biblioteca C destinada a ayudar a escribir programas que tengan en cuenta las diferencias de idioma. Por ejemplo, si está procesando texto en francés codificado, querrá poder escribir <code class="docutils literal notranslate"><span class="pre">\w+</span></code> para que coincida con las palabras, pero <code class="docutils literal notranslate"><span class="pre">\w</span></code> solo coincide con la clase de caracteres <code class="docutils literal notranslate"><span class="pre">[A-Za-z]</span></code> en patrones de bytes; no coincidirá con los bytes correspondientes a <code class="docutils literal notranslate"><span class="pre">é</span></code> or <code class="docutils literal notranslate"><span class="pre">ç</span></code>. Si su sistema está configurado correctamente y se selecciona una configuración regional francesa, ciertas funciones de C le dirán al programa que el byte correspondiente a <code class="docutils literal notranslate"><span class="pre">é</span></code> también debe considerarse una letra. Establecer el indicador <code class="xref py py-const docutils literal notranslate"><span class="pre">LOCALE</span></code> al compilar una expresión regular hará que el objeto compilado resultante use estas funciones C para <code class="docutils literal notranslate"><span class="pre">\w</span></code>; esto es más lento, pero también permite que <code class="docutils literal notranslate"><span class="pre">\w+</span></code> coincida con las palabras en francés como era de esperar. Se desaconseja el uso de esta flag en Python 3 ya que el mecanismo de configuración regional es muy poco confiable, solo maneja una «cultura» a la vez y solo funciona con configuraciones regionales de 8 bits. La coincidencia Unicode ya está habilitada de forma predeterminada en Python 3 para patrones Unicode (str), y puede manejar diferentes configuraciones regionales/idiomas.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt>
+<code class="sig-name descname">M</code></dt>
+<dt>
+<code class="sig-name descname">MULTILINE</code></dt>
+<dd><p>(<code class="docutils literal notranslate"><span class="pre">^</span></code> y <code class="docutils literal notranslate"><span class="pre">$</span></code> aún no se han explicado; se presentarán en la sección <a class="reference internal" href="#more-metacharacters"><span class="std std-ref">Más metacarácteres</span></a>.)</p>
+<p>Por lo general, <code class="docutils literal notranslate"><span class="pre">^</span></code> coincide solo al principio de la cadena de caracteres, y <code class="docutils literal notranslate"><span class="pre">$</span></code> solo coincide con el final de la cadena de caracteres e inmediatamente antes del salto de línea (si existe) al final de la cadena de caracteres. Cuando se especifica esta bandera, <code class="docutils literal notranslate"><span class="pre">^</span></code> coincide al principio de la cadena y al comienzo de cada línea dentro de la cadena, inmediatamente después de cada nueva línea. De manera similar, el metacarácter <code class="docutils literal notranslate"><span class="pre">$</span></code> coincide al final de la cadena de caracteres y al final de cada línea (inmediatamente antes de cada nueva línea).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt>
+<code class="sig-name descname">S</code></dt>
+<dt>
+<code class="sig-name descname">DOTALL</code></dt>
+<dd><p>Hace que el carácter especial <code class="docutils literal notranslate"><span class="pre">'.'</span></code> coincida con cualquier carácter, incluida una nueva línea; sin esta bandera, <code class="docutils literal notranslate"><span class="pre">'.'</span></code> coincidirá con cualquier cosa <em>except</em> una nueva línea.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt>
+<code class="sig-name descname">A</code></dt>
+<dt>
+<code class="sig-name descname">ASCII</code></dt>
+<dd><p>Haga que <code class="docutils literal notranslate"><span class="pre">\w</span></code>, <code class="docutils literal notranslate"><span class="pre">\W</span></code>, <code class="docutils literal notranslate"><span class="pre">\b</span></code>, <code class="docutils literal notranslate"><span class="pre">\B</span></code>, <code class="docutils literal notranslate"><span class="pre">\s</span></code> y <code class="docutils literal notranslate"><span class="pre">\S</span></code> realicen una coincidencia solo en ASCII en lugar de una coincidencia Unicode completa. Esto solo es significativo para los patrones Unicode y se ignora para los patrones de bytes.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt>
+<code class="sig-name descname">X</code></dt>
+<dt>
+<code class="sig-name descname">VERBOSE</code></dt>
+<dd><p>Esta flag le permite escribir expresiones regulares que son más legibles al otorgarle más flexibilidad en cómo puede formatearlas. Cuando se ha especificado esta flag, los espacios en blanco dentro de la cadena de caracteres de la RE se ignoran, excepto cuando el espacio en blanco está en una clase de caracteres o está precedido por una barra invertida sin escape; esto le permite organizar e indentar la RE más claramente. Esta flag también le permite poner comentarios dentro de una RE que serán ignorados por el motor (<em>engine</em>); los comentarios están marcados con un <code class="docutils literal notranslate"><span class="pre">'#'</span></code> que no está en una clase de carácter ni está precedido por una barra invertida sin escape.</p>
+<p>Por ejemplo, aquí hay una RE que usa <a class="reference internal" href="../library/re.html#re.VERBOSE" title="re.VERBOSE"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.VERBOSE</span></code></a>; ¿Ves lo fácil que es leer?</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">charref</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"> &amp;[#]                # Start of a numeric entity reference</span>
+<span class="s2"> (</span>
+<span class="s2">     0[0-7]+         # Octal form</span>
+<span class="s2">   | [0-9]+          # Decimal form</span>
+<span class="s2">   | x[0-9a-fA-F]+   # Hexadecimal form</span>
+<span class="s2"> )</span>
+<span class="s2"> ;                   # Trailing semicolon</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sin la configuración detallada, la RE se vería así:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">charref</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;&amp;#(0[0-7]+&quot;</span>
+                     <span class="s2">&quot;|[0-9]+&quot;</span>
+                     <span class="s2">&quot;|x[0-9a-fA-F]+);&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>En el ejemplo anterior, la concatenación automática de cadenas de caracteres literales de Python se ha utilizado para dividir la RE en partes más pequeñas, pero aún es más difícil de entender que la versión que usa <a class="reference internal" href="../library/re.html#re.VERBOSE" title="re.VERBOSE"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.VERBOSE</span></code></a>.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="more-pattern-power">
+<h2>Más poder de patrones<a class="headerlink" href="#more-pattern-power" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hasta ahora solo hemos cubierto una parte de las características de las expresiones regulares. En esta sección, cubriremos algunos metacarácteres nuevos y cómo usar grupos para recuperar partes del texto que coincidió.</p>
+<section id="more-metacharacters">
+<span id="id2"></span><h3>Más metacarácteres<a class="headerlink" href="#more-metacharacters" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Hay algunos metacarácteres que aún no hemos cubierto. La mayoría de ellos se tratarán en esta sección.</p>
+<p>Algunos de los metacarácteres restantes que se discutirán son <em class="dfn">zero-width assertions</em>. No hacen que el motor avance a través de la cadena de caracteres; en cambio, no consumen caracteres en absoluto y simplemente tienen éxito o fracasan. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">\b</span></code> es una flag de que la posición actual se encuentra en el límite de una palabra; la posición no cambia por la <code class="docutils literal notranslate"><span class="pre">\b</span></code> en absoluto. Esto significa que las aserciones de ancho cero nunca deben repetirse, porque si coinciden una vez en una ubicación determinada, obviamente pueden coincidir un número infinito de veces.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">|</span></code></dt><dd><p>Alternancia, o el operador «or». Si <em>A</em> y <em>B</em> son expresiones regulares, <code class="docutils literal notranslate"><span class="pre">A|B</span></code> coincidirá con cualquier cadena de caracteres que coincida con <em>A</em> o <em>B</em>. <code class="docutils literal notranslate"><span class="pre">|</span></code> tiene una precedencia muy baja para que funcione razonablemente cuando está alternando cadenas de varios caracteres. <code class="docutils literal notranslate"><span class="pre">Crow|Servo</span></code> coincidirá con <cite>“Crow”`</cite> o <code class="docutils literal notranslate"><span class="pre">'Servo'</span></code>, no <code class="docutils literal notranslate"><span class="pre">'Cro'</span></code>, un <code class="docutils literal notranslate"><span class="pre">'w'</span></code> o un <code class="docutils literal notranslate"><span class="pre">'S'</span></code>, y <code class="docutils literal notranslate"><span class="pre">'ervo'</span></code>.</p>
+<p>Para hacer coincidir un literal <code class="docutils literal notranslate"><span class="pre">'|'</span></code>, use <code class="docutils literal notranslate"><span class="pre">\|</span></code>, o enciérrelo dentro de una clase de carácter, como en <code class="docutils literal notranslate"><span class="pre">[|]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">^</span></code></dt><dd><p>Coincide con el comienzo de las líneas. A menos que se haya establecido la flag <code class="xref py py-const docutils literal notranslate"><span class="pre">MULTILINE</span></code> , esto solo coincidirá al principio de la cadena de caracteres. En modo <code class="xref py py-const docutils literal notranslate"><span class="pre">MULTILINE</span></code> , esto también coincide inmediatamente después de cada nueva línea dentro de la cadena.</p>
+<p>Por ejemplo, si desea hacer coincidir la palabra <code class="docutils literal notranslate"><span class="pre">From</span></code> solo al principio de una línea, la RE que debe usar es <code class="docutils literal notranslate"><span class="pre">^From</span></code>.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^From&#39;</span><span class="p">,</span> <span class="s1">&#39;From Here to Eternity&#39;</span><span class="p">))</span>  
+<span class="go">&lt;re.Match object; span=(0, 4), match=&#39;From&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^From&#39;</span><span class="p">,</span> <span class="s1">&#39;Reciting From Memory&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>Para una coincidencia literal <code class="docutils literal notranslate"><span class="pre">'^'</span></code>, usar <code class="docutils literal notranslate"><span class="pre">\^</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$</span></code></dt><dd><p>Coincide con el final de una línea, que se define como el final de la cadena o cualquier ubicación seguida de un carácter de nueva línea.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;}$&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{block}</span><span class="s1">&#39;</span><span class="p">))</span>  
+<span class="go">&lt;re.Match object; span=(6, 7), match=&#39;}&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;}$&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{block}</span><span class="s1"> &#39;</span><span class="p">))</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;}$&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{block}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>  
+<span class="go">&lt;re.Match object; span=(6, 7), match=&#39;}&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Para hacer coincidir un literal <code class="docutils literal notranslate"><span class="pre">'$'</span></code>, usar <code class="docutils literal notranslate"><span class="pre">\$</span></code> o enciérrelo dentro de una clase de carácter, como en <code class="docutils literal notranslate"><span class="pre">[$]</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\A</span></code></dt><dd><p>Coincide solo al comienzo de la cadena de caracteres. Cuando no está en el modo <code class="xref py py-const docutils literal notranslate"><span class="pre">MULTILINE</span></code>,``A`` y <code class="docutils literal notranslate"><span class="pre">^</span></code> son efectivamente lo mismo. En el modo <code class="xref py py-const docutils literal notranslate"><span class="pre">MULTILINE</span></code>, son diferentes: <code class="docutils literal notranslate"><span class="pre">\A</span></code> todavía coincide solo al principio de la cadena, pero <code class="docutils literal notranslate"><span class="pre">^</span></code> puede coincidir en cualquier ubicación dentro de la cadena de caracteres que sigue a un carácter de nueva línea.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\Z</span></code></dt><dd><p>Coincidencias solo al final de la cadena de caracteres.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\b</span></code></dt><dd><p>Límite de palabra. Esta es una aserción de ancho cero que coincide solo al principio o al final de una palabra. Una palabra se define como una secuencia de caracteres alfanuméricos, por lo que el final de una palabra se indica mediante un espacio en blanco o un carácter no alfanumérico.</p>
+<p>El siguiente ejemplo coincide con <code class="docutils literal notranslate"><span class="pre">class</span></code> solo cuando es una palabra completa; no coincidirá cuando esté contenido dentro de otra palabra.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\bclass\b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;no class at all&#39;</span><span class="p">))</span>
+<span class="go">&lt;re.Match object; span=(3, 8), match=&#39;class&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;the declassified algorithm&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;one subclass is&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>Hay dos sutilezas que debe recordar al usar esta secuencia especial. Primero, esta es la peor colisión entre las cadenas literales de caracteres de Python y las secuencias de expresiones regulares. En las cadenas de caracteres literales de Python, <code class="docutils literal notranslate"><span class="pre">\b</span></code> es el carácter de retroceso (<em>backspace</em>), valor ASCII 8. Si no está utilizando cadenas de caracteres sin procesar, Python convertirá la <code class="docutils literal notranslate"><span class="pre">\b</span></code> en una linea de retroceso, y su RE no lo hará coincidir como lo espera. El siguiente ejemplo tiene el mismo aspecto que nuestra RE anterior, pero omite la <code class="docutils literal notranslate"><span class="pre">'r'</span></code> delante de la cadena de caracteres de RE.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\b</span><span class="s1">class</span><span class="se">\b</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;no class at all&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\b</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;class&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\b</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="go">&lt;re.Match object; span=(0, 7), match=&#39;\x08class\x08&#39;&gt;</span>
+</pre></div>
+</div>
+<p>En segundo lugar, dentro de una clase de caracteres, donde no hay uso para esta aserción, <code class="docutils literal notranslate"><span class="pre">\b</span></code> representa el carácter de retroceso, por compatibilidad con las cadenas de caracteres literales de Python.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">\B</span></code></dt><dd><p>Otra flag de ancho cero, esto es lo opuesto a <code class="docutils literal notranslate"><span class="pre">\b</span></code>, solo coincide cuando la posición actual no está en el límite de una palabra.</p>
+</dd>
+</dl>
+</section>
+<section id="grouping">
+<h3>Agrupando<a class="headerlink" href="#grouping" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Con frecuencia, necesita obtener más información que solo si la RE coincide o no. Las expresiones regulares se utilizan a menudo para diseccionar cadenas de caracteres escribiendo una RE dividido en varios subgrupos que coinciden con diferentes componentes de interés. Por ejemplo, una línea de encabezado RFC-822 se divide en un nombre de encabezado y un valor, separados por un <code class="docutils literal notranslate"><span class="pre">':'</span></code>, así:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>From: author@example.com
+User-Agent: Thunderbird 1.5.0.9 (X11/20061227)
+MIME-Version: 1.0
+To: editor@example.com
+</pre></div>
+</div>
+<p>Esto se puede manejar escribiendo una expresión regular que coincida con una línea de encabezado completa y que tenga un grupo que coincida con el nombre del encabezado y otro grupo que coincida con el valor del encabezado.</p>
+<p>Los grupos están marcados por los <code class="docutils literal notranslate"><span class="pre">'('</span></code>, <code class="docutils literal notranslate"><span class="pre">')'</span></code> metacarácteres. <code class="docutils literal notranslate"><span class="pre">'('</span></code> y <code class="docutils literal notranslate"><span class="pre">')'</span></code> tienen el mismo significado que en las expresiones matemáticas; agrupan las expresiones contenidas en ellos, y puedes repetir el contenido de un grupo con un calificador repetitivo, como <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">?</span></code>, o <code class="docutils literal notranslate"><span class="pre">{m,n}</span></code>. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">(ab)*</span></code> coincidirá con cero o más repeticiones de <code class="docutils literal notranslate"><span class="pre">ab</span></code>.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(ab)*&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;ababababab&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="go">(0, 10)</span>
+</pre></div>
+</div>
+<p>Los grupos indicados con <code class="docutils literal notranslate"><span class="pre">'('</span></code>, <code class="docutils literal notranslate"><span class="pre">')'</span></code> también capturan el índice inicial y final del texto que coinciden; esto se puede recuperar pasando un argumento a <a class="reference internal" href="../library/re.html#re.Match.group" title="re.Match.group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">group()</span></code></a>, <a class="reference internal" href="../library/re.html#re.Match.start" title="re.Match.start"><code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code></a>, <a class="reference internal" href="../library/re.html#re.Match.end" title="re.Match.end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end()</span></code></a>, y <a class="reference internal" href="../library/re.html#re.Match.span" title="re.Match.span"><code class="xref py py-meth docutils literal notranslate"><span class="pre">span()</span></code></a>. Los grupos se numeran empezando por 0. El grupo 0 siempre está presente; es todo las RE, entonces todos los métodos <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> tienen el grupo 0 como argumento predeterminado. Más adelante veremos cómo expresar grupos que no capturan el espacio de texto que coinciden.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(a)b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;ab&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="go">&#39;ab&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">&#39;ab&#39;</span>
+</pre></div>
+</div>
+<p>Los subgrupos están numerados de izquierda a derecha, de 1 en adelante. Los grupos se pueden anidar; para determinar el número, simplemente cuente los caracteres del paréntesis de apertura, de izquierda a derecha.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(a(b)c)d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;abcd&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">&#39;abcd&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;abc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;b&#39;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/re.html#re.Match.group" title="re.Match.group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">group()</span></code></a> se pueden pasar varios números de grupo a la vez, en cuyo caso retornará una tupla que contiene los valores correspondientes para esos grupos.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">(&#39;b&#39;, &#39;abc&#39;, &#39;b&#39;)</span>
+</pre></div>
+</div>
+<p>El método <a class="reference internal" href="../library/re.html#re.Match.groups" title="re.Match.groups"><code class="xref py py-meth docutils literal notranslate"><span class="pre">groups()</span></code></a> retorna una tupla que contiene las cadenas de caracteres de todos los subgrupos, desde 1 hasta la cantidad que haya.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+<span class="go">(&#39;abc&#39;, &#39;b&#39;)</span>
+</pre></div>
+</div>
+<p>Las referencias inversas en un patrón le permiten especificar que el contenido de un grupo de captura anterior también debe encontrarse en la ubicación actual en la cadena. Por ejemplo,``1`` tendrá éxito si el contenido exacto del grupo 1 se puede encontrar en la posición actual y falla en caso contrario. Recuerde que las cadenas de caracteres literales de Python también usan una barra invertida seguida de números para permitir la inclusión de caracteres arbitrarios en una cadena de caracteres, así que asegúrese de usar una cadena de caracteres sin procesar al incorporar referencias inversas en una RE.</p>
+<p>Por ejemplo, la siguiente RE detecta palabras duplicadas en una cadena.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\b(\w+)\s+\1\b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;Paris in the the spring&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="go">&#39;the the&#39;</span>
+</pre></div>
+</div>
+<p>Las referencias inversas como esta no suelen ser útiles para buscar a través de una cadena — hay pocos formatos de texto que repiten datos de esta manera — pero pronto descubrirá que son <em>muy</em> útiles al realizar sustituciones de cadenas de caracteres.</p>
+</section>
+<section id="non-capturing-and-named-groups">
+<h3>Grupos con nombre y sin captura<a class="headerlink" href="#non-capturing-and-named-groups" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las RE elaboradas pueden utilizar muchos grupos, tanto para capturar subcadenas de caracteres de interés como para agrupar y estructurar la propia RE. En las RE complejas, resulta difícil realizar un seguimiento de los números de los grupos. Hay dos funciones que ayudan con este problema. Ambos usan una sintaxis común para las extensiones de expresiones regulares, así que veremos eso primero.</p>
+<p>Perl 5 es bien conocido por sus poderosas adiciones a las expresiones regulares estándar. Para estas nuevas características, los desarrolladores de Perl no podían elegir nuevos metacarácteres de una sola pulsación de tecla o nuevas secuencias especiales que comienzan con <code class="docutils literal notranslate"><span class="pre">\</span></code> sin hacer que las expresiones regulares de Perl sean confusamente diferentes de las RE estándar. Si eligieran <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> como un nuevo metacarácter, por ejemplo, las expresiones antiguas supondrían que <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> era un carácter regular y no se habría escapado escribiendo <code class="docutils literal notranslate"><span class="pre">\&amp;</span></code> o <code class="docutils literal notranslate"><span class="pre">[&amp;]</span></code>.</p>
+<p>La solución elegida por los desarrolladores de Perl fue utilizar <code class="docutils literal notranslate"><span class="pre">(?...)</span></code> como sintaxis de extensión. <code class="docutils literal notranslate"><span class="pre">?</span></code> inmediatamente después de un paréntesis había un error de sintaxis porque el <code class="docutils literal notranslate"><span class="pre">?</span></code> no tendría nada que repetir, por lo que esto no introdujo ningún problema de compatibilidad. Los caracteres inmediatamente después de <code class="docutils literal notranslate"><span class="pre">?</span></code> Indican qué extensión se está utilizando, por lo que <code class="docutils literal notranslate"><span class="pre">(?=foo)</span></code> es una cosa (una flag de anticipación positiva) y <code class="docutils literal notranslate"><span class="pre">(?:foo)</span></code> es otra cosa (un grupo de no captura que contiene la subexpresión <code class="docutils literal notranslate"><span class="pre">foo</span></code>).</p>
+<p>Python admite varias de las extensiones de Perl y agrega una sintaxis de extensión a la sintaxis de extensión de Perl. Si el primer carácter después del signo de interrogación es una <code class="docutils literal notranslate"><span class="pre">P</span></code>, sabrá que es una extensión específica de Python.</p>
+<p>Ahora que hemos visto la sintaxis de la extensión general, podemos volver a las características que simplifican el trabajo con grupos en RE complejos.</p>
+<p>A veces querrá usar un grupo para denotar una parte de una expresión regular, pero no está interesado en recuperar el contenido del grupo. Puede hacer que este hecho sea explícito utilizando un grupo de no captura: <code class="docutils literal notranslate"><span class="pre">(?:...)</span></code>, donde puede reemplazar el <code class="docutils literal notranslate"><span class="pre">...</span></code> con cualquier otra expresión regular.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;([abc])+&quot;</span><span class="p">,</span> <span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+<span class="go">(&#39;c&#39;,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(?:[abc])+&quot;</span><span class="p">,</span> <span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+<span class="go">()</span>
+</pre></div>
+</div>
+<p>Excepto por el hecho de que no puede recuperar el contenido de lo que coincide con el grupo, un grupo que no captura se comporta exactamente igual que un grupo que captura; puede poner cualquier cosa dentro de él, repetirlo con un metacarácter de repetición como <code class="docutils literal notranslate"><span class="pre">*</span></code> y anidarlo dentro de otros grupos (capturando o no capturando). <code class="docutils literal notranslate"><span class="pre">(?:...)</span></code> es particularmente útil cuando se modifica un patrón existente, ya que puede agregar nuevos grupos sin cambiar cómo se numeran todos los demás grupos. Cabe mencionar que no hay diferencia de rendimiento en la búsqueda entre grupos de captura y no captura; ninguna forma es más rápida que la otra.</p>
+<p>Una característica más significativa son los grupos nombrados: en lugar de referirse a ellos por números, los grupos pueden ser referenciados por un nombre.</p>
+<p>La sintaxis de un grupo con nombre es una de las extensiones específicas de Python: <code class="docutils literal notranslate"><span class="pre">(?P&lt;name&gt;...)</span></code>.  <em>name</em> es, obviamente, el nombre del grupo. Los grupos con nombre se comportan exactamente como los grupos de captura y, además, asocian un nombre con un grupo. Los métodos <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> que tratan con la captura de grupos aceptan enteros que se refieren al grupo por número o cadenas de caracteres que contienen el nombre del grupo deseado. Los grupos con nombre todavía reciben números, por lo que puede recuperar información sobre un grupo de dos maneras:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;word&gt;\b\w+\b)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span> <span class="s1">&#39;(((( Lots of punctuation )))&#39;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;word&#39;</span><span class="p">)</span>
+<span class="go">&#39;Lots&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;Lots&#39;</span>
+</pre></div>
+</div>
+<p>Además, puede recuperar grupos nombrados como un diccionario con <a class="reference internal" href="../library/re.html#re.Match.groupdict" title="re.Match.groupdict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">groupdict()</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;first&gt;\w+) (?P&lt;last&gt;\w+)&#39;</span><span class="p">,</span> <span class="s1">&#39;Jane Doe&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+<span class="go">{&#39;first&#39;: &#39;Jane&#39;, &#39;last&#39;: &#39;Doe&#39;}</span>
+</pre></div>
+</div>
+<p>Named groups are handy because they let you use easily remembered names, instead
+of having to remember numbers.  Here’s an example RE from the <a class="reference internal" href="../library/imaplib.html#module-imaplib" title="imaplib: IMAP4 protocol client (requires sockets)."><code class="xref py py-mod docutils literal notranslate"><span class="pre">imaplib</span></code></a>
+module:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">InternalDate</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;INTERNALDATE &quot;&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;day&gt;[ 123][0-9])-(?P&lt;mon&gt;[A-Z][a-z][a-z])-&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;year&gt;[0-9][0-9][0-9][0-9])&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39; (?P&lt;hour&gt;[0-9][0-9]):(?P&lt;min&gt;[0-9][0-9]):(?P&lt;sec&gt;[0-9][0-9])&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39; (?P&lt;zonen&gt;[-+])(?P&lt;zoneh&gt;[0-9][0-9])(?P&lt;zonem&gt;[0-9][0-9])&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Obviamente, es mucho más fácil recuperar <code class="docutils literal notranslate"><span class="pre">m.group('zonem')</span></code>, en lugar de tener que recordar recuperar el grupo 9.</p>
+<p>La sintaxis de las referencias inversas en una expresión como <code class="docutils literal notranslate"><span class="pre">(...)\1</span></code> se refiere al número del grupo. Naturalmente, existe una variante que usa el nombre del grupo en lugar del número. Esta es otra extensión de Python: <code class="docutils literal notranslate"><span class="pre">(?P=name)</span></code> indica que el contenido del grupo llamado <em>name</em> debe coincidir nuevamente en el punto actual. La expresión regular para encontrar palabras duplicadas, <code class="docutils literal notranslate"><span class="pre">\b(\w+)\s+\1\b</span></code> también se puede escribir como <code class="docutils literal notranslate"><span class="pre">\b(?P&lt;word&gt;\w+)\s+(?P=word)\b</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\b(?P&lt;word&gt;\w+)\s+(?P=word)\b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;Paris in the the spring&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+<span class="go">&#39;the the&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="lookahead-assertions">
+<h3>Aserciones Anticipadas<a class="headerlink" href="#lookahead-assertions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Otra aserción de ancho cero es la aserción de anticipación. Las afirmaciones anticipadas están disponibles tanto en forma positiva como negativa, y tienen este aspecto:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">(?=...)</span></code></dt><dd><p>Aserción de anticipación positiva. Esto tiene éxito si la expresión regular contenida, representada aquí por <code class="docutils literal notranslate"><span class="pre">...</span></code>, coincide con éxito en la ubicación actual y falla en caso contrario. Pero, una vez que se ha probado la expresión contenida, el motor de comparación no avanza en absoluto; el resto del patrón se intenta justo donde comenzó la aserción.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">(?!...)</span></code></dt><dd><p>Aserción de anticipación negativa. Esto es lo opuesto a la flag positiva; tiene éxito si la expresión contenida <em>no</em> coincide con la posición actual en la cadena.</p>
+</dd>
+</dl>
+<p>Para que esto sea concreto, veamos un caso en el que una búsqueda anticipada es útil. Considere un patrón simple para hacer coincidir un nombre de archivo y dividirlo en un nombre base y una extensión, separados por un <code class="docutils literal notranslate"><span class="pre">.</span></code>. Por ejemplo, en <code class="docutils literal notranslate"><span class="pre">news.rc</span></code>, <code class="docutils literal notranslate"><span class="pre">news</span></code> es el nombre base y <code class="docutils literal notranslate"><span class="pre">rc</span></code> es la extensión del nombre del archivo.</p>
+<p>El patrón para que coincida con esto es bastante simple:</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.].*$</span></code></p>
+<p>Tenga en cuenta que el <code class="docutils literal notranslate"><span class="pre">.</span></code> Debe tratarse especialmente porque es un metacarácter, por lo que está dentro de una clase de carácter para coincidir solo con ese carácter específico. También observe el final <code class="docutils literal notranslate"><span class="pre">$</span></code>; esto se agrega para garantizar que todo el resto de la cadena deba incluirse en la extensión. Esta expresión regular coincide con <code class="docutils literal notranslate"><span class="pre">foo.bar</span></code> y <code class="docutils literal notranslate"><span class="pre">autoexec.bat</span></code> y <code class="docutils literal notranslate"><span class="pre">sendmail.cf</span></code> y <code class="docutils literal notranslate"><span class="pre">printers.conf</span></code>.</p>
+<p>Ahora, considere complicar un poco el problema; ¿Qué sucede si desea hacer coincidir los nombres de archivo donde la extensión no es <code class="docutils literal notranslate"><span class="pre">bat</span></code>? Algunos intentos incorrectos:</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.][^b].*$</span></code> El primer intento anterior intenta excluir <code class="docutils literal notranslate"><span class="pre">bat</span></code> requiriendo que el primer carácter de la extensión no sea una <code class="docutils literal notranslate"><span class="pre">b</span></code>. Esto está mal, porque el patrón tampoco coincide <code class="docutils literal notranslate"><span class="pre">foo.bar</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.]([^b]..|.[^a].|..[^t])$</span></code></p>
+<p>La expresión se vuelve más desordenada cuando intenta parchear la primera solución requiriendo que coincida uno de los siguientes casos: el primer carácter de la extensión no es <code class="docutils literal notranslate"><span class="pre">b</span></code>; el segundo carácter no es <code class="docutils literal notranslate"><span class="pre">a</span></code>; o el tercer carácter no es <code class="docutils literal notranslate"><span class="pre">t</span></code>. Esto acepta <code class="docutils literal notranslate"><span class="pre">foo.bar</span></code> y rechaza <code class="docutils literal notranslate"><span class="pre">autoexec.bat</span></code>, pero requiere una extensión de tres letras y no acepta un nombre de archivo con una extensión de dos letras como <code class="docutils literal notranslate"><span class="pre">sendmail.cf</span></code>. Complicaremos el patrón nuevamente en un esfuerzo por arreglarlo.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.]([^b].?.?|.[^a]?.?|..?[^t]?)$</span></code></p>
+<p>En el tercer intento, la segunda y tercera letras se hacen opcionales para permitir extensiones coincidentes de menos de tres caracteres, como <code class="docutils literal notranslate"><span class="pre">sendmail.cf</span></code>.</p>
+<p>El patrón se está volviendo realmente complicado ahora, lo que dificulta su lectura y comprensión. Peor aún, si el problema cambia y desea excluir tanto <code class="docutils literal notranslate"><span class="pre">bat</span></code> y <code class="docutils literal notranslate"><span class="pre">exe</span></code> como extensiones, el patrón se volvería aún más complicado y confuso.</p>
+<p>Una mirada anticipada negativa atraviesa toda esta confusión:</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.](?!bat$)[^.]*$</span></code> La búsqueda anticipada negativa significa: si la expresión <code class="docutils literal notranslate"><span class="pre">bat</span></code> no coincide en este punto, pruebe el resto del patrón; si <code class="docutils literal notranslate"><span class="pre">bat$</span></code> coincide, todo el patrón fallará. El <code class="docutils literal notranslate"><span class="pre">$</span></code> final es necesario para garantizar que se permita algo como <code class="docutils literal notranslate"><span class="pre">sample.batch</span></code>, donde la extensión solo comienza con <code class="docutils literal notranslate"><span class="pre">bat</span></code>. El <code class="docutils literal notranslate"><span class="pre">[^.]*</span></code> asegura que el patrón funcione cuando hay varios puntos en el nombre del archivo.</p>
+<p>Ahora es fácil excluir otra extensión de nombre de archivo; simplemente agréguelo como una alternativa dentro de la aserción. El siguiente patrón excluye los nombres de archivo que terminan en <code class="docutils literal notranslate"><span class="pre">bat</span></code> o <code class="docutils literal notranslate"><span class="pre">exe</span></code>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">.*[.](?!bat$|exe$)[^.]*$</span></code></p>
+</section>
+</section>
+<section id="modifying-strings">
+<h2>Modificando cadenas de caracteres<a class="headerlink" href="#modifying-strings" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hasta este punto, simplemente hemos realizado búsquedas en una cadena de caracteres estática. Las expresiones regulares también se utilizan comúnmente para modificar cadenas de varias formas, utilizando los siguientes métodos de patrón:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Método/atributo</p></th>
+<th class="head"><p>Objetivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">split()</span></code></p></td>
+<td><p>Divida la cadena de caracteres en una lista, dividiéndola donde coincida la RE</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sub()</span></code></p></td>
+<td><p>Encuentra todas las subcadenas de caracteres donde coincida la RE y las reemplaza con una cadena de caracteres diferente</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">subn()</span></code></p></td>
+<td><p>Hace lo mismo que <code class="xref py py-meth docutils literal notranslate"><span class="pre">sub()</span></code>, pero retorna la nueva cadena de caracteres y el número de reemplazos</p></td>
+</tr>
+</tbody>
+</table>
+<section id="splitting-strings">
+<h3>Separando cadenas de caracteres<a class="headerlink" href="#splitting-strings" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El método <a class="reference internal" href="../library/re.html#re.Pattern.split" title="re.Pattern.split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">split()</span></code></a> de un patrón que divide una cadena de caracteres donde la RE coincide, retornando una lista de las piezas. Es similar al método de cadenas de caracteres <a class="reference internal" href="../library/stdtypes.html#str.split" title="str.split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">split()</span></code></a> pero proporciona mucha más generalidad en los delimitadores por los que puede dividir; cadena de caracteres <code class="xref py py-meth docutils literal notranslate"><span class="pre">split()</span></code> solo admite la división por espacios en blanco o por una cadena fija. Como era de esperar, también hay una función a nivel de módulo <a class="reference internal" href="../library/re.html#re.split" title="re.split"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.split()</span></code></a>.</p>
+<dl class="py method">
+<dt>
+<code class="sig-prename descclassname">.</code><code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param">string</em><span class="optional">[</span>, <em class="sig-param">maxsplit=0</em><span class="optional">]</span><span class="sig-paren">)</span></dt>
+<dd><p>Dividir <em>string</em> por las coincidencias de la expresión regular. Si se utilizan paréntesis de captura en la RE, su contenido también se retornará como parte de la lista resultante. Si <em>maxsplit</em> es distinto de cero, se realizan como máximo divisiones <em>maxsplit</em> .</p>
+</dd></dl>
+
+<p>Puede limitar el número de divisiones realizadas, pasando un valor para <em>maxsplit</em>. Cuando <em>maxsplit</em> es distinto de cero, se realizarán como máximo <em>maxsplit</em> divisiones, y el resto de la cadena de caracteres se retorna como el elemento final de la lista. En el siguiente ejemplo, el delimitador es cualquier secuencia de caracteres no alfanuméricos.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\W+&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;This is a test, short and sweet, of split().&#39;</span><span class="p">)</span>
+<span class="go">[&#39;This&#39;, &#39;is&#39;, &#39;a&#39;, &#39;test&#39;, &#39;short&#39;, &#39;and&#39;, &#39;sweet&#39;, &#39;of&#39;, &#39;split&#39;, &#39;&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;This is a test, short and sweet, of split().&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">[&#39;This&#39;, &#39;is&#39;, &#39;a&#39;, &#39;test, short and sweet, of split().&#39;]</span>
+</pre></div>
+</div>
+<p>A veces, no solo le interesa cuál es el texto entre delimitadores, sino que también necesita saber cuál era el delimitador. Si se utilizan paréntesis de captura en la RE, sus valores también se retornan como parte de la lista. Compare las siguientes llamadas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\W+&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\W+)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;This... is a test.&#39;</span><span class="p">)</span>
+<span class="go">[&#39;This&#39;, &#39;is&#39;, &#39;a&#39;, &#39;test&#39;, &#39;&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;This... is a test.&#39;</span><span class="p">)</span>
+<span class="go">[&#39;This&#39;, &#39;... &#39;, &#39;is&#39;, &#39; &#39;, &#39;a&#39;, &#39; &#39;, &#39;test&#39;, &#39;.&#39;, &#39;&#39;]</span>
+</pre></div>
+</div>
+<p>La función de nivel de módulo <a class="reference internal" href="../library/re.html#re.split" title="re.split"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.split()</span></code></a> agrega la RE que se usará como primer argumento, pero por lo demás es el mismo.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[\W]+&#39;</span><span class="p">,</span> <span class="s1">&#39;Words, words, words.&#39;</span><span class="p">)</span>
+<span class="go">[&#39;Words&#39;, &#39;words&#39;, &#39;words&#39;, &#39;&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([\W]+)&#39;</span><span class="p">,</span> <span class="s1">&#39;Words, words, words.&#39;</span><span class="p">)</span>
+<span class="go">[&#39;Words&#39;, &#39;, &#39;, &#39;words&#39;, &#39;, &#39;, &#39;words&#39;, &#39;.&#39;, &#39;&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[\W]+&#39;</span><span class="p">,</span> <span class="s1">&#39;Words, words, words.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">[&#39;Words&#39;, &#39;words, words.&#39;]</span>
+</pre></div>
+</div>
+</section>
+<section id="search-and-replace">
+<h3>Búsqueda y Remplazo<a class="headerlink" href="#search-and-replace" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Otra tarea común es encontrar todas las coincidencias para un patrón y reemplazarlas con una cadena de caracteres diferente. El método <a class="reference internal" href="../library/re.html#re.Pattern.sub" title="re.Pattern.sub"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sub()</span></code></a> toma un valor de reemplazo, que puede ser una cadena de caracteres o una función, y la cadena de caracteres a procesar.</p>
+<dl class="py method">
+<dt>
+<code class="sig-prename descclassname">.</code><code class="sig-name descname">sub</code><span class="sig-paren">(</span><em class="sig-param">replacement</em>, <em class="sig-param">string</em><span class="optional">[</span>, <em class="sig-param">count=0</em><span class="optional">]</span><span class="sig-paren">)</span></dt>
+<dd><p>Retorna la cadena de caracteres obtenida al reemplazar las apariciones no superpuestas del extremo izquierdo de la RE en <em>string</em> por el remplazo <em>replacement</em>. Si no se encuentra el patrón, el <em>string</em> se retorna sin cambios.</p>
+<p>El argumento opcional <em>count</em> es el número máximo de ocurrencias de patrones que se reemplazarán; <em>count</em> debe ser un número entero no negativo. El valor predeterminado de 0 significa reemplazar todas las ocurrencias.</p>
+</dd></dl>
+
+<p>Aquí hay un ejemplo simple del uso del método <a class="reference internal" href="../library/re.html#re.Pattern.sub" title="re.Pattern.sub"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sub()</span></code></a>. Reemplaza los nombres de los colores con la palabra <code class="docutils literal notranslate"><span class="pre">colour</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(blue|white|red)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;blue socks and red shoes&#39;</span><span class="p">)</span>
+<span class="go">&#39;colour socks and colour shoes&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;blue socks and red shoes&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;colour socks and red shoes&#39;</span>
+</pre></div>
+</div>
+<p>El método <a class="reference internal" href="../library/re.html#re.Pattern.subn" title="re.Pattern.subn"><code class="xref py py-meth docutils literal notranslate"><span class="pre">subn()</span></code></a> hace el mismo trabajo, pero retorna una tupla de 2 que contiene el nuevo valor de cadena de caracteres y el número de reemplazos que se realizaron:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(blue|white|red)&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;blue socks and red shoes&#39;</span><span class="p">)</span>
+<span class="go">(&#39;colour socks and colour shoes&#39;, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;no colours at all&#39;</span><span class="p">)</span>
+<span class="go">(&#39;no colours at all&#39;, 0)</span>
+</pre></div>
+</div>
+<p>Las coincidencias vacías se reemplazan solo cuando no son adyacentes a una coincidencia vacía anterior.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;x*&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;abxd&#39;</span><span class="p">)</span>
+<span class="go">&#39;-a-b--d-&#39;</span>
+</pre></div>
+</div>
+<p>Si <em>replacement</em> es una cadena, se procesan los escapes de barra invertida que contenga. Es decir, <code class="docutils literal notranslate"><span class="pre">\n</span></code> se convierte en un solo carácter de nueva línea, <code class="docutils literal notranslate"><span class="pre">\r</span></code> se convierte en una REtorno de carro, y así sucesivamente. Los escapes desconocidos como <code class="docutils literal notranslate"><span class="pre">\&amp;</span></code> se dejan en paz. Las referencias inversas, como <code class="docutils literal notranslate"><span class="pre">\6</span></code>, se reemplazan con la subcadena de caracteres que coincide con el grupo correspondiente a la RE. Esto le permite incorporar partes del texto original en la cadena de reemplazo resultante.</p>
+<p>Este ejemplo hace coincidir la palabra <code class="docutils literal notranslate"><span class="pre">section</span></code> seguida de una cadena encerrada entre <code class="docutils literal notranslate"><span class="pre">{</span></code>, <code class="docutils literal notranslate"><span class="pre">}</span></code>, y cambia <code class="docutils literal notranslate"><span class="pre">section</span></code> a <code class="docutils literal notranslate"><span class="pre">subsection</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;section{ ( [^}]* ) }&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;subsection{\1}&#39;</span><span class="p">,</span><span class="s1">&#39;section</span><span class="si">{First}</span><span class="s1"> section</span><span class="si">{second}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">&#39;subsection{First} subsection{second}&#39;</span>
+</pre></div>
+</div>
+<p>También hay una sintaxis para hacer referencia a grupos con nombre según lo definido por la sintaxis <code class="docutils literal notranslate"><span class="pre">(?P&lt;name&gt;…)``syntax.</span> <span class="pre">``\g&lt;name&gt;</span></code> usará la subcadena de caracteres que coincide con el grupo llamado <code class="docutils literal notranslate"><span class="pre">name</span></code>, y <code class="docutils literal notranslate"><span class="pre">\g&lt;number&gt;</span></code> usa el número de grupo correspondiente. <code class="docutils literal notranslate"><span class="pre">\g&lt;2&gt;</span></code> es equivalente a <code class="docutils literal notranslate"><span class="pre">\2</span></code>, pero no es ambiguo en una cadena de reemplazo como <code class="docutils literal notranslate"><span class="pre">\g&lt;2&gt;0</span></code>.  (<code class="docutils literal notranslate"><span class="pre">\20</span></code> se interpretaría como una referencia al grupo 20, no como una referencia al grupo 2 seguido del carácter literal <code class="docutils literal notranslate"><span class="pre">'0'</span></code>.) Las siguientes sustituciones son todas equivalentes, pero use las tres variaciones de la cadena de reemplazo.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;section{ (?P&lt;name&gt; [^}]* ) }&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;subsection{\1}&#39;</span><span class="p">,</span><span class="s1">&#39;section</span><span class="si">{First}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">&#39;subsection{First}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;subsection{\g&lt;1&gt;}&#39;</span><span class="p">,</span><span class="s1">&#39;section</span><span class="si">{First}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">&#39;subsection{First}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;subsection{\g&lt;name&gt;}&#39;</span><span class="p">,</span><span class="s1">&#39;section</span><span class="si">{First}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">&#39;subsection{First}&#39;</span>
+</pre></div>
+</div>
+<p><em>replacement</em> también puede ser una función, lo que le brinda aún más control. Si <em>replacement</em> es una función, la función se llama para cada ocurrencia no superpuesta de <em>pattern</em>. En cada llamada, a la función se le pasa un argumento <a class="reference internal" href="../library/re.html#match-objects"><span class="std std-ref">match object</span></a> para la coincidencia y puede usar esta información para calcular la cadena de reemplazo deseada y retornarla.</p>
+<p>En el siguiente ejemplo, la función de reemplazo traduce decimales a hexadecimales:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">hexrepl</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="s2">&quot;Return the hex string for a decimal number&quot;</span>
+<span class="gp">... </span>    <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">hex</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">hexrepl</span><span class="p">,</span> <span class="s1">&#39;Call 65490 for printing, 49152 for user code.&#39;</span><span class="p">)</span>
+<span class="go">&#39;Call 0xffd2 for printing, 0xc000 for user code.&#39;</span>
+</pre></div>
+</div>
+<p>Cuando se usa la función <em>module-level</em> <a class="reference internal" href="../library/re.html#re.sub" title="re.sub"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.sub()</span></code></a>, el patrón se pasa como primer argumento. El patrón puede proporcionarse como un objeto o como una cuerda; Si necesita especificar marcas de expresión regular, debe usar un objeto de patrón como primer parámetro o usar modificadores incrustados en la cadena de patrón, por ejemplo <code class="docutils literal notranslate"><span class="pre">sub(&quot;(?i)b+&quot;,</span> <span class="pre">&quot;x&quot;,</span> <span class="pre">&quot;bbbb</span> <span class="pre">BBBB&quot;)</span></code> retorna <code class="docutils literal notranslate"><span class="pre">'x</span> <span class="pre">x'</span></code>.</p>
+</section>
+</section>
+<section id="common-problems">
+<h2>Problemas comunes<a class="headerlink" href="#common-problems" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las expresiones regulares son una herramienta poderosa para algunas aplicaciones, pero de alguna manera su comportamiento no es intuitivo y, a veces, no se comportan de la forma esperada. Esta sección señalará algunos de los errores más comunes.</p>
+<section id="use-string-methods">
+<h3>Uso de métodos de cadenas de caracteres<a class="headerlink" href="#use-string-methods" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>A veces, usar el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> es un error. Si está haciendo coincidir una cadena de caracteres fija, o una clase de un solo caracter, y no está usando ninguna característica <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> como la marca <a class="reference internal" href="../library/re.html#re.IGNORECASE" title="re.IGNORECASE"><code class="xref py py-const docutils literal notranslate"><span class="pre">IGNORECASE</span></code></a>, entonces todo el poder de las expresiones regulares puede que no sea necesario. Las cadenas tienen varios métodos para realizar operaciones con cadenas fijas y, por lo general, son mucho más rápidas, porque la implementación es un único bucle C pequeño que se ha optimizado para este propósito, en lugar del motor de expresión regular más grande y generalizado.</p>
+<p>Un ejemplo podría ser reemplazar una sola cadena fija por otra; por ejemplo, puede reemplazar <code class="docutils literal notranslate"><span class="pre">word</span></code> por <code class="docutils literal notranslate"><span class="pre">deed</span></code>. <a class="reference internal" href="../library/re.html#re.sub" title="re.sub"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.sub()</span></code></a> parece la función a utilizar para esto, pero considere el método <a class="reference internal" href="../library/stdtypes.html#str.replace" title="str.replace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">replace()</span></code></a>. Tenga en cuenta que <code class="xref py py-meth docutils literal notranslate"><span class="pre">replace()</span></code> también reemplazará <code class="docutils literal notranslate"><span class="pre">word</span></code> dentro de las palabras, convirtiendo <code class="docutils literal notranslate"><span class="pre">swordfish</span></code> en <code class="docutils literal notranslate"><span class="pre">sdeedfish</span></code>, pero la RE naíf <code class="docutils literal notranslate"><span class="pre">word</span></code> también lo habría hecho. (Para evitar realizar la sustitución en partes de palabras, el patrón tendría que ser <code class="docutils literal notranslate"><span class="pre">\bword\b</span></code>, para requerir que <code class="docutils literal notranslate"><span class="pre">word</span></code> tenga un límite de palabra en cada lado. Esto lleva el trabajo más allá de las habilidades de <code class="xref py py-meth docutils literal notranslate"><span class="pre">replace()</span></code>.)</p>
+<p>Otra tarea común es eliminar cada aparición de un solo carácter de una cadena o reemplazarlo con otro solo carácter. Puede hacer esto con algo como <code class="docutils literal notranslate"><span class="pre">re.sub('\n',</span> <span class="pre">'</span> <span class="pre">',</span> <span class="pre">S)</span></code>, pero <a class="reference internal" href="../library/stdtypes.html#str.translate" title="str.translate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">translate()</span></code></a> es capaz de realizar ambas tareas y será más rápido que cualquier expresión regular la operación puede ser.</p>
+<p>En resumen, antes de pasar al módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a>, considere si su problema puede resolverse con un método de cadena de caracteres más rápido y simple.</p>
+</section>
+<section id="match-versus-search">
+<h3><em>match() versus search()</em><a class="headerlink" href="#match-versus-search" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La función <a class="reference internal" href="../library/re.html#re.match" title="re.match"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> solo verifica si la RE coincide con el comienzo de la cadena de caracteres, mientras que <a class="reference internal" href="../library/re.html#re.search" title="re.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> buscará una coincidencia en la cadena de caracteres. Es importante tener en cuenta esta distinción. Recuerde <code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code> solo informará una coincidencia exitosa que comenzará en 0; si la coincidencia no comienza en cero, <code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code> <em>no</em> lo informará.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;super&#39;</span><span class="p">,</span> <span class="s1">&#39;superstition&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="go">(0, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;super&#39;</span><span class="p">,</span> <span class="s1">&#39;insuperable&#39;</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>Por otro lado, <a class="reference internal" href="../library/re.html#re.search" title="re.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> escaneará hacia adelante a través de la cadena de caracteres, informando la primera coincidencia que encuentre.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;super&#39;</span><span class="p">,</span> <span class="s1">&#39;superstition&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="go">(0, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;super&#39;</span><span class="p">,</span> <span class="s1">&#39;insuperable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="go">(2, 7)</span>
+</pre></div>
+</div>
+<p>A veces, tendrá la tentación de seguir usando <a class="reference internal" href="../library/re.html#re.match" title="re.match"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.match()</span></code></a>, y simplemente agregar <code class="docutils literal notranslate"><span class="pre">.*</span></code> al frente de su RE. Resista esta tentación y use <a class="reference internal" href="../library/re.html#re.search" title="re.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.search()</span></code></a> en su lugar. El compilador de expresiones regulares realiza un análisis de las RE para acelerar el proceso de búsqueda de coincidencias. Uno de esos análisis determina cuál debe ser el primer carácter de una coincidencia; por ejemplo, un patrón que comienza con <code class="docutils literal notranslate"><span class="pre">Crow</span></code> debe coincidir con una <code class="docutils literal notranslate"><span class="pre">'C'</span></code>.El análisis permite que el motor escanee rápidamente a través de la cadena en busca del carácter inicial, solo probando la coincidencia completa si se encuentra una <code class="docutils literal notranslate"><span class="pre">'C'</span></code>.</p>
+<p>Agregar <code class="docutils literal notranslate"><span class="pre">.*</span></code> anula esta optimización, lo que requiere escanear hasta el final de la cadena y luego retroceder para encontrar una coincidencia para el resto de la RE. Utilice <a class="reference internal" href="../library/re.html#re.search" title="re.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">re.search()</span></code></a> en su lugar.</p>
+</section>
+<section id="greedy-versus-non-greedy">
+<h3>Codiciosa versus no codiciosa (<em>Greedy versus Non-Greedy</em>)<a class="headerlink" href="#greedy-versus-non-greedy" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Al repetir una expresión regular, como en <code class="docutils literal notranslate"><span class="pre">a*</span></code>, la acción resultante es consumir la mayor cantidad posible del patrón. Este hecho suele molestarle cuando intenta hacer coincidir un par de delimitadores equilibrados, como los corchetes angulares que rodean una etiqueta HTML. El patrón ingenuo para hacer coincidir una sola etiqueta HTML no funciona debido a la naturaleza codiciosa de <code class="docutils literal notranslate"><span class="pre">.*</span></code>.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt;&lt;head&gt;&lt;title&gt;Title&lt;/title&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;&lt;.*&gt;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+<span class="go">(0, 32)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;&lt;.*&gt;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+<span class="go">&lt;html&gt;&lt;head&gt;&lt;title&gt;Title&lt;/title&gt;</span>
+</pre></div>
+</div>
+<p>La RE coincide con el <code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code> en <code class="docutils literal notranslate"><span class="pre">'&lt;html&gt;'</span></code>, y el <code class="docutils literal notranslate"><span class="pre">.*</span></code>  consume el resto de la cadena de caracteres. Sin embargo, aún queda más en la RE y el <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> no puede coincidir al final de la cadena de caracteres, por lo que el motor de la expresión regular tiene que retroceder carácter por carácter hasta que encuentre una coincidencia para el <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>. La coincidencia final se extiende desde el <cite>“&lt;”`</cite> en <code class="docutils literal notranslate"><span class="pre">'&lt;html&gt;'</span></code> al <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code> en <code class="docutils literal notranslate"><span class="pre">'&lt;/title&gt;'</span></code>, que no es lo que queremos.</p>
+<p>En este caso, la solución es utilizar los calificadores no codiciosos <code class="docutils literal notranslate"><span class="pre">*?</span></code>, <code class="docutils literal notranslate"><span class="pre">+?</span></code>, <code class="docutils literal notranslate"><span class="pre">??</span></code>, o <code class="docutils literal notranslate"><span class="pre">{m,n}?</span></code>, Que coinciden como <em>poco</em> texto como sea posible. En el ejemplo anterior, el <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code> se prueba inmediatamente después de las primeras coincidencias <code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code>, y cuando falla, el motor avanza un carácter a la vez, volviendo a intentar el <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code> en cada paso. Esto produce el resultado correcto:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;&lt;.*?&gt;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+<span class="go">&lt;html&gt;</span>
+</pre></div>
+</div>
+<p>(Tenga en cuenta que analizar HTML o XML con expresiones regulares es doloroso. Los patrones rápidos y sucios manejarán casos comunes, pero HTML y XML tienen casos especiales que romperán la expresión regular obvia; para cuando haya escrito una expresión regular que maneja todos los casos posibles, los patrones serán <em>muy</em> complicados. Utilice un módulo analizador HTML o XML para tales tareas.)</p>
+</section>
+<section id="using-re-verbose">
+<h3>Usando re.VERBOSE<a class="headerlink" href="#using-re-verbose" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Probablemente ya haya notado que las expresiones regulares son una notación muy compacta, pero no son muy legibles. Las RE de complejidad moderada pueden convertirse en largas colecciones de barras invertidas, paréntesis y metacarácteres, lo que dificulta su lectura y comprensión.</p>
+<p>Para tales RE, especificar el flag <a class="reference internal" href="../library/re.html#re.VERBOSE" title="re.VERBOSE"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.VERBOSE</span></code></a> al compilar la expresión regular puede ser útil, porque le permite formatear la expresión regular con mayor claridad.</p>
+<p>La flag <code class="docutils literal notranslate"><span class="pre">re.VERBOSE</span></code> tiene varios efectos. Los espacios en blanco en la expresión regular que <em>no están</em> dentro de una clase de caracteres se ignoran. Esto significa que una expresión como <code class="docutils literal notranslate"><span class="pre">dog</span> <span class="pre">|</span> <span class="pre">cat</span></code> es equivalente al menos legible <code class="docutils literal notranslate"><span class="pre">dog</span> <span class="pre">|</span> <span class="pre">cat</span></code>, pero <code class="docutils literal notranslate"><span class="pre">[a</span> <span class="pre">b]</span></code> seguirá coincidiendo con los caracteres <code class="docutils literal notranslate"><span class="pre">'a'</span></code>, <code class="docutils literal notranslate"><span class="pre">'b'</span></code> o un espacio. Además, también puede poner comentarios dentro de una RE; los comentarios se extienden desde un carácter <code class="docutils literal notranslate"><span class="pre">#</span></code> hasta la siguiente línea nueva. Cuando se usa con cadenas entre comillas triples, esto permite que las REs sean formateados de manera más ordenada:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"> \s*                 # Skip leading whitespace</span>
+<span class="s2"> (?P&lt;header&gt;[^:]+)   # Header name</span>
+<span class="s2"> \s* :               # Whitespace, and a colon</span>
+<span class="s2"> (?P&lt;value&gt;.*?)      # The header&#39;s value -- *? used to</span>
+<span class="s2">                     # lose the following trailing whitespace</span>
+<span class="s2"> \s*$                # Trailing whitespace to end-of-line</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esto es mas legible que:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*(?P&lt;header&gt;[^:]+)\s*:(?P&lt;value&gt;.*?)\s*$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="feedback">
+<h2>Feedback<a class="headerlink" href="#feedback" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las expresiones regulares son un tema complicado. ¿Le ayudó este documento a comprenderlas? ¿Hubo partes que no estaban claras o problemas que encontró que no se trataron aquí? Si es así, envíe sugerencias de mejora al autor.</p>
+<p>El libro más completo sobre expresiones regulares es casi con certeza <em>Mastering Regular Expressions de Jeffrey Friedl</em>, publicado por <em>O’Reilly</em>. Desafortunadamente, se concentra exclusivamente en los tipos de expresiones regulares de Perl y Java, y no contiene ningún material de Python, por lo que no será útil como referencia para la programación en Python. (La primera edición cubría el módulo <code class="xref py py-mod docutils literal notranslate"><span class="pre">regex</span></code> de Python, ahora eliminado, que no le ayudará mucho.) Considere sacarlo de su biblioteca.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Expresiones regulares COMOS (<em>HOWTO</em>)</a><ul>
+<li><a class="reference internal" href="#introduction">Introducción</a></li>
+<li><a class="reference internal" href="#simple-patterns">Patrones simples</a><ul>
+<li><a class="reference internal" href="#matching-characters">Coincidencia de Caracteres (<em>Matching Characters</em>)</a></li>
+<li><a class="reference internal" href="#repeating-things">Repitiendo cosas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-regular-expressions">Usando Expresiones Regulares</a><ul>
+<li><a class="reference internal" href="#compiling-regular-expressions">Compilando Expresiones regulares</a></li>
+<li><a class="reference internal" href="#the-backslash-plague">La plaga de la barra invertida (<em>The Backslash Plague</em>)</a></li>
+<li><a class="reference internal" href="#performing-matches">Realizando coincidencias</a></li>
+<li><a class="reference internal" href="#module-level-functions">Funciones a nivel de módulo</a></li>
+<li><a class="reference internal" href="#compilation-flags">Los Flags de compilación</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-pattern-power">Más poder de patrones</a><ul>
+<li><a class="reference internal" href="#more-metacharacters">Más metacarácteres</a></li>
+<li><a class="reference internal" href="#grouping">Agrupando</a></li>
+<li><a class="reference internal" href="#non-capturing-and-named-groups">Grupos con nombre y sin captura</a></li>
+<li><a class="reference internal" href="#lookahead-assertions">Aserciones Anticipadas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modifying-strings">Modificando cadenas de caracteres</a><ul>
+<li><a class="reference internal" href="#splitting-strings">Separando cadenas de caracteres</a></li>
+<li><a class="reference internal" href="#search-and-replace">Búsqueda y Remplazo</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-problems">Problemas comunes</a><ul>
+<li><a class="reference internal" href="#use-string-methods">Uso de métodos de cadenas de caracteres</a></li>
+<li><a class="reference internal" href="#match-versus-search"><em>match() versus search()</em></a></li>
+<li><a class="reference internal" href="#greedy-versus-non-greedy">Codiciosa versus no codiciosa (<em>Greedy versus Non-Greedy</em>)</a></li>
+<li><a class="reference internal" href="#using-re-verbose">Usando re.VERBOSE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#feedback">Feedback</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="logging-cookbook.html"
+                        title="capítulo anterior">Libro de recetas de Logging</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="sockets.html"
+                        title="próximo capítulo">HOW TO - Programación con sockets</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/regex.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="sockets.html" title="HOW TO - Programación con sockets"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="logging-cookbook.html" title="Libro de recetas de Logging"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Expresiones regulares COMOS (<em>HOWTO</em>)</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

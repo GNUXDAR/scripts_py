@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>5. Creación de extensiones C y C++ en Windows &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="1. Incrustando Python en Otra Aplicación" href="embedding.html" />
+    <link rel="prev" title="4. Construyendo Extensiones C y C++" href="building.html" />
+    <link rel="canonical" href="https://docs.python.org/3/extending/windows.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Creación de extensiones C y C++ en Windows</a><ul>
+<li><a class="reference internal" href="#a-cookbook-approach">5.1. Un enfoque de libro de cocina</a></li>
+<li><a class="reference internal" href="#differences-between-unix-and-windows">5.2. Diferencias entre Unix y Windows</a></li>
+<li><a class="reference internal" href="#using-dlls-in-practice">5.3. Usar DLL en la práctica</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="building.html"
+                        title="capítulo anterior"><span class="section-number">4. </span>Construyendo Extensiones C y C++</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="embedding.html"
+                        title="próximo capítulo"><span class="section-number">1. </span>Incrustando Python en Otra Aplicación</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/extending/windows.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="embedding.html" title="1. Incrustando Python en Otra Aplicación"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="building.html" title="4. Construyendo Extensiones C y C++"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Ampliación e incrustación del intérprete de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">5. </span>Creación de extensiones C y C++ en Windows</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="building-c-and-c-extensions-on-windows">
+<span id="building-on-windows"></span><h1><span class="section-number">5. </span>Creación de extensiones C y C++ en Windows<a class="headerlink" href="#building-c-and-c-extensions-on-windows" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Este capítulo explica brevemente cómo crear un módulo de extensión de Windows para Python usando Microsoft Visual C++, y sigue con información de fondo más detallada sobre cómo funciona. El material explicativo es útil tanto para el programador de Windows que está aprendiendo a construir extensiones de Python como para el programador de Unix interesado en producir software que se pueda construir con éxito tanto en Unix como en Windows.</p>
+<p>Se alienta a los autores de módulos a utilizar el enfoque distutils para construir módulos de extensión, en lugar del descrito en esta sección. Aún necesitará el compilador de C que se utilizó para construir Python; típicamente Microsoft Visual C++.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Este capítulo menciona varios nombres de archivo que incluyen un número de versión codificado de Python. Estos nombres de archivo se representan con el número de versión que se muestra como <code class="docutils literal notranslate"><span class="pre">XY</span></code>; en la práctica, <code class="docutils literal notranslate"><span class="pre">'X'</span></code> será el número de versión principal y <code class="docutils literal notranslate"><span class="pre">'Y'</span></code> será el número de versión menor de la versión de Python con la que está trabajando. Por ejemplo, si está utilizando Python 2.2.1, <code class="docutils literal notranslate"><span class="pre">XY</span></code> en realidad será <code class="docutils literal notranslate"><span class="pre">22</span></code>.</p>
+</div>
+<section id="a-cookbook-approach">
+<span id="win-cookbook"></span><h2><span class="section-number">5.1. </span>Un enfoque de libro de cocina<a class="headerlink" href="#a-cookbook-approach" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hay dos enfoques para construir módulos de extensión en Windows, al igual que en Unix: use el paquete <a class="reference internal" href="../library/distutils.html#module-distutils" title="distutils: Support for building and installing Python modules into an existing Python installation."><code class="xref py py-mod docutils literal notranslate"><span class="pre">distutils</span></code></a> para controlar el proceso de construcción, o haga las cosas manualmente. El enfoque distutils funciona bien para la mayoría de las extensiones; La documentación sobre el uso de <a class="reference internal" href="../library/distutils.html#module-distutils" title="distutils: Support for building and installing Python modules into an existing Python installation."><code class="xref py py-mod docutils literal notranslate"><span class="pre">distutils</span></code></a> para compilar y empaquetar módulos de extensión está disponible en <a class="reference internal" href="../distutils/index.html#distutils-index"><span class="std std-ref">Distribución de módulos de Python (versión heredada)</span></a>. Si encuentra que realmente necesita hacer las cosas manualmente, puede ser instructivo estudiar el archivo del proyecto para el módulo de biblioteca estándar <a class="reference external" href="https://github.com/python/cpython/tree/3.10/PCbuild/winsound.vcxproj">winsound</a>.</p>
+</section>
+<section id="differences-between-unix-and-windows">
+<span id="dynamic-linking"></span><h2><span class="section-number">5.2. </span>Diferencias entre Unix y Windows<a class="headerlink" href="#differences-between-unix-and-windows" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Unix y Windows usan paradigmas completamente diferentes para la carga de código en tiempo de ejecución. Antes de intentar construir un módulo que se pueda cargar dinámicamente, tenga en cuenta cómo funciona su sistema.</p>
+<p>En Unix, un archivo de objeto compartido (<code class="file docutils literal notranslate"><span class="pre">.so</span></code>) contiene código para ser utilizado por el programa, y también los nombres de funciones y datos que espera encontrar en el programa. Cuando el archivo se une al programa, todas las referencias a esas funciones y datos en el código del archivo se cambian para apuntar a las ubicaciones reales en el programa donde las funciones y los datos se colocan en la memoria. Esto es básicamente una operación de enlace.</p>
+<p>En Windows, un archivo de biblioteca de enlace dinámico (<code class="file docutils literal notranslate"><span class="pre">.dll</span></code>) no tiene referencias colgantes. En cambio, un acceso a funciones o datos pasa por una tabla de búsqueda. Por lo tanto, el código DLL no tiene que repararse en tiempo de ejecución para referirse a la memoria del programa; en cambio, el código ya usa la tabla de búsqueda de la DLL, y la tabla de búsqueda se modifica en tiempo de ejecución para apuntar a las funciones y los datos.</p>
+<p>En Unix, solo hay un tipo de archivo de biblioteca (<code class="file docutils literal notranslate"><span class="pre">.a</span></code>) que contiene código de varios archivos de objeto (<code class="file docutils literal notranslate"><span class="pre">.o</span></code>). Durante el paso de enlace para crear un archivo de objeto compartido (<code class="file docutils literal notranslate"><span class="pre">.so</span></code>), el enlazador puede encontrar que no sabe dónde se define un identificador. El enlazador lo buscará en los archivos de objetos en las bibliotecas; si lo encuentra, incluirá todo el código de ese archivo de objeto.</p>
+<p>En Windows, hay dos tipos de biblioteca, una biblioteca estática y una biblioteca de importación (ambas llamadas <code class="file docutils literal notranslate"><span class="pre">.lib</span></code>). Una biblioteca estática es como un archivo Unix <code class="file docutils literal notranslate"><span class="pre">.a</span></code>; Contiene código para ser incluido según sea necesario. Una biblioteca de importación se usa básicamente solo para asegurarle al enlazador que cierto identificador es legal y estará presente en el programa cuando se cargue la DLL. Por lo tanto, el enlazador utiliza la información de la biblioteca de importación para crear la tabla de búsqueda para usar identificadores que no están incluidos en la DLL. Cuando se vincula una aplicación o una DLL, se puede generar una biblioteca de importación, que deberá usarse para todas las DLL futuras que dependan de los símbolos en la aplicación o DLL.</p>
+<p>Suponga que está creando dos módulos de carga dinámica, B y C, que deberían compartir otro bloque de código A. En Unix, <em>no</em> pasaría <code class="file docutils literal notranslate"><span class="pre">A.a</span></code> al enlazador para <code class="file docutils literal notranslate"><span class="pre">B.so</span></code> y <code class="file docutils literal notranslate"><span class="pre">C.so</span></code>; eso haría que se incluyera dos veces, de modo que B y C tengan cada uno su propia copia. En Windows, compilar <code class="file docutils literal notranslate"><span class="pre">A.dll</span></code> también compilará <code class="file docutils literal notranslate"><span class="pre">A.lib</span></code>. Usted <em>si</em> pasa <code class="file docutils literal notranslate"><span class="pre">A.lib</span></code> al enlazador para B y C. <code class="file docutils literal notranslate"><span class="pre">A.lib</span></code> no contiene código; solo contiene información que se usará en tiempo de ejecución para acceder al código de A.</p>
+<p>En Windows, usar una biblioteca de importación es como usar <code class="docutils literal notranslate"><span class="pre">importar</span> <span class="pre">spam</span></code>; le da acceso a los nombres de spam, pero no crea una copia separada. En Unix, vincular con una biblioteca es más como <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">spam</span> <span class="pre">import*</span></code>; crea una copia separada.</p>
+</section>
+<section id="using-dlls-in-practice">
+<span id="win-dlls"></span><h2><span class="section-number">5.3. </span>Usar DLL en la práctica<a class="headerlink" href="#using-dlls-in-practice" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Windows Python is built in Microsoft Visual C++; using other compilers may or
+may not work.  The rest of this section is MSVC++ specific.</p>
+<p>Al crear archivos DLL en Windows, debe pasar <code class="file docutils literal notranslate"><span class="pre">pythonXY.lib</span></code> al enlazador. Para construir dos DLL, spam y ni (que usa funciones C que se encuentran en el spam), puede usar estos comandos:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">cl</span><span class="w"> </span><span class="o">/</span><span class="n">LD</span><span class="w"> </span><span class="o">/</span><span class="n">I</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">include</span><span class="w"> </span><span class="n">spam</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">pythonXY</span><span class="p">.</span><span class="n">lib</span><span class="w"></span>
+<span class="n">cl</span><span class="w"> </span><span class="o">/</span><span class="n">LD</span><span class="w"> </span><span class="o">/</span><span class="n">I</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">include</span><span class="w"> </span><span class="n">ni</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="n">spam</span><span class="p">.</span><span class="n">lib</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">pythonXY</span><span class="p">.</span><span class="n">lib</span><span class="w"></span>
+</pre></div>
+</div>
+<p>El primer comando creó tres archivos: <code class="file docutils literal notranslate"><span class="pre">spam.obj</span></code>, <code class="file docutils literal notranslate"><span class="pre">spam.dll</span></code> y <code class="file docutils literal notranslate"><span class="pre">spam.lib</span></code>. <code class="file docutils literal notranslate"><span class="pre">Spam.dll</span></code> no contiene ninguna función de Python (como <a class="reference internal" href="../c-api/arg.html#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a>), pero sabe cómo encontrar el código de Python gracias a <code class="file docutils literal notranslate"><span class="pre">pythonXY.lib</span></code>.</p>
+<p>El segundo comando creó <code class="file docutils literal notranslate"><span class="pre">ni.dll</span></code> (y <code class="file docutils literal notranslate"><span class="pre">.obj</span></code> y <code class="file docutils literal notranslate"><span class="pre">.lib</span></code>), que sabe cómo encontrar las funciones necesarias del spam, y también del ejecutable de Python.</p>
+<p>No todos los identificadores se exportan a la tabla de búsqueda. Si desea que cualquier otro módulo (incluido Python) pueda ver sus identificadores, debe decir <code class="docutils literal notranslate"><span class="pre">_declspec(dllexport)</span></code>, como en <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">_declspec(dllexport)</span> <span class="pre">initspam(void)</span></code> o <code class="docutils literal notranslate"><span class="pre">PyObject_declspec(dllexport)</span> <span class="pre">*NiGetSpamData(void)</span></code>.</p>
+<p>Developer Studio incluirá muchas bibliotecas de importación que realmente no necesita, agregando aproximadamente 100K a su ejecutable. Para deshacerse de ellos, use el cuadro de diálogo Configuración del proyecto, pestaña Enlace, para especificar <em>ignorar las bibliotecas predeterminadas</em>. Agregue el archivo correcto <code class="file docutils literal notranslate"><span class="pre">msvcrtxx.lib</span></code> a la lista de bibliotecas.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Creación de extensiones C y C++ en Windows</a><ul>
+<li><a class="reference internal" href="#a-cookbook-approach">5.1. Un enfoque de libro de cocina</a></li>
+<li><a class="reference internal" href="#differences-between-unix-and-windows">5.2. Diferencias entre Unix y Windows</a></li>
+<li><a class="reference internal" href="#using-dlls-in-practice">5.3. Usar DLL en la práctica</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="building.html"
+                        title="capítulo anterior"><span class="section-number">4. </span>Construyendo Extensiones C y C++</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="embedding.html"
+                        title="próximo capítulo"><span class="section-number">1. </span>Incrustando Python en Otra Aplicación</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/extending/windows.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="embedding.html" title="1. Incrustando Python en Otra Aplicación"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="building.html" title="4. Construyendo Extensiones C y C++"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Ampliación e incrustación del intérprete de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">5. </span>Creación de extensiones C y C++ en Windows</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

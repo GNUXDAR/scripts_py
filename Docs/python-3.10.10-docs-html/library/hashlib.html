@@ -1,0 +1,870 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>hashlib — Hashes seguros y resúmenes de mensajes &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="hmac — Hash con clave para autenticación de mensajes" href="hmac.html" />
+    <link rel="prev" title="Servicios Criptográficos" href="crypto.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/hashlib.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code> — Hashes seguros y resúmenes de mensajes</a><ul>
+<li><a class="reference internal" href="#hash-algorithms">Algoritmos de hash</a></li>
+<li><a class="reference internal" href="#shake-variable-length-digests">Resúmenes SHAKE de largo variable</a></li>
+<li><a class="reference internal" href="#key-derivation">Derivación de clave</a></li>
+<li><a class="reference internal" href="#blake2">BLAKE2</a><ul>
+<li><a class="reference internal" href="#creating-hash-objects">Creando objetos hash</a></li>
+<li><a class="reference internal" href="#constants">Constantes</a></li>
+<li><a class="reference internal" href="#examples">Ejemplos</a><ul>
+<li><a class="reference internal" href="#simple-hashing">Cifrado simple</a></li>
+<li><a class="reference internal" href="#using-different-digest-sizes">Usar diferentes tamaños de resumen</a></li>
+<li><a class="reference internal" href="#keyed-hashing">Cifrado de clave</a></li>
+<li><a class="reference internal" href="#randomized-hashing">Cifrado aleatorio</a></li>
+<li><a class="reference internal" href="#personalization">Personalización</a></li>
+<li><a class="reference internal" href="#tree-mode">Modo de árbol</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#credits">Créditos</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="crypto.html"
+                        title="capítulo anterior">Servicios Criptográficos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="hmac.html"
+                        title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hmac</span></code> — <em>Hash</em> con clave para autenticación de mensajes</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/hashlib.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="hmac.html" title="hmac — Hash con clave para autenticación de mensajes"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="crypto.html" title="Servicios Criptográficos"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="crypto.html" accesskey="U">Servicios Criptográficos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code> — Hashes seguros y resúmenes de mensajes</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-hashlib">
+<span id="hashlib-secure-hashes-and-message-digests"></span><h1><a class="reference internal" href="#module-hashlib" title="hashlib: Secure hash and message digest algorithms."><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code></a> — Hashes seguros y resúmenes de mensajes<a class="headerlink" href="#module-hashlib" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Lib/hashlib.py">Lib/hashlib.py</a></p>
+<span class="target" id="index-0"></span><hr class="docutils" />
+<p>Este módulo implementa una interfaz común a diferentes algoritmos de hash seguro y resúmenes de mensajes. Están incluidos los algoritmos de hash seguro FIPS  SHA1, SHA224, SHA256, SHA384 y SHA512 (definidos en FIPS 180-2) además del algoritmo MD5 de RSA (definido en Internet <span class="target" id="index-9"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc1321.html"><strong>RFC 1321</strong></a>). Los términos «hash seguro» y «resumen de mensaje» son intercambiables. Los algoritmos más antiguos eran denominados resúmenes de mensajes. El término moderno es hash seguro.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Si quieres las funciones de hash adler32 o crc32, están disponibles en el módulo <a class="reference internal" href="zlib.html#module-zlib" title="zlib: Low-level interface to compression and decompression routines compatible with gzip."><code class="xref py py-mod docutils literal notranslate"><span class="pre">zlib</span></code></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Algunos algoritmos tienen conocidas debilidades de colisión de hash, consulte la sección «Ver también» al final.</p>
+</div>
+<section id="hash-algorithms">
+<span id="id1"></span><h2>Algoritmos de hash<a class="headerlink" href="#hash-algorithms" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hay un método constructor nombrado para cada tipo de <em class="dfn">hash</em>. Todos retornan un objeto de hash con la misma interfaz simple. Por ejemplo, usa <code class="xref py py-func docutils literal notranslate"><span class="pre">sha256()</span></code> para crear un objeto de hash SHA-256. Ahora puedes alimentar este objeto con <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">objetos como bytes</span></a> (normalmente <a class="reference internal" href="stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>) usando el método <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code>. En cualquier punto puedes pedir el resumen (<em class="dfn">digest</em>) de la concatenación de los datos alimentados al mismo usando los métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">digest()</span></code> o <code class="xref py py-meth docutils literal notranslate"><span class="pre">hexdigest()</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Para un rendimiento multihilo mejor, el <a class="reference internal" href="../glossary.html#term-GIL"><span class="xref std std-term">GIL</span></a> de Python es liberado para datos superiores a 2047 bytes en la creación o actualización de objetos.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La alimentación de objetos de cadenas en <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> no está soportada, ya que los hashes funcionan en bytes, no en caracteres.</p>
+</div>
+<p id="index-2">Los constructores para algoritmos hash que siempre están presentes en este módulo son <code class="xref py py-func docutils literal notranslate"><span class="pre">sha1()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha224()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha256()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha384()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha512()</span></code>, <a class="reference internal" href="#hashlib.blake2b" title="hashlib.blake2b"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2b()</span></code></a> y <a class="reference internal" href="#hashlib.blake2s" title="hashlib.blake2s"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2s()</span></code></a>. <code class="xref py py-func docutils literal notranslate"><span class="pre">md5()</span></code> normalmente también está disponible, aunque puede faltar o estar bloqueado si está utilizando una rara compilación de Python «compatible con FIPS «. También pueden estar disponibles algoritmos adicionales dependiendo de la biblioteca OpenSSL que Python use en su plataforma. En la mayoría de las plataformas también están disponibles <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_224()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_256()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_384()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_512()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_128()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_256()</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6: </span>Constructores SHA3 (Keccak) y SHAKE <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_224()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_256()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_384()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">sha3_512()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_128()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_256()</span></code>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6: </span>Fueron añadidas <a class="reference internal" href="#hashlib.blake2b" title="hashlib.blake2b"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2b()</span></code></a> y <a class="reference internal" href="#hashlib.blake2s" title="hashlib.blake2s"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2s()</span></code></a>.</p>
+</div>
+<div class="versionchanged" id="hashlib-usedforsecurity">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Todos los constructores hashlib toman un argumento de solo palabra clave <em>usedforsecurity</em> con el valor predeterminado <code class="docutils literal notranslate"><span class="pre">True</span></code>. Un valor falso permite el uso de algoritmos hash inseguros y bloqueados en entornos restringidos. <code class="docutils literal notranslate"><span class="pre">False</span></code> indica que el algoritmo hash no se utiliza en un contexto de seguridad, por ejemplo, como una función de compresión unidireccional no criptográfica.</p>
+<p>Hashlib ahora usa SHA3 y SHAKE de OpenSSL 1.1.1 y posteriores.</p>
+</div>
+<p>Por ejemplo, para obtener el resumen de la cadena de bytes <code class="docutils literal notranslate"><span class="pre">b'Nobody</span> <span class="pre">inspects</span> <span class="pre">the</span> <span class="pre">spammish</span> <span class="pre">repetition'</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Nobody inspects&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot; the spammish repetition&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="go">b&#39;\x03\x1e\xdd}Ae\x15\x93\xc5\xfe\\\x00o\xa5u+7\xfd\xdf\xf7\xbcN\x84:\xa6\xaf\x0c\x95\x0fK\x94\x06&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">digest_size</span>
+<span class="go">32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">block_size</span>
+<span class="go">64</span>
+</pre></div>
+</div>
+<p>Más resumido:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha224</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Nobody inspects the spammish repetition&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;a4337bc45a8fc544c03f52dc550cd6e1e87021bc896588bd79e901e2&#39;</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt id="hashlib.new">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">new</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <span class="optional">[</span><em class="sig-param">data</em>, <span class="optional">]</span><em class="sig-param">*</em>, <em class="sig-param">usedforsecurity=True</em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.new" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Es un constructor genérico que toma la cadena <em>name</em> del algoritmo deseado como su primer parámetro. También existe para permitir acceso a los hashes arriba listados así como cualquiera de los otros algoritmos que tu biblioteca OpenSSL puede ofrecer. Los constructores nombrados son mucho más rápidos que <a class="reference internal" href="#hashlib.new" title="hashlib.new"><code class="xref py py-func docutils literal notranslate"><span class="pre">new()</span></code></a> y deberían preferirse.</p>
+</dd></dl>
+
+<p>Usando <a class="reference internal" href="#hashlib.new" title="hashlib.new"><code class="xref py py-func docutils literal notranslate"><span class="pre">new()</span></code></a> con un algoritmo provisto por OpenSSL:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Nobody inspects the spammish repetition&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;031edd7d41651593c5fe5c006fa5752b37fddff7bc4e843aa6af0c950f4b9406&#39;</span>
+</pre></div>
+</div>
+<p>Hashlib provee los siguientes atributos constantes:</p>
+<dl class="py data">
+<dt id="hashlib.algorithms_guaranteed">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">algorithms_guaranteed</code><a class="headerlink" href="#hashlib.algorithms_guaranteed" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un conjunto que contiene los nombres de los algoritmos garantizados a ser soportados por este módulo en todas las plataformas. Ten en cuenta que “md5” se encuentra en esta lista a pesar de que algunos proveedores ofrecen una extraña construcción Python «compatible con FIPS» que la excluye.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.algorithms_available">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">algorithms_available</code><a class="headerlink" href="#hashlib.algorithms_available" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un conjunto que contiene los nombres de los algoritmos de hash que están disponibles en el intérprete de Python en ejecución. Estos nombres serán reconocidos cuando sean pasados a <a class="reference internal" href="#hashlib.new" title="hashlib.new"><code class="xref py py-func docutils literal notranslate"><span class="pre">new()</span></code></a>. <a class="reference internal" href="#hashlib.algorithms_guaranteed" title="hashlib.algorithms_guaranteed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">algorithms_guaranteed</span></code></a> siempre será un subconjunto. El mismo algoritmo puede aparecer múltiples veces en este conjunto bajo diferentes nombres (gracias a OpenSSL).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<p>Los siguientes valores son provistos como atributos constantes de los objetos hash retornados por los constructores:</p>
+<dl class="py data">
+<dt id="hashlib.hash.digest_size">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">digest_size</code><a class="headerlink" href="#hashlib.hash.digest_size" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El tamaño del hash resultante en bytes.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.hash.block_size">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">block_size</code><a class="headerlink" href="#hashlib.hash.block_size" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El tamaño del bloque interno del algoritmo de hash en bytes.</p>
+</dd></dl>
+
+<p>Un objeto hash tiene los siguientes atributos:</p>
+<dl class="py attribute">
+<dt id="hashlib.hash.name">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">name</code><a class="headerlink" href="#hashlib.hash.name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>El nombre canónico de este hash, siempre en minúsculas y siempre adecuado como un parámetro a <a class="reference internal" href="#hashlib.new" title="hashlib.new"><code class="xref py py-func docutils literal notranslate"><span class="pre">new()</span></code></a> para crear otro hash de este tipo.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>El atributo <em>name</em> ha estado presente en CPython desde su inicio, pero desde Python 3.4 no fue especificado formalmente, por lo que puede no existir en algunas plataformas.</p>
+</div>
+</dd></dl>
+
+<p>Un objeto hash tiene los siguientes métodos:</p>
+<dl class="py method">
+<dt id="hashlib.hash.update">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.hash.update" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Actualiza el objeto de hash con el <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>. Invocaciones repetidas son equivalentes a una única invocación con la concatenación de todos los argumentos: <code class="docutils literal notranslate"><span class="pre">m.update(a);</span> <span class="pre">m.update(b)</span></code> es equivalente a <code class="docutils literal notranslate"><span class="pre">m.update(a+b)</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span>El GIL de Python es liberado para permitir a otros hilos ejecutarse mientras ocurren actualizaciones de hash en datos con tamaños superiores a 2047 bytes cuando se usan algoritmos de hash suministrados por OpenSSL.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hashlib.hash.digest">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">digest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.hash.digest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el resumen de los datos pasados al método <a class="reference internal" href="#hashlib.hash.update" title="hashlib.hash.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> hasta el momento. Este es un objeto de bytes de tamaño <a class="reference internal" href="#hashlib.hash.digest_size" title="hashlib.hash.digest_size"><code class="xref py py-attr docutils literal notranslate"><span class="pre">digest_size</span></code></a> el cual puede contener bytes en el rango completo desde 0 a 255.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hashlib.hash.hexdigest">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">hexdigest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.hash.hexdigest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#hashlib.hash.digest" title="hashlib.hash.digest"><code class="xref py py-meth docutils literal notranslate"><span class="pre">digest()</span></code></a> excepto que el resumen es retornado como un objeto de cadena del doble de largo, conteniendo sólo dígitos hexadecimales. Este puede ser usado para intercambiar el valor de forma segura en correos electrónicos u otros entornos no binarios.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hashlib.hash.copy">
+<code class="sig-prename descclassname">hash.</code><code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.hash.copy" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna una copia («clon») del objeto hash. Este puede ser usado para calcular eficientemente los resúmenes de datos compartiendo una subcadena inicial común.</p>
+</dd></dl>
+
+</section>
+<section id="shake-variable-length-digests">
+<h2>Resúmenes SHAKE de largo variable<a class="headerlink" href="#shake-variable-length-digests" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los algoritmos <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_128()</span></code> y <code class="xref py py-func docutils literal notranslate"><span class="pre">shake_256()</span></code> proveen resúmenes de largo variable con largo_en_bits//2 hasta 128 ó 256 bits de seguridad. Como tales, sus métodos de resumen requieren un largo. El largo máximo no está limitado por el algoritmo SHAKE.</p>
+<dl class="py method">
+<dt id="hashlib.shake.digest">
+<code class="sig-prename descclassname">shake.</code><code class="sig-name descname">digest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.shake.digest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el resumen de los datos pasados al método <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> hasta el momento. Este es un objeto de bytes de tamaño <em>length</em> el cual puede contener bytes en el rango completo desde 0 a 255.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hashlib.shake.hexdigest">
+<code class="sig-prename descclassname">shake.</code><code class="sig-name descname">hexdigest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.shake.hexdigest" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#hashlib.shake.digest" title="hashlib.shake.digest"><code class="xref py py-meth docutils literal notranslate"><span class="pre">digest()</span></code></a> excepto que el resumen es retornado como un objeto de cadena del doble de largo, conteniendo sólo dígitos hexadecimales. Este puede ser usado para intercambiar el valor de forma segura en correos electrónicos u otros entornos no binarios.</p>
+</dd></dl>
+
+</section>
+<section id="key-derivation">
+<h2>Derivación de clave<a class="headerlink" href="#key-derivation" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los algoritmos de derivación de clave y estiramiento de clave están diseñados para el cifrado seguro de contraseña. Algoritmos ingenuos como <code class="docutils literal notranslate"><span class="pre">sha1(password)</span></code> no son resistentes contra ataques de fuerza bruta. Una buena función hash de contraseña debe ser afinable, lenta e incluir una <a class="reference external" href="https://es.wikipedia.org/wiki/Sal_(criptograf%C3%ADa)">sal</a>.</p>
+<dl class="py function">
+<dt id="hashlib.pbkdf2_hmac">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">pbkdf2_hmac</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hash_name</span></em>, <em class="sig-param"><span class="n">password</span></em>, <em class="sig-param"><span class="n">salt</span></em>, <em class="sig-param"><span class="n">iterations</span></em>, <em class="sig-param"><span class="n">dklen</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.pbkdf2_hmac" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La función provee contraseñas PKCS#5 basadas en función de derivación de clave 2. Usa HMAC como función de pseudoaleatoriedad.</p>
+<p>La cadena <em>hash_name</em> es el nombre deseado del algoritmo de resumen de hash para HMAC, ej. “sha1” o “sha256”. <em>password</em> y <em>salt</em> son interpretados como búferes de bytes. Aplicaciones y bibliotecas deberían limitar <em>password</em> a un largo razonable (ej. 1024). <em>salt</em> debería ser sobre 16 o más bytes desde una fuente adecuada, ej. <a class="reference internal" href="os.html#os.urandom" title="os.urandom"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.urandom()</span></code></a>.</p>
+<p>The number of <em>iterations</em> should be chosen based on the hash algorithm and
+computing power. As of 2022, hundreds of thousands of iterations of SHA-256
+are suggested. For rationale as to why and how to choose what is best for
+your application, read <em>Appendix A.2.2</em> of <a class="reference external" href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf">NIST-SP-800-132</a>. The answers
+on the <a class="reference external" href="https://security.stackexchange.com/questions/3959/recommended-of-iterations-when-using-pbkdf2-sha256/">stackexchange pbkdf2 iterations question</a> explain in detail.</p>
+<p><em>dklen</em> es el largo de la clave derivada. Si <em>dklen</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> entonces el tamaño de resumen del algoritmo de hash <em>hash_name</em> es usado, ej. 64 para SHA-512.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">pbkdf2_hmac</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">our_app_iters</span> <span class="o">=</span> <span class="mi">500_000</span>  <span class="c1"># Application specific, read above.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dk</span> <span class="o">=</span> <span class="n">pbkdf2_hmac</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;bad salt&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">our_app_iters</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dk</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+<span class="go">&#39;15530bba69924174860db778f2c6f8104d3aaf9d26241840c8c4a641c8d000a9&#39;</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.4.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Una implementación rápida de <em>pbkdf2_hmac</em> está disponible con OpenSSL. La implementación Python usa una versión en línea de <a class="reference internal" href="hmac.html#module-hmac" title="hmac: Keyed-Hashing for Message Authentication (HMAC) implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hmac</span></code></a>. Es aproximadamente tres veces más lenta y no libera el GIL.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10: </span>La implementación lenta en Python de <em>pbkdf2_hmac</em> está obsoleta. En el futuro la función estará disponible sólo cuando Python sea compilado con OpenSSL.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="hashlib.scrypt">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">scrypt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">password</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">salt</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">r</span></em>, <em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="n">maxmem</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">dklen</span><span class="o">=</span><span class="default_value">64</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.scrypt" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La función provee una contraseña scrypt basada en una función derivación de clave como es definida en <span class="target" id="index-10"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc7914.html"><strong>RFC 7914</strong></a>.</p>
+<p><em>password</em> y <em>salt</em> deben ser <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">objetos de bytes</span></a>. Aplicaciones y bibliotecas deberían limitar <em>password</em> a un largo razonable (ej. 1024). <em>salt</em> debería ser aproximadamente 16 o más bytes de una fuente adecuada, ej. <code class="xref py py-func docutils literal notranslate"><span class="pre">os.unrandom()</span></code>.</p>
+<p><em>n</em> es el factor de coste de CPU/Memoria, <em>r</em> el tamaño de bloque, <em>p</em> el factor de paralelización y <em>maxmem</em> limita la memoria (OpenSSL 1.1.0 por defecto a 32 MiB). <em>dklen</em> es el largo de la clave derivada.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.6.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="blake2">
+<h2>BLAKE2<a class="headerlink" href="#blake2" title="Enlazar permanentemente con este título">¶</a></h2>
+<p id="index-4"><a class="reference external" href="https://blake2.net">BLAKE2</a> es una función de hash criptográfico definida en <span class="target" id="index-11"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc7693.html"><strong>RFC 7693</strong></a> que viene en dos sabores:</p>
+<ul class="simple">
+<li><p><strong>BLAKE2b</strong>, optimizada para plataformas de 64 bits y produce resúmenes de cualquier tamaño entre 1 y 64 bytes,</p></li>
+<li><p><strong>BLAKE2s</strong>, optimizada para plataformas de 8 a 32 bits y produce resúmenes de cualquier tamaño entre 1 y 32 bytes.</p></li>
+</ul>
+<p>BLAKE2 proporciona el <strong>modo keyed</strong> (un remplazamiento más simple rápido para <a class="reference external" href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC</a>), <strong>cifrado salado</strong> (<em>salted hashing</em>), <strong>personalización</strong> y <strong>cifrado de árbol</strong>.</p>
+<p>Los objetos hash de este módulo siguen los estándares de los objetos de la biblioteca <a class="reference internal" href="#module-hashlib" title="hashlib: Secure hash and message digest algorithms."><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code></a>.</p>
+<section id="creating-hash-objects">
+<h3>Creando objetos hash<a class="headerlink" href="#creating-hash-objects" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Se crean nuevos objetos hash invocando a las funciones de constructor:</p>
+<dl class="py function">
+<dt id="hashlib.blake2b">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">blake2b</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">digest_size</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">salt</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">person</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">fanout</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">depth</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">leaf_size</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">node_offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">node_depth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">inner_size</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">last_node</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">usedforsecurity</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.blake2b" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="hashlib.blake2s">
+<code class="sig-prename descclassname">hashlib.</code><code class="sig-name descname">blake2s</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">digest_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">salt</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">person</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">fanout</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">depth</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">leaf_size</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">node_offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">node_depth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">inner_size</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">last_node</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">usedforsecurity</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hashlib.blake2s" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<p>Estas funciones retornan los objetos hash correspondientes para calcular BLAKE2b o BLAKE2s. Ellas toman opcionalmente estos parámetros generales:</p>
+<ul class="simple">
+<li><p><em>data</em>: trozo inicial de datos a cifrar, el cual debe ser un <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>. Puede ser pasado sólo como argumento posicional.</p></li>
+<li><p><em>digest_size</em>: tamaño del resumen de salida en bytes.</p></li>
+<li><p><em>key</em>: clave para el cifrado de clave (<em>keyed hashing</em>) (hasta 64 bytes para BLAKE2b, hasta 32 bytes para BLAKE2s).</p></li>
+<li><p><em>salt</em>: sal para el cifrado aleatorio (hasta 16 bytes para BLAKE2b, hasta 8 bytes para BLAKE2s).</p></li>
+<li><p><em>person</em>: cadena de personalización (hasta 16 bytes para BLAKE2b, hasta 8 bytes para BLAKE2s).</p></li>
+</ul>
+<p>La siguiente tabla muestra los límites para parámetros generales (en bytes):</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 24%" />
+<col style="width: 17%" />
+<col style="width: 20%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Cifrado</p></th>
+<th class="head"><p>digest_size</p></th>
+<th class="head"><p>len(key)</p></th>
+<th class="head"><p>len(salt)</p></th>
+<th class="head"><p>len(person)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BLAKE2b</p></td>
+<td><p>64</p></td>
+<td><p>64</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-odd"><td><p>BLAKE2s</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>8</p></td>
+<td><p>8</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La especificación BLAKE2 define largos constantes para los parámetros de sal y personalización, sin embargo, por conveniencia, esta implementación acepta cadenas de bytes de cualquier tamaño hasta el largo especificado. Si el largo del parámetro es menor que el especificado, es acolchado con ceros, por lo tanto, por ejemplo, <code class="docutils literal notranslate"><span class="pre">b'salt'</span></code> y <code class="docutils literal notranslate"><span class="pre">b'salt\x00'</span></code> es el mismo valor. (Este no es el caso para <em>key</em>.)</p>
+</div>
+<p>Estos tamaños están disponibles como <a class="reference internal" href="#constants">constantes</a> del módulo descritas abajo.</p>
+<p>Las funciones constructoras también aceptan los siguientes parámetros de cifrado de árbol:</p>
+<ul class="simple">
+<li><p><em>fanout</em>: despliegue en abanico (0 a 255, 0 si ilimitado, 1 en modo secuencial).</p></li>
+<li><p><em>depth</em>: profundidad máxima del árbol (1 a 255, 255 si ilimitado, 1 en modo secuencial).</p></li>
+<li><p><em>leaf_size</em>: tamaño máximo en bytes de hoja (0 a <code class="docutils literal notranslate"><span class="pre">2**32-1</span></code>, 0 si ilimitado o en modo secuencial).</p></li>
+<li><p><em>node_offset</em>: desplazamiento del nodo (0 a <code class="docutils literal notranslate"><span class="pre">2**64-1</span></code> para BLAKE2b, 0 a <code class="docutils literal notranslate"><span class="pre">2**48-1</span></code> para BLAKE2s, 0 para la primera hoja más a la izquierda, o en modo secuencial).</p></li>
+<li><p><em>node_depth</em>: profundidad de nodo (0 a 255, 0 para hojas o en modo secuencial).</p></li>
+<li><p><em>inner_size</em>: tamaño interno del resumen (0 a 64 para BLAKE2b, 0 a 32 para BLAKE2s, 0 en modo secuencial).</p></li>
+<li><p><em>last_node</em>: boolean indicating whether the processed node is the last
+one (<code class="docutils literal notranslate"><span class="pre">False</span></code> for sequential mode).</p></li>
+</ul>
+<figure class="align-default">
+<img alt="Explanation of tree mode parameters." src="../_images/hashlib-blake2-tree.png" />
+</figure>
+<p>Consulta la sección 2.10 en la <cite>especificación BLAKE2 &lt;https://blake2.net/blake2_20130129.pdf&gt;</cite> para una revisión integral del cifrado en árbol.</p>
+</section>
+<section id="constants">
+<h3>Constantes<a class="headerlink" href="#constants" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="py data">
+<dt id="hashlib.blake2b.SALT_SIZE">
+<code class="sig-prename descclassname">blake2b.</code><code class="sig-name descname">SALT_SIZE</code><a class="headerlink" href="#hashlib.blake2b.SALT_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.blake2s.SALT_SIZE">
+<code class="sig-prename descclassname">blake2s.</code><code class="sig-name descname">SALT_SIZE</code><a class="headerlink" href="#hashlib.blake2s.SALT_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<p>Largo de sal (largo máximo aceptado por los constructores).</p>
+<dl class="py data">
+<dt id="hashlib.blake2b.PERSON_SIZE">
+<code class="sig-prename descclassname">blake2b.</code><code class="sig-name descname">PERSON_SIZE</code><a class="headerlink" href="#hashlib.blake2b.PERSON_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.blake2s.PERSON_SIZE">
+<code class="sig-prename descclassname">blake2s.</code><code class="sig-name descname">PERSON_SIZE</code><a class="headerlink" href="#hashlib.blake2s.PERSON_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<p>Largo de cadena de personalización (largo máximo aceptado por los constructores).</p>
+<dl class="py data">
+<dt id="hashlib.blake2b.MAX_KEY_SIZE">
+<code class="sig-prename descclassname">blake2b.</code><code class="sig-name descname">MAX_KEY_SIZE</code><a class="headerlink" href="#hashlib.blake2b.MAX_KEY_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.blake2s.MAX_KEY_SIZE">
+<code class="sig-prename descclassname">blake2s.</code><code class="sig-name descname">MAX_KEY_SIZE</code><a class="headerlink" href="#hashlib.blake2s.MAX_KEY_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<p>Tamaño máximo de clave.</p>
+<dl class="py data">
+<dt id="hashlib.blake2b.MAX_DIGEST_SIZE">
+<code class="sig-prename descclassname">blake2b.</code><code class="sig-name descname">MAX_DIGEST_SIZE</code><a class="headerlink" href="#hashlib.blake2b.MAX_DIGEST_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt id="hashlib.blake2s.MAX_DIGEST_SIZE">
+<code class="sig-prename descclassname">blake2s.</code><code class="sig-name descname">MAX_DIGEST_SIZE</code><a class="headerlink" href="#hashlib.blake2s.MAX_DIGEST_SIZE" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<p>Tamaño máximo de resumen que puede producir la función hash.</p>
+</section>
+<section id="examples">
+<h3>Ejemplos<a class="headerlink" href="#examples" title="Enlazar permanentemente con este título">¶</a></h3>
+<section id="simple-hashing">
+<h4>Cifrado simple<a class="headerlink" href="#simple-hashing" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>Para calcular el hash de algunos datos, primero debes construir un objeto hash invocando a la función del constructor apropiada (<a class="reference internal" href="#hashlib.blake2b" title="hashlib.blake2b"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2b()</span></code></a> o <a class="reference internal" href="#hashlib.blake2s" title="hashlib.blake2s"><code class="xref py py-func docutils literal notranslate"><span class="pre">blake2s()</span></code></a>), entonces actualizarlo con los datos invocando <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> en el objeto y, finalmente, obtener el resumen del objeto invocando <code class="xref py py-meth docutils literal notranslate"><span class="pre">digest()</span></code> (o <code class="xref py py-meth docutils literal notranslate"><span class="pre">hexdigest()</span></code> para una cadena codificada en hexadecimal).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Hello world&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;6ff843ba685842aa82031d3f53c48b66326df7639a63d128974c5c14f31a0f33343a8c65551134ed1ae0f2b0dd2bb495dc81039e3eeb0aa1bb0388bbeac29183&#39;</span>
+</pre></div>
+</div>
+<p>Como atajo, puedes pasar el primer trozo de datos para actualizar directamente el constructor como el argumento posicional:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blake2b</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Hello world&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;6ff843ba685842aa82031d3f53c48b66326df7639a63d128974c5c14f31a0f33343a8c65551134ed1ae0f2b0dd2bb495dc81039e3eeb0aa1bb0388bbeac29183&#39;</span>
+</pre></div>
+</div>
+<p>Puedes invocar <a class="reference internal" href="#hashlib.hash.update" title="hashlib.hash.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hash.update()</span></code></a> tantas veces como necesites para actualizar el hash iterativamente:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;Hello&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;world&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;6ff843ba685842aa82031d3f53c48b66326df7639a63d128974c5c14f31a0f33343a8c65551134ed1ae0f2b0dd2bb495dc81039e3eeb0aa1bb0388bbeac29183&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="using-different-digest-sizes">
+<h4>Usar diferentes tamaños de resumen<a class="headerlink" href="#using-different-digest-sizes" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>BLAKE2 tiene tamaño de resúmenes configurables de hasta 64 bytes para BLAKE2b y 32 bytes para BLAKE2s. Por ejemplo, para remplazar SHA-1 con BLAKE2b sin cambiar el tamaño de la salida, puedes decirle a BLAKE2b que produzca resúmenes de 20 bytes:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Replacing SHA1 with the more secure function&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;d24f26cf8de66472d58d4e1b1774b4c9158b1f4c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">digest_size</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+<span class="go">20</span>
+</pre></div>
+</div>
+<p>Objetos hash con diferentes tamaños de resumen tienen salidas completamente diferentes (hashes más cortos <em>no</em> son prefijos de hashes más largos); BLAKE2b y BLAKE2s producen salidas diferentes incluso si el largo de salida es el mismo:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span><span class="p">,</span> <span class="n">blake2s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;6fa1d8fcfd719046d762&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;eb6ec15daf9546254f0809&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blake2s</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;1bf21a98c78a1c376ae9&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blake2s</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;567004bf96e4a25773ebf4&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="keyed-hashing">
+<h4>Cifrado de clave<a class="headerlink" href="#keyed-hashing" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>El cifrado de clave puede ser usado para autentificación como un remplazo más rápido y simple para <a class="reference external" href="https://es.wikipedia.org/wiki/HMAC">Código de autentificación de mensajes en clave-hash</a> (HMAC). BLAKE2 puede ser usado de forma segura en modo de prefijo MAC gracias a la propiedad de indiferenciabilidad heredada de BLAKE.</p>
+<p>Este ejemplo muestra como obtener un código de autentificación (codificado como hexadecimal) de 128 bits para el mensaje <code class="docutils literal notranslate"><span class="pre">b'message</span> <span class="pre">data'</span></code> con la clave <code class="docutils literal notranslate"><span class="pre">b'pseudorandom</span> <span class="pre">key'</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;pseudorandom key&#39;</span><span class="p">,</span> <span class="n">digest_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;message data&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;3d363ff7401e02026f4a4687d4863ced&#39;</span>
+</pre></div>
+</div>
+<p>Como ejemplo práctico, una aplicación web puede firmar simétricamente cookies enviadas a los usuarios y verificarlas más tarde para asegurar que no fueron manipuladas con:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hmac</span> <span class="kn">import</span> <span class="n">compare_digest</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;pseudorandomly generated server secret key&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AUTH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">cookie</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="n">AUTH_SIZE</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">SECRET_KEY</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cookie</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="n">cookie</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">good_sig</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="n">cookie</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">compare_digest</span><span class="p">(</span><span class="n">good_sig</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cookie</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;user-alice&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sig</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="n">cookie</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">,</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cookie</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">sig</span><span class="p">))</span>
+<span class="go">user-alice,b&#39;43b3c982cf697e0c5ab22172d1ca7421&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">verify</span><span class="p">(</span><span class="n">cookie</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">verify</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;user-bob&#39;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">verify</span><span class="p">(</span><span class="n">cookie</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;0102030405060708090a0b0c0d0e0f00&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Incluso aunque hay un modo de cifrado de claves nativo, BLAKE2 puede, por supuesto, ser usado en construcción de HMAC con el módulo <a class="reference internal" href="hmac.html#module-hmac" title="hmac: Keyed-Hashing for Message Authentication (HMAC) implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hmac</span></code></a>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">hmac</span><span class="o">,</span> <span class="nn">hashlib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;secret key&#39;</span><span class="p">,</span> <span class="n">digestmod</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">blake2s</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;message&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;e3c8102868d28b5ff85fc35dda07329970d1a01e273c37481326fe0c861c8142&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="randomized-hashing">
+<h4>Cifrado aleatorio<a class="headerlink" href="#randomized-hashing" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>Definiendo el parámetro <em>salt</em> los usuarios pueden introducir aleatoriedad a la función hash. El cifrado aleatorio es útil para proteger contra ataques de colisión en la función hash usada en firmas digitales.</p>
+<blockquote>
+<div><p>El cifrado aleatorio está diseñado para situaciones en las que una parte, el preparador del mensaje, genera todo o parte de un mensaje para ser firmado por una segunda parte, el firmante del mensaje. Si el preparador del mensaje es capaz de encontrar colisiones de funciones hash criptográficas (ej., dos mensajes produciendo el mismo valor de hash), entonces ellos pueden preparar versiones significativas del mensaje que producirían el mismo valor de hash y firma digital, pero con diferentes resultados (ej., transfiriendo 1,000,000 $ a una cuenta, en lugar de 10 $), Las funciones de hash criptográfico han sido diseñadas con resistencia de colisión como objetivo principal, pero la concentración actual en el ataque a las funciones hash criptográficas puede resultar en una función hash criptográfica dada que provea menor resistencia de colisión de la esperada. El cifrado aleatorio ofrece al firmante protección adicional reduciendo la probabilidad de que un preparador puede generar dos o más mensajes que en última instancia producen el mismo valor hash durante el proceso de generación de la firma digital, — incluso si es práctico encontrar colisiones para la función hash. Sin embargo, el uso de cifrado aleatorio puede reducir la cantidad de seguridad provista por una firma digital cuando todas las porciones del mensaje son preparadas por el firmante.</p>
+<p>(<a class="reference external" href="https://csrc.nist.gov/publications/detail/sp/800-106/final">NIST SP-800-106 «Randomized Hashing for Digital Signatures»</a>)</p>
+</div></blockquote>
+<p>En BLAKE2 la sal es procesada como una entrada de una vez a la función hash durante la inicialización, en lugar de como una entrada para cada función de compresión.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>El <em>cifrado salado</em> (o sólo cifrado) con BLAKE2 o cualquier otra función de hash criptográfico de propósito general, como SHA-256, no son aptas para cifrar contraseñas. Ver <a class="reference external" href="https://blake2.net/#qa">BLAKE2 FAQ</a> para más información.</p>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;some message&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Calculate the first hash with a random salt.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">salt1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">blake2b</span><span class="o">.</span><span class="n">SALT_SIZE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h1</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">salt</span><span class="o">=</span><span class="n">salt1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Calculate the second hash with a different random salt.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">salt2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">blake2b</span><span class="o">.</span><span class="n">SALT_SIZE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h2</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">salt</span><span class="o">=</span><span class="n">salt2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h2</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The digests are different.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span> <span class="o">!=</span> <span class="n">h2</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="personalization">
+<h4>Personalización<a class="headerlink" href="#personalization" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>A veces es útil forzar a la función hash para producir diferentes resúmenes para la misma entrada para diferentes propósitos. Citando a los autores de la función hash Skein:</p>
+<blockquote>
+<div><p>Recomendamos que todos los diseñadores de aplicaciones consideren seriamente hacer esto; hemos visto muchos protocolos donde un hash que es calculado en una parte del protocolo puede ser usado en una parte completamente diferente porque dos cálculos hash fueron realizados en datos similares o relacionados, y el atacante puede forzar a la aplicación a hacer las entradas hash iguales. Personalizar cada función hash usada en el protocolo resumidamente detiene este tipo de ataque.</p>
+<p>(<a class="reference external" href="https://www.schneier.com/wp-content/uploads/2016/02/skein.pdf">The Skein Hash Function Family</a>,
+p. 21)</p>
+</div></blockquote>
+<p>BLAKE2 puede ser personalizado pasando bytes al argumento <em>person</em>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FILES_HASH_PERSON</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;MyApp Files Hash&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BLOCK_HASH_PERSON</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;MyApp Block Hash&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="n">FILES_HASH_PERSON</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;the same content&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;20d9cd024d4fb086aae819a1432dd2466de12947831b75c5a30cf2676095d3b4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="n">BLOCK_HASH_PERSON</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;the same content&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;cf68fb5761b9c44e7878bfb2c4c9aea52264a80b75005e65619778de59f383a3&#39;</span>
+</pre></div>
+</div>
+<p>Se puede usar también personalización en conjunto con el modo de clave para derivar diferentes claves desde una sola.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64decode</span><span class="p">,</span> <span class="n">b64encode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orig_key</span> <span class="o">=</span> <span class="n">b64decode</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Rm5EPJai72qcK3RGBpW3vPNfZy5OZothY+kHY6h21KM=&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enc_key</span> <span class="o">=</span> <span class="n">blake2s</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">orig_key</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;kEncrypt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mac_key</span> <span class="o">=</span> <span class="n">blake2s</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">orig_key</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;kMAC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">b64encode</span><span class="p">(</span><span class="n">enc_key</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+<span class="go">rbPb15S/Z9t+agffno5wuhB77VbRi6F9Iv2qIxU7WHw=</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">b64encode</span><span class="p">(</span><span class="n">mac_key</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+<span class="go">G9GtHFE1YluXY1zWPlYk1e/nWfu0WSEb0KRcjhDeP/o=</span>
+</pre></div>
+</div>
+</section>
+<section id="tree-mode">
+<h4>Modo de árbol<a class="headerlink" href="#tree-mode" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>Aquí hay un ejemplo de cifrar un árbol mínimo con dos nodos de hoja:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>  <span class="mi">10</span>
+ <span class="o">/</span>  \
+<span class="mi">00</span>  <span class="mi">01</span>
+</pre></div>
+</div>
+<p>Este ejemplo usa resúmenes internos de 64 bytes, y retorna el resumen final de 32 bytes:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">blake2b</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FANOUT</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DEPTH</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LEAF_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">INNER_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">buf</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="mi">6000</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Left leaf</span>
+<span class="gp">... </span><span class="n">h00</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">LEAF_SIZE</span><span class="p">],</span> <span class="n">fanout</span><span class="o">=</span><span class="n">FANOUT</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">DEPTH</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">leaf_size</span><span class="o">=</span><span class="n">LEAF_SIZE</span><span class="p">,</span> <span class="n">inner_size</span><span class="o">=</span><span class="n">INNER_SIZE</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">node_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">node_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last_node</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Right leaf</span>
+<span class="gp">... </span><span class="n">h01</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">LEAF_SIZE</span><span class="p">:],</span> <span class="n">fanout</span><span class="o">=</span><span class="n">FANOUT</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">DEPTH</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">leaf_size</span><span class="o">=</span><span class="n">LEAF_SIZE</span><span class="p">,</span> <span class="n">inner_size</span><span class="o">=</span><span class="n">INNER_SIZE</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">node_offset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last_node</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Root node</span>
+<span class="gp">... </span><span class="n">h10</span> <span class="o">=</span> <span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">fanout</span><span class="o">=</span><span class="n">FANOUT</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">DEPTH</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">leaf_size</span><span class="o">=</span><span class="n">LEAF_SIZE</span><span class="p">,</span> <span class="n">inner_size</span><span class="o">=</span><span class="n">INNER_SIZE</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">node_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">node_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">last_node</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h10</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">h00</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h10</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">h01</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h10</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;3ad2a9b37c6070e374c7a8c508fe20ca86b6ed54e286e93a0318e95e881db5aa&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="credits">
+<h3>Créditos<a class="headerlink" href="#credits" title="Enlazar permanentemente con este título">¶</a></h3>
+<p><a class="reference external" href="https://blake2.net">BLAKE2</a> fue diseñado por <em>Jean-Philippe Aumasson</em>, <em>Samuel Neves</em>, <em>Zooko Wilcox-O’Hearn</em> y <em>Christian Winnerlein</em> basado en el <a class="reference external" href="https://en.wikipedia.org/wiki/NIST_hash_function_competition">SHA-3</a> finalista <a class="reference external" href="https://131002.net/blake/">BLAKE</a> creado por <em>Jean-Philippe Aumasson</em>, <em>Luca Henzen</em>, <em>Willi Meier</em> y <em>Raphael C.-W. Phan</em>.</p>
+<p>Usa el algoritmo núcleo del cifrado <a class="reference external" href="https://cr.yp.to/chacha.html">ChaCha</a> diseñado por <em>Daniel J. Bernstein</em>.</p>
+<p>La implementación stdlib está basada en el módulo <a class="reference external" href="https://pythonhosted.org/pyblake2/">pyblake2</a>. Fue escrita por <em>Dmitry Chestnykh</em> basada en la implementación C escrita por <em>Samuel Neves</em>. La documentación fue copiada desde <a class="reference external" href="https://pythonhosted.org/pyblake2/">pyblake2</a> y escrita por <em>Dmitry Chestnykh</em>.</p>
+<p>El código C fue parcialmente reescrito para Python por <em>Christian Heimes</em>.</p>
+<p>La siguiente dedicación de dominio público aplica tanto para la implementación de la función hash C, el código de extensión y su documentación:</p>
+<blockquote>
+<div><p>En la medida en que la ley lo permite, el/los autor/es han dedicado todos los derechos de autor y los derechos relacionados y vecinos de este software al dominio público mundial. Este software se distribuye sin ninguna garantía.</p>
+<p>Deberías haber recibido una copia de la Dedicación CC0 de Dominio Público junto a este software. Si no, consulta <a class="reference external" href="https://creativecommons.org/publicdomain/zero/1.0/">https://creativecommons.org/publicdomain/zero/1.0/</a>.</p>
+</div></blockquote>
+<p>Las siguientes personas han ayudado con el desarrollo o contribuyeron con sus cambios al proyecto y el dominio público de acuerdo a Creative Commons Public Domain Dedication 1.0 Universal:</p>
+<ul class="simple">
+<li><p><em>Alexandr Sokolovskiy</em></p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<dl class="simple">
+<dt>Módulo <a class="reference internal" href="hmac.html#module-hmac" title="hmac: Keyed-Hashing for Message Authentication (HMAC) implementation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hmac</span></code></a></dt><dd><p>Un módulo para generar mensajes de códigos de autentificación usando hashes.</p>
+</dd>
+<dt>Módulo <a class="reference internal" href="base64.html#module-base64" title="base64: RFC 4648: Base16, Base32, Base64 Data Encodings; Base85 and Ascii85"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base64</span></code></a></dt><dd><p>Otra forma de codificar hashes binarios para entornos no binarios.</p>
+</dd>
+<dt><a class="reference external" href="https://blake2.net">https://blake2.net</a></dt><dd><p>Sitio web oficial de BLAKE2.</p>
+</dd>
+<dt><a class="reference external" href="https://csrc.nist.gov/csrc/media/publications/fips/180/2/archive/2002-08-01/documents/fips180-2.pdf">https://csrc.nist.gov/csrc/media/publications/fips/180/2/archive/2002-08-01/documents/fips180-2.pdf</a></dt><dd><p>La publicación FIPS 180-2 sobre Algoritmos de Cifrado Seguros.</p>
+</dd>
+<dt><a class="reference external" href="https://en.wikipedia.org/wiki/Cryptographic_hash_function#Cryptographic_hash_algorithms">https://en.wikipedia.org/wiki/Cryptographic_hash_function#Cryptographic_hash_algorithms</a></dt><dd><p>Artículo de Wikipedia con información sobre cuáles algoritmos tienen errores conocidos y lo que eso significa con respecto a su uso.</p>
+</dd>
+<dt><a class="reference external" href="https://www.ietf.org/rfc/rfc8018.txt">https://www.ietf.org/rfc/rfc8018.txt</a></dt><dd><p>PKCS #5: Password-Based Cryptography Specification Version 2.1</p>
+</dd>
+<dt><a class="reference external" href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf">https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf</a></dt><dd><p>NIST Recommendation for Password-Based Key Derivation.</p>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code> — Hashes seguros y resúmenes de mensajes</a><ul>
+<li><a class="reference internal" href="#hash-algorithms">Algoritmos de hash</a></li>
+<li><a class="reference internal" href="#shake-variable-length-digests">Resúmenes SHAKE de largo variable</a></li>
+<li><a class="reference internal" href="#key-derivation">Derivación de clave</a></li>
+<li><a class="reference internal" href="#blake2">BLAKE2</a><ul>
+<li><a class="reference internal" href="#creating-hash-objects">Creando objetos hash</a></li>
+<li><a class="reference internal" href="#constants">Constantes</a></li>
+<li><a class="reference internal" href="#examples">Ejemplos</a><ul>
+<li><a class="reference internal" href="#simple-hashing">Cifrado simple</a></li>
+<li><a class="reference internal" href="#using-different-digest-sizes">Usar diferentes tamaños de resumen</a></li>
+<li><a class="reference internal" href="#keyed-hashing">Cifrado de clave</a></li>
+<li><a class="reference internal" href="#randomized-hashing">Cifrado aleatorio</a></li>
+<li><a class="reference internal" href="#personalization">Personalización</a></li>
+<li><a class="reference internal" href="#tree-mode">Modo de árbol</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#credits">Créditos</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="crypto.html"
+                        title="capítulo anterior">Servicios Criptográficos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="hmac.html"
+                        title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hmac</span></code> — <em>Hash</em> con clave para autenticación de mensajes</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/hashlib.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="hmac.html" title="hmac — Hash con clave para autenticación de mensajes"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="crypto.html" title="Servicios Criptográficos"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="crypto.html" >Servicios Criptográficos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code> — Hashes seguros y resúmenes de mensajes</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

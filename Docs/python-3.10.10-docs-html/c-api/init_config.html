@@ -1,0 +1,1536 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Configuración de inicialización de Python &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Gestión de la memoria" href="memory.html" />
+    <link rel="prev" title="Inicialización, Finalización e Hilos" href="init.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/init_config.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuración de inicialización de Python</a><ul>
+<li><a class="reference internal" href="#example">Ejemplo</a></li>
+<li><a class="reference internal" href="#pywidestringlist">PyWideStringList</a></li>
+<li><a class="reference internal" href="#pystatus">PyStatus</a></li>
+<li><a class="reference internal" href="#pypreconfig">PyPreConfig</a></li>
+<li><a class="reference internal" href="#preinitialize-python-with-pypreconfig">Preinicialización de Python con PyPreConfig</a></li>
+<li><a class="reference internal" href="#pyconfig">PyConfig</a></li>
+<li><a class="reference internal" href="#initialization-with-pyconfig">Inicialización con PyConfig</a></li>
+<li><a class="reference internal" href="#isolated-configuration">Configuración aislada</a></li>
+<li><a class="reference internal" href="#python-configuration">Configuración de Python</a></li>
+<li><a class="reference internal" href="#python-path-configuration">Configuración de la ruta de Python</a></li>
+<li><a class="reference internal" href="#py-runmain">Py_RunMain()</a></li>
+<li><a class="reference internal" href="#py-getargcargv">Py_GetArgcArgv()</a></li>
+<li><a class="reference internal" href="#multi-phase-initialization-private-provisional-api">API Provisional Privada de Inicialización Multifásica</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="init.html"
+                        title="capítulo anterior">Inicialización, Finalización e Hilos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="memory.html"
+                        title="próximo capítulo">Gestión de la memoria</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/init_config.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="memory.html" title="Gestión de la memoria"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="init.html" title="Inicialización, Finalización e Hilos"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Configuración de inicialización de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="python-initialization-configuration">
+<span id="init-config"></span><h1>Configuración de inicialización de Python<a class="headerlink" href="#python-initialization-configuration" title="Enlazar permanentemente con este título">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+<p>Python se puede inicializar con <a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_InitializeFromConfig()</span></code></a> y la estructura <a class="reference internal" href="#c.PyConfig" title="PyConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyConfig</span></code></a>. Se puede preinicializar con <a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitialize()</span></code></a> y la estructura <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyPreConfig</span></code></a>.</p>
+<p>Hay dos tipos de configuración:</p>
+<ul class="simple">
+<li><p>The <a class="reference internal" href="#init-python-config"><span class="std std-ref">Python Configuration</span></a> can be used to build a
+customized Python which behaves as the regular Python. For example,
+environment variables and command line arguments are used to configure
+Python.</p></li>
+<li><p>The <a class="reference internal" href="#init-isolated-conf"><span class="std std-ref">Isolated Configuration</span></a> can be used to embed
+Python into an application. It isolates Python from the system. For example,
+environment variables are ignored, the LC_CTYPE locale is left unchanged and
+no signal handler is registered.</p></li>
+</ul>
+<p>La función <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a> se puede utilizar para escribir un programa Python personalizado.</p>
+<p>Consulte también <a class="reference internal" href="init.html#initialization"><span class="std std-ref">Inicialización, finalización y subprocesos</span></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><span class="target" id="index-67"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0587"><strong>PEP 587</strong></a> «Configuración de inicialización de Python».</p>
+</div>
+<section id="example">
+<h2>Ejemplo<a class="headerlink" href="#example" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Ejemplo de Python personalizado que siempre se ejecuta en modo aislado:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">PyConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_InitPythonConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">config</span><span class="p">.</span><span class="n">isolated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Decode command line arguments.</span>
+<span class="cm">       Implicitly preinitialize Python (in isolated mode). */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyConfig_SetBytesArgv</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">exception</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_InitializeFromConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">exception</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Py_RunMain</span><span class="p">();</span><span class="w"></span>
+
+<span class="nl">exception</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_IsExit</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">status</span><span class="p">.</span><span class="n">exitcode</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Display the error message and exit the process with</span>
+<span class="cm">       non-zero exit code */</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="pywidestringlist">
+<h2>PyWideStringList<a class="headerlink" href="#pywidestringlist" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c type">
+<dt id="c.PyWideStringList">
+<em class="property">type </em><code class="sig-name descname">PyWideStringList</code><a class="headerlink" href="#c.PyWideStringList" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Lista de cadenas de caracteres <code class="docutils literal notranslate"><span class="pre">wchar_t*</span></code>.</p>
+<p>Si <em>length</em> no es cero, <em>items</em> no deben ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y todas las cadenas de caracteres deben ser no <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Métodos:</p>
+<dl class="c function">
+<dt id="c.PyWideStringList.PyWideStringList_Append">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyWideStringList_Append</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> *<em>list</em>, <em class="property">const</em> wchar_t *<em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyWideStringList.PyWideStringList_Append" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Agregar <em>item</em> a <em>list</em>.</p>
+<p>Python debe estar preinicializado para llamar a esta función.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyWideStringList.PyWideStringList_Insert">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyWideStringList_Insert</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> *<em>list</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>index</em>, <em class="property">const</em> wchar_t *<em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyWideStringList.PyWideStringList_Insert" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inserta <em>item</em> en <em>list</em> en <em>index</em>.</p>
+<p>Si <em>index</em> es mayor o igual que el largo de <em>list</em>, agrega <em>item</em> a <em>list</em>.</p>
+<p><em>index</em> debe ser mayor o igual que 0.</p>
+<p>Python debe estar preinicializado para llamar a esta función.</p>
+</dd></dl>
+
+<p>Campos de estructura:</p>
+<dl class="c member">
+<dt id="c.PyWideStringList.length">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <code class="sig-name descname">length</code><a class="headerlink" href="#c.PyWideStringList.length" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Longitud de la lista.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyWideStringList.items">
+wchar_t **<code class="sig-name descname">items</code><a class="headerlink" href="#c.PyWideStringList.items" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Elementos de la lista.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="pystatus">
+<h2>PyStatus<a class="headerlink" href="#pystatus" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c type">
+<dt id="c.PyStatus">
+<em class="property">type </em><code class="sig-name descname">PyStatus</code><a class="headerlink" href="#c.PyStatus" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Estructura para almacenar el estado de una función de inicialización: éxito, error o salida.</p>
+<p>Para un error, puede almacenar el nombre de la función C que creó el error.</p>
+<p>Campos de estructura:</p>
+<dl class="c member">
+<dt id="c.PyStatus.exitcode">
+int <code class="sig-name descname">exitcode</code><a class="headerlink" href="#c.PyStatus.exitcode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Código de salida El argumento pasó a <code class="docutils literal notranslate"><span class="pre">exit()</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyStatus.err_msg">
+<em class="property">const</em> char *<code class="sig-name descname">err_msg</code><a class="headerlink" href="#c.PyStatus.err_msg" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Mensaje de error.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyStatus.func">
+<em class="property">const</em> char *<code class="sig-name descname">func</code><a class="headerlink" href="#c.PyStatus.func" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>El nombre de la función que creó un error puede ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<p>Funciones para crear un estado:</p>
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_Ok">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyStatus_Ok</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_Ok" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Éxito.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_Error">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyStatus_Error</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>err_msg</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_Error" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Error de inicialización con un mensaje.</p>
+<p><em>err_msg</em> no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_NoMemory">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyStatus_NoMemory</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_NoMemory" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Error de asignación de memoria (sin memoria).</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_Exit">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyStatus_Exit</code><span class="sig-paren">(</span>int <em>exitcode</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_Exit" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Sale de Python con el código de salida especificado.</p>
+</dd></dl>
+
+<p>Funciones para manejar un estado:</p>
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_Exception">
+int <code class="sig-name descname">PyStatus_Exception</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <em>status</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_Exception" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Es el estado un error o una salida? Si es verdadero, la excepción debe ser manejada; por ejemplo llamando a <a class="reference internal" href="#c.PyStatus.Py_ExitStatusException" title="Py_ExitStatusException"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_ExitStatusException()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_IsError">
+int <code class="sig-name descname">PyStatus_IsError</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <em>status</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_IsError" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Es el resultado un error?</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.PyStatus_IsExit">
+int <code class="sig-name descname">PyStatus_IsExit</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <em>status</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.PyStatus_IsExit" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿El resultado es una salida?</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyStatus.Py_ExitStatusException">
+void <code class="sig-name descname">Py_ExitStatusException</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <em>status</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyStatus.Py_ExitStatusException" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a <code class="docutils literal notranslate"><span class="pre">exit(exitcode)</span></code> si <em>status</em> es una salida. Imprime el mensaje de error y sale con un código de salida distinto de cero si <em>status</em> es un error. Solo se debe llamar si <code class="docutils literal notranslate"><span class="pre">PyStatus_Exception(status)</span></code> no es cero.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Internamente, Python usa macros que establecen <code class="docutils literal notranslate"><span class="pre">PyStatus.func</span></code>, mientras que las funciones para crear un estado establecen <code class="docutils literal notranslate"><span class="pre">func</span></code> en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</div>
+<p>Ejemplo:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyStatus</span><span class="w"> </span><span class="nf">alloc</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">**</span><span class="n">ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">*</span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyMem_RawMalloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">ptr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">PyStatus_NoMemory</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyStatus_Ok</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ptr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ptr</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyMem_Free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="pypreconfig">
+<h2>PyPreConfig<a class="headerlink" href="#pypreconfig" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c type">
+<dt id="c.PyPreConfig">
+<em class="property">type </em><code class="sig-name descname">PyPreConfig</code><a class="headerlink" href="#c.PyPreConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Estructura utilizada para preinicializar Python.</p>
+<p>Función para inicializar una preconfiguración:</p>
+<dl class="c function">
+<dt id="c.PyPreConfig.PyPreConfig_InitPythonConfig">
+void <code class="sig-name descname">PyPreConfig_InitPythonConfig</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig">PyPreConfig</a> *<em>preconfig</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyPreConfig.PyPreConfig_InitPythonConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inicializa la preconfiguración con <a class="reference internal" href="#init-python-config"><span class="std std-ref">Configuración de Python</span></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyPreConfig.PyPreConfig_InitIsolatedConfig">
+void <code class="sig-name descname">PyPreConfig_InitIsolatedConfig</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig">PyPreConfig</a> *<em>preconfig</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyPreConfig.PyPreConfig_InitIsolatedConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inicializa la preconfiguración con <a class="reference internal" href="#init-isolated-conf"><span class="std std-ref">Configuración aislada</span></a>.</p>
+</dd></dl>
+
+<p>Campos de estructura:</p>
+<dl class="c member">
+<dt id="c.PyPreConfig.allocator">
+int <code class="sig-name descname">allocator</code><a class="headerlink" href="#c.PyPreConfig.allocator" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Nombre de los asignadores de memoria de Python:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_NOT_SET</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span></code>): no cambia asignadores de memoria (usa los valores predeterminados)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_DEFAULT</span></code> (<code class="docutils literal notranslate"><span class="pre">1</span></code>): <a class="reference internal" href="memory.html#default-memory-allocators"><span class="std std-ref">asignadores de memoria predeterminados</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_DEBUG</span></code> (<code class="docutils literal notranslate"><span class="pre">2</span></code>): <a class="reference internal" href="memory.html#default-memory-allocators"><span class="std std-ref">asignadores de memoria predeterminados</span></a> con <a class="reference internal" href="memory.html#pymem-debug-hooks"><span class="std std-ref">ganchos de depuración</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_MALLOC</span></code> (<code class="docutils literal notranslate"><span class="pre">3</span></code>): usa <code class="docutils literal notranslate"><span class="pre">malloc()</span></code> de la biblioteca C.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_MALLOC_DEBUG</span></code> (<code class="docutils literal notranslate"><span class="pre">4</span></code>): fuerza el uso de <code class="docutils literal notranslate"><span class="pre">malloc()</span></code> con <a class="reference internal" href="memory.html#pymem-debug-hooks"><span class="std std-ref">ganchos de depuración</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_PYMALLOC</span></code> (<code class="docutils literal notranslate"><span class="pre">5</span></code>): <a class="reference internal" href="memory.html#pymalloc"><span class="std std-ref">asignador de memoria pymalloc de Python</span></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_PYMALLOC_DEBUG</span></code> (<code class="docutils literal notranslate"><span class="pre">6</span></code>): <a class="reference internal" href="memory.html#pymalloc"><span class="std std-ref">asignador de memoria pymalloc de Python</span></a> con <a class="reference internal" href="memory.html#pymem-debug-hooks"><span class="std std-ref">ganchos de depuración</span></a>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_PYMALLOC</span></code> y <code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_PYMALLOC_DEBUG</span></code> no son compatibles si Python es <a class="reference internal" href="../using/configure.html#cmdoption-without-pymalloc"><code class="xref std std-option docutils literal notranslate"><span class="pre">configurado</span> <span class="pre">usando</span> <span class="pre">--without-pymalloc</span></code></a>.</p>
+<p>Ver <a class="reference internal" href="memory.html#memory"><span class="std std-ref">Administración de memorias</span></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_NOT_SET</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.configure_locale">
+int <code class="sig-name descname">configure_locale</code><a class="headerlink" href="#c.PyPreConfig.configure_locale" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Set the LC_CTYPE locale to the user preferred locale.</p>
+<p>Si es igual a 0, establezca los miembros <a class="reference internal" href="#c.PyPreConfig.coerce_c_locale" title="PyPreConfig.coerce_c_locale"><code class="xref c c-member docutils literal notranslate"><span class="pre">coerce_c_locale</span></code></a> y <a class="reference internal" href="#c.PyPreConfig.coerce_c_locale_warn" title="PyPreConfig.coerce_c_locale_warn"><code class="xref c c-member docutils literal notranslate"><span class="pre">coerce_c_locale_warn</span></code></a> en 0.</p>
+<p>Vea el <a class="reference internal" href="../glossary.html#term-locale-encoding"><span class="xref std std-term">locale encoding</span></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code> en la configuración de Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.coerce_c_locale">
+int <code class="sig-name descname">coerce_c_locale</code><a class="headerlink" href="#c.PyPreConfig.coerce_c_locale" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es igual a 2, imponga la configuración regional C.</p>
+<p>Si es igual a 1, lea la configuración regional LC_CTYPE para decidir si debe ser coaccionado.</p>
+<p>Vea el <a class="reference internal" href="../glossary.html#term-locale-encoding"><span class="xref std std-term">locale encoding</span></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en la configuración de Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.coerce_c_locale_warn">
+int <code class="sig-name descname">coerce_c_locale_warn</code><a class="headerlink" href="#c.PyPreConfig.coerce_c_locale_warn" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, emita una advertencia si la configuración regional C está coaccionada.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en la configuración de Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.dev_mode">
+int <code class="sig-name descname">dev_mode</code><a class="headerlink" href="#c.PyPreConfig.dev_mode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es distinto de cero, habilita el <a class="reference internal" href="../library/devmode.html#devmode"><span class="std std-ref">Modo de desarrollo de Python</span></a>: consulte <a class="reference internal" href="#c.PyConfig.dev_mode" title="PyConfig.dev_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.dev_mode</span></code></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.isolated">
+int <code class="sig-name descname">isolated</code><a class="headerlink" href="#c.PyPreConfig.isolated" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Modo aislado: consulte <a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.isolated</span></code></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.legacy_windows_fs_encoding">
+int <code class="sig-name descname">legacy_windows_fs_encoding</code><a class="headerlink" href="#c.PyPreConfig.legacy_windows_fs_encoding" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero:</p>
+<ul class="simple">
+<li><p>Establezca <a class="reference internal" href="#c.PyPreConfig.utf8_mode" title="PyPreConfig.utf8_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.utf8_mode</span></code></a> en <code class="docutils literal notranslate"><span class="pre">0</span></code>,</p></li>
+<li><p>Establezca <a class="reference internal" href="#c.PyConfig.filesystem_encoding" title="PyConfig.filesystem_encoding"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.filesystem_encoding</span></code></a> en <code class="docutils literal notranslate"><span class="pre">&quot;mbcs&quot;</span></code>,</p></li>
+<li><p>Establezca <a class="reference internal" href="#c.PyConfig.filesystem_errors" title="PyConfig.filesystem_errors"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.filesystem_errors</span></code></a> en <code class="docutils literal notranslate"><span class="pre">&quot;replace&quot;</span></code>.</p></li>
+</ul>
+<p>Inicializado desde valor de variable de entorno <span class="target" id="index-68"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONLEGACYWINDOWSFSENCODING"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONLEGACYWINDOWSFSENCODING</span></code></a>.</p>
+<p>Solo disponible en Windows. La macro <code class="docutils literal notranslate"><span class="pre">#ifdef</span> <span class="pre">MS_WINDOWS</span></code> se puede usar para el código específico de Windows.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.parse_argv">
+int <code class="sig-name descname">parse_argv</code><a class="headerlink" href="#c.PyPreConfig.parse_argv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, <a class="reference internal" href="#c.Py_PreInitializeFromArgs" title="Py_PreInitializeFromArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitializeFromArgs()</span></code></a> y <a class="reference internal" href="#c.Py_PreInitializeFromBytesArgs" title="Py_PreInitializeFromBytesArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitializeFromBytesArgs()</span></code></a> analizan su argumento <code class="docutils literal notranslate"><span class="pre">argv</span></code> de la misma manera que Python analiza los argumentos de la línea de comandos: ver <a class="reference internal" href="../using/cmdline.html#using-on-cmdline"><span class="std std-ref">Argumentos de línea de comandos</span></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code> en la configuración de Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.use_environment">
+int <code class="sig-name descname">use_environment</code><a class="headerlink" href="#c.PyPreConfig.use_environment" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Utiliza <a class="reference internal" href="../using/cmdline.html#using-on-envvars"><span class="std std-ref">variables de entorno</span></a>? Consulte <a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.use_environment</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code> en la configuración de Python y <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyPreConfig.utf8_mode">
+int <code class="sig-name descname">utf8_mode</code><a class="headerlink" href="#c.PyPreConfig.utf8_mode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es distinto de cero, habilite <a class="reference internal" href="../library/os.html#utf8-mode"><span class="std std-ref">Python UTF-8 Mode</span></a>.</p>
+<p>Establecido por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">utf8</span></code></a> y la variable de entorno <span class="target" id="index-69"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONUTF8"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONUTF8</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en la configuración de Python y <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="preinitialize-python-with-pypreconfig">
+<span id="c-preinit"></span><h2>Preinicialización de Python con PyPreConfig<a class="headerlink" href="#preinitialize-python-with-pypreconfig" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La preinicialización de Python:</p>
+<ul class="simple">
+<li><p>Establecer los asignadores de memoria de Python (<a class="reference internal" href="#c.PyPreConfig.allocator" title="PyPreConfig.allocator"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.allocator</span></code></a>)</p></li>
+<li><p>Configurar la configuración regional LC_CTYPE (<a class="reference internal" href="../glossary.html#term-locale-encoding"><span class="xref std std-term">locale encoding</span></a>)</p></li>
+<li><p>Establecer el <a class="reference internal" href="../library/os.html#utf8-mode"><span class="std std-ref">Python UTF-8 Mode</span></a> (<a class="reference internal" href="#c.PyPreConfig.utf8_mode" title="PyPreConfig.utf8_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.utf8_mode</span></code></a>)</p></li>
+</ul>
+<p>La preconfiguración actual (tipo <code class="docutils literal notranslate"><span class="pre">PyPreConfig</span></code>) se almacena en <code class="docutils literal notranslate"><span class="pre">_PyRuntime.preconfig</span></code>.</p>
+<p>Funciones para preinicializar Python:</p>
+<dl class="c function">
+<dt id="c.Py_PreInitialize">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">Py_PreInitialize</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig">PyPreConfig</a> *<em>preconfig</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_PreInitialize" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Preinicializa Python desde la preconfiguración <em>preconfig</em>.</p>
+<p><em>preconfig</em> no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.Py_PreInitializeFromBytesArgs">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">Py_PreInitializeFromBytesArgs</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig">PyPreConfig</a> *<em>preconfig</em>, int <em>argc</em>, char *<em class="property">const</em> *<em>argv</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_PreInitializeFromBytesArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Preinicializa Python desde la preconfiguración <em>preconfig</em>.</p>
+<p>Analice los argumentos de la línea de comando <em>argv</em> (cadenas de bytes) si <a class="reference internal" href="#c.PyPreConfig.parse_argv" title="PyPreConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> de <em>preconfig</em> no es cero.</p>
+<p><em>preconfig</em> no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.Py_PreInitializeFromArgs">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">Py_PreInitializeFromArgs</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig">PyPreConfig</a> *<em>preconfig</em>, int <em>argc</em>, wchar_t *<em class="property">const</em> *<em>argv</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_PreInitializeFromArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Preinicializa Python desde la preconfiguración <em>preconfig</em>.</p>
+<p>Analice los argumentos de la línea de comando <em>argv</em> (cadenas anchas) si <a class="reference internal" href="#c.PyPreConfig.parse_argv" title="PyPreConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> de <em>preconfig</em> no es cero.</p>
+<p><em>preconfig</em> no debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<p>La persona que llama es responsable de manejar las excepciones (error o salida) usando <code class="xref c c-func docutils literal notranslate"><span class="pre">PyStatus_Exception()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">Py_ExitStatusException()</span></code>.</p>
+<p>Para <a class="reference internal" href="#init-python-config"><span class="std std-ref">Configuración de Python</span></a> (<code class="xref c c-func docutils literal notranslate"><span class="pre">PyPreConfig_InitPythonConfig()</span></code>), si Python se inicializa con argumentos de línea de comando, los argumentos de la línea de comando también deben pasarse para preinicializar Python, ya que tienen un efecto en la preconfiguración como codificaciones. Por ejemplo, la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">utf8</span></code></a> habilita el <a class="reference internal" href="../library/os.html#utf8-mode"><span class="std std-ref">Python UTF-8 Mode</span></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyMem_SetAllocator()</span></code> se puede llamar después de <a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitialize()</span></code></a> y antes <a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_InitializeFromConfig()</span></code></a> para instalar un asignador de memoria personalizado. Se puede llamar antes <a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_PreInitialize()</span></code></a> si <a class="reference internal" href="#c.PyPreConfig.allocator" title="PyPreConfig.allocator"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.allocator</span></code></a> está configurado en <code class="docutils literal notranslate"><span class="pre">PYMEM_ALLOCATOR_NOT_SET</span></code>.</p>
+<p>Las funciones de asignación de memoria de Python como <a class="reference internal" href="memory.html#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_RawMalloc()</span></code></a> no deben usarse antes de la preinicialización de Python, mientras que llamar directamente a <code class="docutils literal notranslate"><span class="pre">malloc()</span></code> y <code class="docutils literal notranslate"><span class="pre">free()</span></code> siempre es seguro. No se debe llamar a <a class="reference internal" href="sys.html#c.Py_DecodeLocale" title="Py_DecodeLocale"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DecodeLocale()</span></code></a> antes de la preinicialización de Python.</p>
+<p>Ejemplo usando la preinicialización para habilitar el <a class="reference internal" href="../library/os.html#utf8-mode"><span class="std std-ref">Python UTF-8 Mode</span></a></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+<span class="n">PyPreConfig</span><span class="w"> </span><span class="n">preconfig</span><span class="p">;</span><span class="w"></span>
+<span class="n">PyPreConfig_InitPythonConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">preconfig</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">preconfig</span><span class="p">.</span><span class="n">utf8_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_PreInitialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">preconfig</span><span class="p">);</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="cm">/* at this point, Python speaks UTF-8 */</span><span class="w"></span>
+
+<span class="n">Py_Initialize</span><span class="p">();</span><span class="w"></span>
+<span class="cm">/* ... use Python API here ... */</span><span class="w"></span>
+<span class="n">Py_Finalize</span><span class="p">();</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="pyconfig">
+<h2>PyConfig<a class="headerlink" href="#pyconfig" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c type">
+<dt id="c.PyConfig">
+<em class="property">type </em><code class="sig-name descname">PyConfig</code><a class="headerlink" href="#c.PyConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Estructura que contiene la mayoría de los parámetros para configurar Python.</p>
+<p>Cuando termine, se debe utilizar la función <a class="reference internal" href="#c.PyConfig.PyConfig_Clear" title="PyConfig_Clear"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_Clear()</span></code></a> para liberar la memoria de configuración.</p>
+<p>Métodos de estructura:</p>
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_InitPythonConfig">
+void <code class="sig-name descname">PyConfig_InitPythonConfig</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_InitPythonConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inicialice la configuración con la <a class="reference internal" href="#init-python-config"><span class="std std-ref">Configuración de Python</span></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_InitIsolatedConfig">
+void <code class="sig-name descname">PyConfig_InitIsolatedConfig</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_InitIsolatedConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inicialice la configuración con la <a class="reference internal" href="#init-isolated-conf"><span class="std std-ref">Configuración Aislada</span></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_SetString">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_SetString</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em>, wchar_t *<em class="property">const</em> *<em>config_str</em>, <em class="property">const</em> wchar_t *<em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_SetString" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Copia la cadena de caracteres anchos <em>str</em> en <code class="docutils literal notranslate"><span class="pre">*config_str</span></code>.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_SetBytesString">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_SetBytesString</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em>, wchar_t *<em class="property">const</em> *<em>config_str</em>, <em class="property">const</em> char *<em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_SetBytesString" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Decodifique <em>str</em> usando <a class="reference internal" href="sys.html#c.Py_DecodeLocale" title="Py_DecodeLocale"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DecodeLocale()</span></code></a> y establezca el resultado en <code class="docutils literal notranslate"><span class="pre">*config_str</span></code>.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_SetArgv">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_SetArgv</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em>, int <em>argc</em>, wchar_t *<em class="property">const</em> *<em>argv</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_SetArgv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Configure los argumentos de la línea de comando (miembro <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> de <em>config</em>) de la lista <em>argv</em> de cadenas de caracteres anchas.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_SetBytesArgv">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_SetBytesArgv</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em>, int <em>argc</em>, char *<em class="property">const</em> *<em>argv</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_SetBytesArgv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Establezca argumentos de línea de comando (miembro <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> de <em>config</em>) de la lista <em>argv</em> de cadenas de bytes. Decodifica bytes usando <a class="reference internal" href="sys.html#c.Py_DecodeLocale" title="Py_DecodeLocale"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_DecodeLocale()</span></code></a>.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_SetWideStringList">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_SetWideStringList</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em>, <a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> *<em>list</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>length</em>, wchar_t **<em>items</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_SetWideStringList" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Establece la lista de cadenas de caracteres anchas <em>list</em> a <em>length</em> y <em>items</em>.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_Read">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">PyConfig_Read</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_Read" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Lee toda la configuración de Python.</p>
+<p>Los campos que ya están inicializados no se modifican.</p>
+<p>La función <a class="reference internal" href="#c.PyConfig.PyConfig_Read" title="PyConfig_Read"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_Read()</span></code></a> solo analiza los argumentos <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a> una vez: <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">2</span></code> después de analizar los argumentos. Dado que los argumentos de Python se eliminan de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a>, analizar los argumentos dos veces analizaría las opciones de la aplicación como opciones de Python.</p>
+<p><a class="reference internal" href="#c-preinit"><span class="std std-ref">Preinicializa Python</span></a> si es necesario.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Los argumentos <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a> ahora solo se analizan una vez, <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">2</span></code> después de analizar los argumentos y los argumentos solo se analizan si <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a> es igual a <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyConfig.PyConfig_Clear">
+void <code class="sig-name descname">PyConfig_Clear</code><span class="sig-paren">(</span><a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyConfig.PyConfig_Clear" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Libera memoria de configuración.</p>
+</dd></dl>
+
+<p>La mayoría de los método <code class="docutils literal notranslate"><span class="pre">PyConfig</span></code> <a class="reference internal" href="#c-preinit"><span class="std std-ref">preinitializan Python</span></a> si es necesario. En ese caso, la configuración de preinicialización de Python (<a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyPreConfig</span></code></a>) se basa en <a class="reference internal" href="#c.PyConfig" title="PyConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyConfig</span></code></a>. Si se ajustan los campos de configuración que son comunes con <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyPreConfig</span></code></a>, deben establecerse antes de llamar a un método <a class="reference internal" href="#c.PyConfig" title="PyConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyConfig</span></code></a>:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#c.PyConfig.dev_mode" title="PyConfig.dev_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.dev_mode</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.isolated</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.use_environment</span></code></a></p></li>
+</ul>
+<p>Además, si se usa <a class="reference internal" href="#c.PyConfig.PyConfig_SetArgv" title="PyConfig_SetArgv"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_SetArgv()</span></code></a> o <a class="reference internal" href="#c.PyConfig.PyConfig_SetBytesArgv" title="PyConfig_SetBytesArgv"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_SetBytesArgv()</span></code></a>, este método debe llamarse antes que otros métodos, ya que la configuración de preinicialización depende de los argumentos de la línea de comando (si <a class="reference internal" href="#c.PyConfig.parse_argv" title="parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> no es cero).</p>
+<p>Quien llama de estos métodos es responsable de manejar las excepciones (error o salida) usando <code class="docutils literal notranslate"><span class="pre">PyStatus_Exception()</span></code> y <code class="docutils literal notranslate"><span class="pre">Py_ExitStatusException()</span></code>.</p>
+<p>Campos de estructura:</p>
+<dl class="c member">
+<dt id="c.PyConfig.argv">
+<a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> <code class="sig-name descname">argv</code><a class="headerlink" href="#c.PyConfig.argv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Argumentos de la línea de comando: <a class="reference internal" href="../library/sys.html#sys.argv" title="sys.argv"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
+<p>Configure <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> en <code class="docutils literal notranslate"><span class="pre">1</span></code> para analizar <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> de la misma manera que Python normal analiza los argumentos de la línea de comandos de Python y luego quita los argumentos de Python de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a>.</p>
+<p>Si <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> está vacío, se agrega una cadena vacía para garantizar que <a class="reference internal" href="../library/sys.html#sys.argv" title="sys.argv"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.argv</span></code></a> siempre exista y nunca esté vacío.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Consulte también el miembro <a class="reference internal" href="#c.PyConfig.orig_argv" title="PyConfig.orig_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">orig_argv</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.base_exec_prefix">
+wchar_t *<code class="sig-name descname">base_exec_prefix</code><a class="headerlink" href="#c.PyConfig.base_exec_prefix" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="../library/sys.html#sys.base_exec_prefix" title="sys.base_exec_prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.base_exec_prefix</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.base_executable">
+wchar_t *<code class="sig-name descname">base_executable</code><a class="headerlink" href="#c.PyConfig.base_executable" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Ejecutable base de Python: <code class="xref py py-data docutils literal notranslate"><span class="pre">sys._base_executable</span></code>.</p>
+<p>Establecido por la variable de entorno <span class="target" id="index-70"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">__PYVENV_LAUNCHER__</span></code>.</p>
+<p>Establecido desde <a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.executable</span></code></a> si <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.base_prefix">
+wchar_t *<code class="sig-name descname">base_prefix</code><a class="headerlink" href="#c.PyConfig.base_prefix" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="../library/sys.html#sys.base_prefix" title="sys.base_prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.base_prefix</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.buffered_stdio">
+int <code class="sig-name descname">buffered_stdio</code><a class="headerlink" href="#c.PyConfig.buffered_stdio" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es igual a 0 y <a class="reference internal" href="#c.PyConfig.configure_c_stdio" title="PyConfig.configure_c_stdio"><code class="xref c c-member docutils literal notranslate"><span class="pre">configure_c_stdio</span></code></a> no es cero, deshabilite el almacenamiento en búfer en las secuencias C stdout y stderr.</p>
+<p>Establecido en 0 por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-u"><code class="xref std std-option docutils literal notranslate"><span class="pre">-u</span></code></a> y la variable de entorno <span class="target" id="index-71"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONUNBUFFERED"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONUNBUFFERED</span></code></a>.</p>
+<p>stdin siempre se abre en modo de búfer.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.bytes_warning">
+int <code class="sig-name descname">bytes_warning</code><a class="headerlink" href="#c.PyConfig.bytes_warning" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es igual a 1, emite una advertencia al comparar <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> o <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> con <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, o al comparar <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> con <a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
+<p>Si es igual o mayor a 2, lanza una excepción <a class="reference internal" href="../library/exceptions.html#BytesWarning" title="BytesWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BytesWarning</span></code></a> en estos casos.</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-b"><code class="xref std std-option docutils literal notranslate"><span class="pre">-b</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.warn_default_encoding">
+int <code class="sig-name descname">warn_default_encoding</code><a class="headerlink" href="#c.PyConfig.warn_default_encoding" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, emite una advertencia <a class="reference internal" href="../library/exceptions.html#EncodingWarning" title="EncodingWarning"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EncodingWarning</span></code></a> cuando <a class="reference internal" href="../library/io.html#io.TextIOWrapper" title="io.TextIOWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.TextIOWrapper</span></code></a> usa su codificación predeterminada. Consulte <a class="reference internal" href="../library/io.html#io-encoding-warning"><span class="std std-ref">EncodingWarning opcional</span></a> para obtener más detalles.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.check_hash_pycs_mode">
+wchar_t *<code class="sig-name descname">check_hash_pycs_mode</code><a class="headerlink" href="#c.PyConfig.check_hash_pycs_mode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Controla el comportamiento de validación de archivos <code class="docutils literal notranslate"><span class="pre">.pyc</span></code> basados en hash: valor de la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-check-hash-based-pycs"><code class="xref std std-option docutils literal notranslate"><span class="pre">--check-hash-based-pycs</span></code></a>.</p>
+<p>Valores válidos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">L&quot;always&quot;</span></code>: Calcula el hash el archivo fuente para invalidación independientemente del valor de la marca “check_source”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">L&quot;never&quot;</span></code>: suponga que los pycs basados en hash siempre son válidos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">L&quot;default&quot;</span></code>: El indicador “check_source” en pycs basados en hash determina la invalidación.</p></li>
+</ul>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">L&quot;default&quot;</span></code>.</p>
+<p>Consulte también <span class="target" id="index-72"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0552"><strong>PEP 552</strong></a> «Pycs deterministas».</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.configure_c_stdio">
+int <code class="sig-name descname">configure_c_stdio</code><a class="headerlink" href="#c.PyConfig.configure_c_stdio" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es distinto de cero, configure los flujos estándar de C:</p>
+<ul class="simple">
+<li><p>En Windows, configure el modo binario (<code class="docutils literal notranslate"><span class="pre">O_BINARY</span></code>) en stdin, stdout y stderr.</p></li>
+<li><p>Si <a class="reference internal" href="#c.PyConfig.buffered_stdio" title="PyConfig.buffered_stdio"><code class="xref c c-member docutils literal notranslate"><span class="pre">buffered_stdio</span></code></a> es igual a cero, deshabilite el almacenamiento en búfer de los flujos stdin, stdout y stderr.</p></li>
+<li><p>Si <a class="reference internal" href="#c.PyConfig.interactive" title="PyConfig.interactive"><code class="xref c c-member docutils literal notranslate"><span class="pre">interactive</span></code></a> no es cero, habilite el almacenamiento en búfer de flujo en stdin y stdout (solo stdout en Windows).</p></li>
+</ul>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code> en la configuración de Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.dev_mode">
+int <code class="sig-name descname">dev_mode</code><a class="headerlink" href="#c.PyConfig.dev_mode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es distinto de cero, habilita <a class="reference internal" href="../library/devmode.html#devmode"><span class="std std-ref">Modo de desarrollo de Python</span></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.dump_refs">
+int <code class="sig-name descname">dump_refs</code><a class="headerlink" href="#c.PyConfig.dump_refs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Dump Python references?</p>
+<p>Si no es cero, volcar todos los objetos que aún están vivos en la salida.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> por la variable de entorno <span class="target" id="index-73"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONDUMPREFS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONDUMPREFS</span></code></a>.</p>
+<p>Necesita una compilación especial de Python con la macro <code class="docutils literal notranslate"><span class="pre">Py_TRACE_REFS</span></code> definida: consulte la <a class="reference internal" href="../using/configure.html#cmdoption-with-trace-refs"><code class="xref std std-option docutils literal notranslate"><span class="pre">opción</span> <span class="pre">de</span> <span class="pre">configure</span> <span class="pre">--with-trace-refs</span> <span class="pre">option</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.exec_prefix">
+wchar_t *<code class="sig-name descname">exec_prefix</code><a class="headerlink" href="#c.PyConfig.exec_prefix" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>El prefijo de directorio específico del sitio donde se instalan los archivos Python dependientes de la plataforma: <a class="reference internal" href="../library/sys.html#sys.exec_prefix" title="sys.exec_prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.exec_prefix</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.executable">
+wchar_t *<code class="sig-name descname">executable</code><a class="headerlink" href="#c.PyConfig.executable" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>La ruta absoluta del binario ejecutable para el intérprete de Python: <a class="reference internal" href="../library/sys.html#sys.executable" title="sys.executable"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.executable</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.faulthandler">
+int <code class="sig-name descname">faulthandler</code><a class="headerlink" href="#c.PyConfig.faulthandler" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Habilitar administrador de fallas?</p>
+<p>Si no es cero, llama a <a class="reference internal" href="../library/faulthandler.html#faulthandler.enable" title="faulthandler.enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">faulthandler.enable()</span></code></a> al inicio.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> por <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">faulthandler</span></code></a> y la variable de entorno <span class="target" id="index-74"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONFAULTHANDLER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONFAULTHANDLER</span></code></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.filesystem_encoding">
+wchar_t *<code class="sig-name descname">filesystem_encoding</code><a class="headerlink" href="#c.PyConfig.filesystem_encoding" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="../glossary.html#term-filesystem-encoding-and-error-handler"><span class="xref std std-term">Codificación del sistema de archvios</span></a>: <a class="reference internal" href="../library/sys.html#sys.getfilesystemencoding" title="sys.getfilesystemencoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.getfilesystemencoding()</span></code></a>.</p>
+<p>En macOS, Android y VxWorks: use <code class="docutils literal notranslate"><span class="pre">&quot;utf-8&quot;</span></code> de forma predeterminada.</p>
+<p>En Windows: utilice <code class="docutils literal notranslate"><span class="pre">&quot;utf-8&quot;</span></code> de forma predeterminada o <code class="docutils literal notranslate"><span class="pre">&quot;mbcs&quot;</span></code> si <a class="reference internal" href="#c.PyPreConfig.legacy_windows_fs_encoding" title="PyPreConfig.legacy_windows_fs_encoding"><code class="xref c c-member docutils literal notranslate"><span class="pre">legacy_windows_fs_encoding</span></code></a> de <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyPreConfig</span></code></a> no es cero.</p>
+<p>Codificación predeterminada en otras plataformas:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;utf-8&quot;</span></code> si <a class="reference internal" href="#c.PyPreConfig.utf8_mode" title="PyPreConfig.utf8_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.utf8_mode</span></code></a> es distinto de cero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ascii&quot;</span></code> if Python detects that <code class="docutils literal notranslate"><span class="pre">nl_langinfo(CODESET)</span></code> announces
+the ASCII encoding, whereas the <code class="docutils literal notranslate"><span class="pre">mbstowcs()</span></code> function
+decodes from a different encoding (usually Latin1).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;utf-8&quot;</span></code> si <code class="docutils literal notranslate"><span class="pre">nl_langinfo(CODESET)</span></code> retorna una cadena vacía.</p></li>
+<li><p>De lo contrario, utilice el resultado <a class="reference internal" href="../glossary.html#term-locale-encoding"><span class="xref std std-term">locale encoding</span></a>: <code class="docutils literal notranslate"><span class="pre">nl_langinfo(CODESET)</span></code>.</p></li>
+</ul>
+<p>Al inicio de Python, el nombre de codificación se normaliza al nombre del códec de Python. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">&quot;ANSI_X3.4-1968&quot;</span></code> se reemplaza por <code class="docutils literal notranslate"><span class="pre">&quot;ascii&quot;</span></code>.</p>
+<p>Consulte también el miembro <a class="reference internal" href="#c.PyConfig.filesystem_errors" title="PyConfig.filesystem_errors"><code class="xref c c-member docutils literal notranslate"><span class="pre">filesystem_errors</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.filesystem_errors">
+wchar_t *<code class="sig-name descname">filesystem_errors</code><a class="headerlink" href="#c.PyConfig.filesystem_errors" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="../glossary.html#term-filesystem-encoding-and-error-handler"><span class="xref std std-term">Manejador de errores del sistema de archivos</span></a>: <a class="reference internal" href="../library/sys.html#sys.getfilesystemencodeerrors" title="sys.getfilesystemencodeerrors"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.getfilesystemencodeerrors()</span></code></a>.</p>
+<p>En Windows: utilice <code class="docutils literal notranslate"><span class="pre">&quot;surrogatepass&quot;</span></code> de forma predeterminada o <code class="docutils literal notranslate"><span class="pre">&quot;replace&quot;</span></code> si <a class="reference internal" href="#c.PyPreConfig.legacy_windows_fs_encoding" title="PyPreConfig.legacy_windows_fs_encoding"><code class="xref c c-member docutils literal notranslate"><span class="pre">legacy_windows_fs_encoding</span></code></a> de <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyPreConfig</span></code></a> no es cero.</p>
+<p>En otras plataformas: utilice <code class="docutils literal notranslate"><span class="pre">&quot;surrogateescape&quot;</span></code> de forma predeterminada.</p>
+<p>Controladores de errores admitidos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;strict&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;surrogateescape&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;surrogatepass&quot;</span></code> (solo compatible con la codificación UTF-8)</p></li>
+</ul>
+<p>Consulte también el miembro <a class="reference internal" href="#c.PyConfig.filesystem_encoding" title="PyConfig.filesystem_encoding"><code class="xref c c-member docutils literal notranslate"><span class="pre">filesystem_encoding</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.hash_seed">
+unsigned long <code class="sig-name descname">hash_seed</code><a class="headerlink" href="#c.PyConfig.hash_seed" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.use_hash_seed">
+int <code class="sig-name descname">use_hash_seed</code><a class="headerlink" href="#c.PyConfig.use_hash_seed" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Funciones de semillas aleatorias hash.</p>
+<p>Si <a class="reference internal" href="#c.PyConfig.use_hash_seed" title="PyConfig.use_hash_seed"><code class="xref c c-member docutils literal notranslate"><span class="pre">use_hash_seed</span></code></a> es cero, se elige una semilla al azar en el inicio de Python y se ignora <a class="reference internal" href="#c.PyConfig.hash_seed" title="PyConfig.hash_seed"><code class="xref c c-member docutils literal notranslate"><span class="pre">hash_seed</span></code></a>.</p>
+<p>Establecido por la variable de entorno <span class="target" id="index-75"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONHASHSEED"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONHASHSEED</span></code></a>.</p>
+<p>Valor predeterminado de <em>use_hash_seed</em>: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.home">
+wchar_t *<code class="sig-name descname">home</code><a class="headerlink" href="#c.PyConfig.home" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Directorio de inicio de Python.</p>
+<p>Si se ha llamado a <a class="reference internal" href="init.html#c.Py_SetPythonHome" title="Py_SetPythonHome"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_SetPythonHome()</span></code></a>, use su argumento si no es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Establecido por la variable de entorno <span class="target" id="index-76"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONHOME"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONHOME</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la entrada <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.import_time">
+int <code class="sig-name descname">import_time</code><a class="headerlink" href="#c.PyConfig.import_time" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, el tiempo de importación del perfil.</p>
+<p>Configure el <code class="docutils literal notranslate"><span class="pre">1</span></code> mediante la opción <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">importtime</span></code></a> y la variable de entorno <span class="target" id="index-77"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONPROFILEIMPORTTIME"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONPROFILEIMPORTTIME</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.inspect">
+int <code class="sig-name descname">inspect</code><a class="headerlink" href="#c.PyConfig.inspect" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Ingresa al modo interactivo después de ejecutar un script o un comando.</p>
+<p>Si es mayor que 0, habilite inspeccionar: cuando se pasa una secuencia de comandos como primer argumento o se usa la opción -c, ingrese al modo interactivo después de ejecutar la secuencia de comandos o el comando, incluso cuando <a class="reference internal" href="../library/sys.html#sys.stdin" title="sys.stdin"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdin</span></code></a> no parezca ser una terminal.</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">-i</span></code></a>. Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> si la variable de entorno <span class="target" id="index-78"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONINSPECT"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONINSPECT</span></code></a> no está vacía.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.install_signal_handlers">
+int <code class="sig-name descname">install_signal_handlers</code><a class="headerlink" href="#c.PyConfig.install_signal_handlers" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Instalar controladores de señales de Python?</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.interactive">
+int <code class="sig-name descname">interactive</code><a class="headerlink" href="#c.PyConfig.interactive" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es mayor que 0, habilita el modo interactivo (REPL).</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">-i</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.isolated">
+int <code class="sig-name descname">isolated</code><a class="headerlink" href="#c.PyConfig.isolated" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es mayor que 0, habilite el modo aislado:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a> no contiene ni el directorio del script (calculado a partir de <code class="docutils literal notranslate"><span class="pre">argv[0]</span></code> o el directorio actual) ni el directorio de paquetes del sitio del usuario.</p></li>
+<li><p>Python REPL no importa <a class="reference internal" href="../library/readline.html#module-readline" title="readline: GNU readline support for Python. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">readline</span></code></a> ni habilita la configuración predeterminada de readline en mensajes interactivos.</p></li>
+<li><p>Establece <a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code class="xref c c-member docutils literal notranslate"><span class="pre">use_environment</span></code></a> y <a class="reference internal" href="#c.PyConfig.user_site_directory" title="PyConfig.user_site_directory"><code class="xref c c-member docutils literal notranslate"><span class="pre">user_site_directory</span></code></a> en 0.</p></li>
+</ul>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo aislado.</p>
+<p>Ver también <a class="reference internal" href="#c.PyPreConfig.isolated" title="PyPreConfig.isolated"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.isolated</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.legacy_windows_stdio">
+int <code class="sig-name descname">legacy_windows_stdio</code><a class="headerlink" href="#c.PyConfig.legacy_windows_stdio" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, usa <a class="reference internal" href="../library/io.html#io.FileIO" title="io.FileIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.FileIO</span></code></a> en lugar de <code class="xref py py-class docutils literal notranslate"><span class="pre">io.WindowsConsoleIO</span></code> para <a class="reference internal" href="../library/sys.html#sys.stdin" title="sys.stdin"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdin</span></code></a>, <a class="reference internal" href="../library/sys.html#sys.stdout" title="sys.stdout"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdout</span></code></a> y <a class="reference internal" href="../library/sys.html#sys.stderr" title="sys.stderr"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stderr</span></code></a>.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> si la variable de entorno <span class="target" id="index-79"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONLEGACYWINDOWSSTDIO"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONLEGACYWINDOWSSTDIO</span></code></a> está establecida en una cadena no vacía.</p>
+<p>Solo disponible en Windows. La macro <code class="docutils literal notranslate"><span class="pre">#ifdef</span> <span class="pre">MS_WINDOWS</span></code> se puede usar para el código específico de Windows.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Consulte también <span class="target" id="index-80"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0528"><strong>PEP 528</strong></a> (Cambiar la codificación de la consola de Windows a UTF-8).</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.malloc_stats">
+int <code class="sig-name descname">malloc_stats</code><a class="headerlink" href="#c.PyConfig.malloc_stats" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, volcar las estadísticas en <a class="reference internal" href="memory.html#pymalloc"><span class="std std-ref">Asignador de memoria Python pymalloc</span></a> en la salida.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> por la variable de entorno <span class="target" id="index-81"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONMALLOCSTATS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONMALLOCSTATS</span></code></a>.</p>
+<p>La opción se ignora si Python es <a class="reference internal" href="../using/configure.html#cmdoption-without-pymalloc"><code class="xref std std-option docutils literal notranslate"><span class="pre">configurado</span> <span class="pre">usando</span> <span class="pre">la</span> <span class="pre">opción</span> <span class="pre">--without-pymalloc</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.platlibdir">
+wchar_t *<code class="sig-name descname">platlibdir</code><a class="headerlink" href="#c.PyConfig.platlibdir" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Nombre del directorio de la biblioteca de la plataforma: <a class="reference internal" href="../library/sys.html#sys.platlibdir" title="sys.platlibdir"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.platlibdir</span></code></a>.</p>
+<p>Establecido por la variable de entorno <span class="target" id="index-82"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONPLATLIBDIR"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONPLATLIBDIR</span></code></a>.</p>
+<p>Predeterminado: valor de la macro <code class="docutils literal notranslate"><span class="pre">PLATLIBDIR</span></code> que establece la <a class="reference internal" href="../using/configure.html#cmdoption-with-platlibdir"><code class="xref std std-option docutils literal notranslate"><span class="pre">opción</span> <span class="pre">configure</span> <span class="pre">--with-platlibdir</span></code></a> (predeterminado: <code class="docutils literal notranslate"><span class="pre">&quot;lib&quot;</span></code>).</p>
+<p>Parte de la entrada <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.pythonpath_env">
+wchar_t *<code class="sig-name descname">pythonpath_env</code><a class="headerlink" href="#c.PyConfig.pythonpath_env" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Rutas de búsqueda de módulos (<a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>) como una cadena separada por <code class="docutils literal notranslate"><span class="pre">DELIM</span></code> (<code class="xref py py-data docutils literal notranslate"><span class="pre">os.path.pathsep</span></code>).</p>
+<p>Establecido por la variable de entorno <span class="target" id="index-83"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONPATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la entrada <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.module_search_paths">
+<a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> <code class="sig-name descname">module_search_paths</code><a class="headerlink" href="#c.PyConfig.module_search_paths" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.module_search_paths_set">
+int <code class="sig-name descname">module_search_paths_set</code><a class="headerlink" href="#c.PyConfig.module_search_paths_set" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Rutas de búsqueda del módulo: <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p>
+<p>Si <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths_set</span></code></a> es igual a 0, la función que calcula <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a> anula <a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths</span></code></a> y establece <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths_set</span></code></a> en <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>Por defecto: lista vacía (<code class="docutils literal notranslate"><span class="pre">module_search_paths</span></code>) y <code class="docutils literal notranslate"><span class="pre">0</span></code> (<code class="docutils literal notranslate"><span class="pre">module_search_paths_set</span></code>).</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.optimization_level">
+int <code class="sig-name descname">optimization_level</code><a class="headerlink" href="#c.PyConfig.optimization_level" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Nivel de optimización de compilación:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: Optimizador de mirilla, configure <code class="docutils literal notranslate"><span class="pre">__debug__</span></code> en <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: Nivel 0, elimina las aserciones, establece <code class="docutils literal notranslate"><span class="pre">__debug__</span></code> en <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code>: Nivel 1, elimina docstrings.</p></li>
+</ul>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-O"><code class="xref std std-option docutils literal notranslate"><span class="pre">-O</span></code></a>. Establecido en el valor de la variable de entorno <span class="target" id="index-84"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONOPTIMIZE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONOPTIMIZE</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.orig_argv">
+<a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> <code class="sig-name descname">orig_argv</code><a class="headerlink" href="#c.PyConfig.orig_argv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>La lista de los argumentos originales de la línea de comandos pasados al ejecutable de Python: <a class="reference internal" href="../library/sys.html#sys.orig_argv" title="sys.orig_argv"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.orig_argv</span></code></a>.</p>
+<p>Si la lista <a class="reference internal" href="#c.PyConfig.orig_argv" title="PyConfig.orig_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">orig_argv</span></code></a> está vacía y <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> no es una lista que solo contiene una cadena vacía, <a class="reference internal" href="#c.PyConfig.PyConfig_Read" title="PyConfig_Read"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_Read()</span></code></a> copia <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> en <a class="reference internal" href="#c.PyConfig.orig_argv" title="PyConfig.orig_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">orig_argv</span></code></a> antes de modificar <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> (si <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> no es cero).</p>
+<p>Consulte también el miembro <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> y la función <a class="reference internal" href="#c.Py_GetArgcArgv" title="Py_GetArgcArgv"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_GetArgcArgv()</span></code></a>.</p>
+<p>Predeterminado: lista vacía.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.10.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.parse_argv">
+int <code class="sig-name descname">parse_argv</code><a class="headerlink" href="#c.PyConfig.parse_argv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Analizar los argumentos de la línea de comando?</p>
+<p>Si es igual a <code class="docutils literal notranslate"><span class="pre">1</span></code>, analiza <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> de la misma forma que Python normal analiza <a class="reference internal" href="../using/cmdline.html#using-on-cmdline"><span class="std std-ref">argumentos de línea de comando</span></a> y elimina los argumentos de Python de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a>.</p>
+<p>La función <a class="reference internal" href="#c.PyConfig.PyConfig_Read" title="PyConfig_Read"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_Read()</span></code></a> solo analiza los argumentos <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a> una vez: <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">2</span></code> después de analizar los argumentos. Dado que los argumentos de Python se eliminan de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a>, analizar los argumentos dos veces analizaría las opciones de la aplicación como opciones de Python.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Los argumentos <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a> ahora solo se analizan si <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.parse_argv</span></code></a> es igual a <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.parser_debug">
+int <code class="sig-name descname">parser_debug</code><a class="headerlink" href="#c.PyConfig.parser_debug" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Modo de depuración del analizador. Si es mayor que 0, active la salida de depuración del analizador (solo para expertos, según las opciones de compilación).</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-d"><code class="xref std std-option docutils literal notranslate"><span class="pre">-d</span></code></a>. Establecido en el valor de la variable de entorno <span class="target" id="index-85"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONDEBUG"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONDEBUG</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.pathconfig_warnings">
+int <code class="sig-name descname">pathconfig_warnings</code><a class="headerlink" href="#c.PyConfig.pathconfig_warnings" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>En Unix, si es distinto de cero, el cálculo de <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a> puede registrar advertencias en <code class="docutils literal notranslate"><span class="pre">stderr</span></code>. Si es igual a 0, suprima estas advertencias.</p>
+<p>No tiene ningún efecto en Windows.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+<p>Parte de la entrada <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.prefix">
+wchar_t *<code class="sig-name descname">prefix</code><a class="headerlink" href="#c.PyConfig.prefix" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>El prefijo de directorio específico del sitio donde se instalan los archivos Python independientes de la plataforma: <a class="reference internal" href="../library/sys.html#sys.prefix" title="sys.prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.prefix</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la salida <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.program_name">
+wchar_t *<code class="sig-name descname">program_name</code><a class="headerlink" href="#c.PyConfig.program_name" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Nombre del programa utilizado para inicializar <a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code class="xref c c-member docutils literal notranslate"><span class="pre">executable</span></code></a> y en los primeros mensajes de error durante la inicialización de Python.</p>
+<ul class="simple">
+<li><p>Si se ha llamado a <code class="xref py py-func docutils literal notranslate"><span class="pre">Py_SetProgramName()</span></code>, usa su argumento.</p></li>
+<li><p>En macOS, usa la variable de entorno <span class="target" id="index-86"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONEXECUTABLE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONEXECUTABLE</span></code></a> si está configurada.</p></li>
+<li><p>Si se define la macro <code class="docutils literal notranslate"><span class="pre">WITH_NEXT_FRAMEWORK</span></code>, utiliza la variable de entorno <span class="target" id="index-87"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">__PYVENV_LAUNCHER__</span></code> si está configurada.</p></li>
+<li><p>Utiliza <code class="docutils literal notranslate"><span class="pre">argv[0]</span></code> de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> si está disponible y no está vacío.</p></li>
+<li><p>De lo contrario, utiliza <code class="docutils literal notranslate"><span class="pre">L&quot;python&quot;</span></code> en Windows o <code class="docutils literal notranslate"><span class="pre">L&quot;python3&quot;</span></code> en otras plataformas.</p></li>
+</ul>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Parte de la entrada <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.pycache_prefix">
+wchar_t *<code class="sig-name descname">pycache_prefix</code><a class="headerlink" href="#c.PyConfig.pycache_prefix" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Directorio donde se escriben los archivos <code class="docutils literal notranslate"><span class="pre">.pyc</span></code> almacenados en caché: <a class="reference internal" href="../library/sys.html#sys.pycache_prefix" title="sys.pycache_prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.pycache_prefix</span></code></a>.</p>
+<p>Establecido por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">pycache_prefix=PATH</span></code></a> y la variable de entorno <span class="target" id="index-88"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONPYCACHEPREFIX"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONPYCACHEPREFIX</span></code></a>.</p>
+<p>Si <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, <a class="reference internal" href="../library/sys.html#sys.pycache_prefix" title="sys.pycache_prefix"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.pycache_prefix</span></code></a> es establecido a <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.quiet">
+int <code class="sig-name descname">quiet</code><a class="headerlink" href="#c.PyConfig.quiet" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Modo silencioso. Si es mayor que 0, no muestre los derechos de autor y la versión al inicio de Python en modo interactivo.</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-q"><code class="xref std std-option docutils literal notranslate"><span class="pre">-q</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.run_command">
+wchar_t *<code class="sig-name descname">run_command</code><a class="headerlink" href="#c.PyConfig.run_command" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Valor de la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-c"><code class="xref std std-option docutils literal notranslate"><span class="pre">-c</span></code></a>.</p>
+<p>Usado por <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.run_filename">
+wchar_t *<code class="sig-name descname">run_filename</code><a class="headerlink" href="#c.PyConfig.run_filename" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Nombre de archivo pasado en la línea de comando: argumento de línea de comando final sin <a class="reference internal" href="../using/cmdline.html#cmdoption-c"><code class="xref std std-option docutils literal notranslate"><span class="pre">-c</span></code></a> o <a class="reference internal" href="../using/cmdline.html#cmdoption-m"><code class="xref std std-option docutils literal notranslate"><span class="pre">-m</span></code></a>.</p>
+<p>Por ejemplo, el comando <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">script.py</span> <span class="pre">arg</span></code> lo establece en <code class="docutils literal notranslate"><span class="pre">script.py</span></code>.</p>
+<p>Usado por <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.run_module">
+wchar_t *<code class="sig-name descname">run_module</code><a class="headerlink" href="#c.PyConfig.run_module" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Valor de la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-m"><code class="xref std std-option docutils literal notranslate"><span class="pre">-m</span></code></a>.</p>
+<p>Usado por <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a>.</p>
+<p>Valor predeterminado: <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.show_ref_count">
+int <code class="sig-name descname">show_ref_count</code><a class="headerlink" href="#c.PyConfig.show_ref_count" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Mostrar el recuento de referencia total en la salida?</p>
+<p>Establecido en 1 por la opción de línea de comandos <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">showrefcount</span></code></a>.</p>
+<p>Necesita una <a class="reference internal" href="../using/configure.html#debug-build"><span class="std std-ref">compilación de depuración de Python</span></a> (se debe definir la macro <code class="docutils literal notranslate"><span class="pre">Py_REF_DEBUG</span></code>).</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.site_import">
+int <code class="sig-name descname">site_import</code><a class="headerlink" href="#c.PyConfig.site_import" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Importar el módulo <a class="reference internal" href="../library/site.html#module-site" title="site: Module responsible for site-specific configuration."><code class="xref py py-mod docutils literal notranslate"><span class="pre">site</span></code></a> al inicio?</p>
+<p>Si es igual a cero, desactive la importación del sitio del módulo y las manipulaciones dependientes del sitio de <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a> que conlleva.</p>
+<p>También deshabilite estas manipulaciones si el módulo <a class="reference internal" href="../library/site.html#module-site" title="site: Module responsible for site-specific configuration."><code class="xref py py-mod docutils literal notranslate"><span class="pre">site</span></code></a> se importa explícitamente más tarde (llame a <a class="reference internal" href="../library/site.html#site.main" title="site.main"><code class="xref py py-func docutils literal notranslate"><span class="pre">site.main()</span></code></a> si desea que se activen).</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">0</span></code> mediante la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-S"><code class="xref std std-option docutils literal notranslate"><span class="pre">-S</span></code></a>.</p>
+<p><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.flags.no_site</span></code> se establece en el valor invertido de <a class="reference internal" href="#c.PyConfig.site_import" title="PyConfig.site_import"><code class="xref c c-member docutils literal notranslate"><span class="pre">site_import</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.skip_source_first_line">
+int <code class="sig-name descname">skip_source_first_line</code><a class="headerlink" href="#c.PyConfig.skip_source_first_line" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si no es cero, omita la primera línea de la fuente <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.run_filename</span></code></a>.</p>
+<p>Permite el uso de formas de <code class="docutils literal notranslate"><span class="pre">#!cmd</span></code> que no son Unix. Esto está destinado únicamente a un truco específico de DOS.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">1</span></code> mediante la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-x"><code class="xref std std-option docutils literal notranslate"><span class="pre">-x</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.stdio_encoding">
+wchar_t *<code class="sig-name descname">stdio_encoding</code><a class="headerlink" href="#c.PyConfig.stdio_encoding" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.stdio_errors">
+wchar_t *<code class="sig-name descname">stdio_errors</code><a class="headerlink" href="#c.PyConfig.stdio_errors" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Codificación y errores de codificación de <a class="reference internal" href="../library/sys.html#sys.stdin" title="sys.stdin"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdin</span></code></a>, <a class="reference internal" href="../library/sys.html#sys.stdout" title="sys.stdout"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdout</span></code></a> y <a class="reference internal" href="../library/sys.html#sys.stderr" title="sys.stderr"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stderr</span></code></a> (pero <a class="reference internal" href="../library/sys.html#sys.stderr" title="sys.stderr"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stderr</span></code></a> siempre usa el controlador de errores <code class="docutils literal notranslate"><span class="pre">&quot;backslashreplace&quot;</span></code>).</p>
+<p>Si se ha llamado a <a class="reference internal" href="init.html#c.Py_SetStandardStreamEncoding" title="Py_SetStandardStreamEncoding"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_SetStandardStreamEncoding()</span></code></a>, utilice sus argumentos <em>error</em> y <em>errors</em> si no son <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Utilice la variable de entorno <span class="target" id="index-89"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONIOENCODING"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONIOENCODING</span></code></a> si no está vacía.</p>
+<p>Codificación predeterminada:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;UTF-8&quot;</span></code> si <a class="reference internal" href="#c.PyPreConfig.utf8_mode" title="PyPreConfig.utf8_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.utf8_mode</span></code></a> es distinto de cero.</p></li>
+<li><p>De lo contrario, usa el <a class="reference internal" href="../glossary.html#term-locale-encoding"><span class="xref std std-term">locale encoding</span></a>.</p></li>
+</ul>
+<p>Manejador de errores predeterminado:</p>
+<ul class="simple">
+<li><p>En Windows: use <code class="docutils literal notranslate"><span class="pre">&quot;surrogateescape&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;surrogateescape&quot;</span></code> si <a class="reference internal" href="#c.PyPreConfig.utf8_mode" title="PyPreConfig.utf8_mode"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyPreConfig.utf8_mode</span></code></a> no es cero o si la configuración regional LC_CTYPE es «C» o «POSIX».</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;strict&quot;</span></code> de lo contrario.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.tracemalloc">
+int <code class="sig-name descname">tracemalloc</code><a class="headerlink" href="#c.PyConfig.tracemalloc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Habilitar tracemalloc?</p>
+<p>Si no es cero, llama a <a class="reference internal" href="../library/tracemalloc.html#tracemalloc.start" title="tracemalloc.start"><code class="xref py py-func docutils literal notranslate"><span class="pre">tracemalloc.start()</span></code></a> al inicio.</p>
+<p>Establecido por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span> <span class="pre">tracemalloc=N</span></code></a> y por la variable de entorno <span class="target" id="index-90"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONTRACEMALLOC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONTRACEMALLOC</span></code></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">-1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.use_environment">
+int <code class="sig-name descname">use_environment</code><a class="headerlink" href="#c.PyConfig.use_environment" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>¿Utiliza <a class="reference internal" href="../using/cmdline.html#using-on-envvars"><span class="std std-ref">variables de entorno</span></a>?</p>
+<p>Si es igual a cero, ignora las <a class="reference internal" href="../using/cmdline.html#using-on-envvars"><span class="std std-ref">variables de entorno</span></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code> en la configuración de Python y <code class="docutils literal notranslate"><span class="pre">0</span></code> en la configuración aislada.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.user_site_directory">
+int <code class="sig-name descname">user_site_directory</code><a class="headerlink" href="#c.PyConfig.user_site_directory" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es distinto de cero, agregue el directorio del sitio del usuario a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">0</span></code> por las opciones de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-s"><code class="xref std std-option docutils literal notranslate"><span class="pre">-s</span></code></a> y <a class="reference internal" href="../using/cmdline.html#cmdoption-I"><code class="xref std std-option docutils literal notranslate"><span class="pre">-I</span></code></a>.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">0</span></code> por la variable de entorno <span class="target" id="index-91"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONNOUSERSITE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONNOUSERSITE</span></code></a>.</p>
+<p>Por defecto: <code class="docutils literal notranslate"><span class="pre">1</span></code> en modo Python, <code class="docutils literal notranslate"><span class="pre">0</span></code> en modo aislado.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.verbose">
+int <code class="sig-name descname">verbose</code><a class="headerlink" href="#c.PyConfig.verbose" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Modo detallado. Si es mayor que 0, imprima un mensaje cada vez que se importe un módulo, mostrando el lugar (nombre de archivo o módulo integrado) desde el que se carga.</p>
+<p>Si es mayor o igual a 2, imprima un mensaje para cada archivo que se compruebe al buscar un módulo. También proporciona información sobre la limpieza del módulo al salir.</p>
+<p>Incrementado por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-1"><code class="xref std std-option docutils literal notranslate"><span class="pre">-v</span></code></a>.</p>
+<p>Establecido en el valor de la variable de entorno <span class="target" id="index-92"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONVERBOSE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONVERBOSE</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.warnoptions">
+<a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> <code class="sig-name descname">warnoptions</code><a class="headerlink" href="#c.PyConfig.warnoptions" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Opciones del módulo <a class="reference internal" href="../library/warnings.html#module-warnings" title="warnings: Issue warning messages and control their disposition."><code class="xref py py-mod docutils literal notranslate"><span class="pre">warnings</span></code></a> para crear filtros de advertencias, de menor a mayor prioridad: <a class="reference internal" href="../library/sys.html#sys.warnoptions" title="sys.warnoptions"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.warnoptions</span></code></a>.</p>
+<p>El módulo <a class="reference internal" href="../library/warnings.html#module-warnings" title="warnings: Issue warning messages and control their disposition."><code class="xref py py-mod docutils literal notranslate"><span class="pre">warnings</span></code></a> agrega <a class="reference internal" href="../library/sys.html#sys.warnoptions" title="sys.warnoptions"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.warnoptions</span></code></a> en el orden inverso: el último elemento <a class="reference internal" href="#c.PyConfig.warnoptions" title="PyConfig.warnoptions"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.warnoptions</span></code></a> se convierte en el primer elemento de <code class="xref py py-data docutils literal notranslate"><span class="pre">warnings.filters</span></code> que es verificado primero (máxima prioridad).</p>
+<p>Las opciones de la línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-W"><code class="xref std std-option docutils literal notranslate"><span class="pre">-W</span></code></a> agregan su valor a <a class="reference internal" href="#c.PyConfig.warnoptions" title="PyConfig.warnoptions"><code class="xref c c-member docutils literal notranslate"><span class="pre">warnoptions</span></code></a>, se puede usar varias veces.</p>
+<p>La variable de entorno <span class="target" id="index-93"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONWARNINGS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONWARNINGS</span></code></a> también se puede utilizar para agregar opciones de advertencia. Se pueden especificar varias opciones, separadas por comas (<code class="docutils literal notranslate"><span class="pre">,</span></code>).</p>
+<p>Predeterminado: lista vacía.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.write_bytecode">
+int <code class="sig-name descname">write_bytecode</code><a class="headerlink" href="#c.PyConfig.write_bytecode" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si es igual a 0, Python no intentará escribir archivos <code class="docutils literal notranslate"><span class="pre">.pyc</span></code> en la importación de módulos fuente.</p>
+<p>Establecido en <code class="docutils literal notranslate"><span class="pre">0</span></code> por la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-B"><code class="xref std std-option docutils literal notranslate"><span class="pre">-B</span></code></a> y la variable de entorno <span class="target" id="index-94"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONDONTWRITEBYTECODE</span></code></a>.</p>
+<p><a class="reference internal" href="../library/sys.html#sys.dont_write_bytecode" title="sys.dont_write_bytecode"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.dont_write_bytecode</span></code></a> se inicializa al valor invertido de <a class="reference internal" href="#c.PyConfig.write_bytecode" title="PyConfig.write_bytecode"><code class="xref c c-member docutils literal notranslate"><span class="pre">write_bytecode</span></code></a>.</p>
+<p>Predeterminado: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.PyConfig.xoptions">
+<a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList">PyWideStringList</a> <code class="sig-name descname">xoptions</code><a class="headerlink" href="#c.PyConfig.xoptions" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Valores de las opciones de la línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span></code></a>: <a class="reference internal" href="../library/sys.html#sys._xoptions" title="sys._xoptions"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys._xoptions</span></code></a>.</p>
+<p>Predeterminado: lista vacía.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Si <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">parse_argv</span></code></a> no es cero, los argumentos de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a> se analizan de la misma forma que Python normal analiza <a class="reference internal" href="../using/cmdline.html#using-on-cmdline"><span class="std std-ref">argumentos de línea de comando</span></a>, y los argumentos de Python se eliminan de <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">argv</span></code></a>.</p>
+<p>Las opciones de <a class="reference internal" href="#c.PyConfig.xoptions" title="PyConfig.xoptions"><code class="xref c c-member docutils literal notranslate"><span class="pre">xoptions</span></code></a> se analizan para establecer otras opciones: consulte la opción de línea de comando <a class="reference internal" href="../using/cmdline.html#cmdoption-X"><code class="xref std std-option docutils literal notranslate"><span class="pre">-X</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>El campo <code class="docutils literal notranslate"><span class="pre">show_alloc_count</span></code> fue removido.</p>
+</div>
+</section>
+<section id="initialization-with-pyconfig">
+<h2>Inicialización con PyConfig<a class="headerlink" href="#initialization-with-pyconfig" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Función para inicializar Python:</p>
+<dl class="c function">
+<dt id="c.Py_InitializeFromConfig">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">Py_InitializeFromConfig</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#c.PyConfig" title="PyConfig">PyConfig</a> *<em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_InitializeFromConfig" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Inicializa Python desde la configuración <em>config</em>.</p>
+</dd></dl>
+
+<p>La persona que llama es responsable de manejar las excepciones (error o salida) usando <code class="xref c c-func docutils literal notranslate"><span class="pre">PyStatus_Exception()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">Py_ExitStatusException()</span></code>.</p>
+<p>Si se utilizan <a class="reference internal" href="import.html#c.PyImport_FrozenModules" title="PyImport_FrozenModules"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_FrozenModules()</span></code></a>, <a class="reference internal" href="import.html#c.PyImport_AppendInittab" title="PyImport_AppendInittab"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_AppendInittab()</span></code></a> o <a class="reference internal" href="import.html#c.PyImport_ExtendInittab" title="PyImport_ExtendInittab"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_ExtendInittab()</span></code></a>, deben establecerse o llamarse después de la preinicialización de Python y antes de la inicialización de Python. Si Python se inicializa varias veces, se debe llamar a <a class="reference internal" href="import.html#c.PyImport_AppendInittab" title="PyImport_AppendInittab"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_AppendInittab()</span></code></a> o <a class="reference internal" href="import.html#c.PyImport_ExtendInittab" title="PyImport_ExtendInittab"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_ExtendInittab()</span></code></a> antes de cada inicialización de Python.</p>
+<p>La configuración actual (tipo <code class="docutils literal notranslate"><span class="pre">PyConfig</span></code>) se almacena en <code class="docutils literal notranslate"><span class="pre">PyInterpreterState.config</span></code>.</p>
+<p>Ejemplo de configuración del nombre del programa:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">init_python</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">PyConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_InitPythonConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Set the program name. Implicitly preinitialize Python. */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyConfig_SetString</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">program_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="sa">L</span><span class="s">&quot;/path/to/my_program&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">exception</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_InitializeFromConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">exception</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">exception</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Ejemplo más completo que modifica la configuración predeterminada, lee la configuración y luego anula algunos parámetros</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyStatus</span><span class="w"> </span><span class="nf">init_python</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">program_name</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">PyConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_InitPythonConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Set the program name before reading the configuration</span>
+<span class="cm">       (decode byte string from the locale encoding).</span>
+
+<span class="cm">       Implicitly preinitialize Python. */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyConfig_SetBytesString</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">program_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                     </span><span class="n">program_name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">done</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Read all configuration at once */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyConfig_Read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">done</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Append our custom search path to sys.path */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyWideStringList_Append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">module_search_paths</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                     </span><span class="sa">L</span><span class="s">&quot;/path/to/more/modules&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">done</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Override executable computed by PyConfig_Read() */</span><span class="w"></span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyConfig_SetString</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">config</span><span class="p">.</span><span class="n">executable</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="sa">L</span><span class="s">&quot;/path/to/my_executable&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">done</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_InitializeFromConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+
+<span class="nl">done</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="isolated-configuration">
+<span id="init-isolated-conf"></span><h2>Configuración aislada<a class="headerlink" href="#isolated-configuration" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><code class="xref c c-func docutils literal notranslate"><span class="pre">PyPreConfig_InitIsolatedConfig()</span></code> y las funciones <code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_InitIsolatedConfig()</span></code> crean una configuración para aislar Python del sistema. Por ejemplo, para incrustar Python en una aplicación.</p>
+<p>This configuration ignores global configuration variables, environment
+variables, command line arguments (<a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.argv</span></code></a> is not parsed)
+and user site directory. The C standard streams (ex: <code class="docutils literal notranslate"><span class="pre">stdout</span></code>) and the
+LC_CTYPE locale are left unchanged. Signal handlers are not installed.</p>
+<p>Los archivos de configuración todavía se utilizan con esta configuración. Configure el <a class="reference internal" href="#init-path-config"><span class="std std-ref">Python Path Configuration</span></a> («campos de salida») para ignorar estos archivos de configuración y evitar que la función calcule la configuración de ruta predeterminada.</p>
+</section>
+<section id="python-configuration">
+<span id="init-python-config"></span><h2>Configuración de Python<a class="headerlink" href="#python-configuration" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><code class="xref c c-func docutils literal notranslate"><span class="pre">PyPreConfig_InitPythonConfig()</span></code> y las funciones <code class="xref c c-func docutils literal notranslate"><span class="pre">PyConfig_InitPythonConfig()</span></code> crean una configuración para construir un Python personalizado que se comporta como el Python normal.</p>
+<p>Las variables de entorno y los argumentos de la línea de comandos se utilizan para configurar Python, mientras que las variables de configuración global se ignoran.</p>
+<p>Esta función habilita la coerción de configuración regional C (<span class="target" id="index-95"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0538"><strong>PEP 538</strong></a>) y <a class="reference internal" href="../library/os.html#utf8-mode"><span class="std std-ref">Python UTF-8 Mode</span></a> (<span class="target" id="index-96"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0540"><strong>PEP 540</strong></a>) según la configuración regional LC_CTYPE, las variables de entorno <span class="target" id="index-97"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONUTF8"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONUTF8</span></code></a> y <span class="target" id="index-98"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONCOERCECLOCALE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">PYTHONCOERCECLOCALE</span></code></a>.</p>
+</section>
+<section id="python-path-configuration">
+<span id="init-path-config"></span><h2>Configuración de la ruta de Python<a class="headerlink" href="#python-path-configuration" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><a class="reference internal" href="#c.PyConfig" title="PyConfig"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyConfig</span></code></a> contiene múltiples campos para la configuración de ruta:</p>
+<ul class="simple">
+<li><p>Entradas de configuración de ruta:</p>
+<ul>
+<li><p><a class="reference internal" href="#c.PyConfig.home" title="PyConfig.home"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.home</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.platlibdir" title="PyConfig.platlibdir"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.platlibdir</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.pathconfig_warnings" title="PyConfig.pathconfig_warnings"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.pathconfig_warnings</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.program_name" title="PyConfig.program_name"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.program_name</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.pythonpath_env" title="PyConfig.pythonpath_env"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.pythonpath_env</span></code></a></p></li>
+<li><p>directorio de trabajo actual: para obtener rutas absolutas</p></li>
+<li><p>Variable de entorno <code class="docutils literal notranslate"><span class="pre">PATH</span></code> para obtener la ruta completa del programa (de <a class="reference internal" href="#c.PyConfig.program_name" title="PyConfig.program_name"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.program_name</span></code></a>)</p></li>
+<li><p>Variable de entorno <code class="docutils literal notranslate"><span class="pre">__PYVENV_LAUNCHER__</span></code></p></li>
+<li><p>(Solo Windows) Rutas de aplicación en el registro en «SoftwarePythonPythonCoreX.YPythonPath» de HKEY_CURRENT_USER y HKEY_LOCAL_MACHINE (donde X.Y es la versión de Python).</p></li>
+</ul>
+</li>
+<li><p>Campos de salida de configuración de ruta:</p>
+<ul>
+<li><p><a class="reference internal" href="#c.PyConfig.base_exec_prefix" title="PyConfig.base_exec_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.base_exec_prefix</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.base_executable" title="PyConfig.base_executable"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.base_executable</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.base_prefix" title="PyConfig.base_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.base_prefix</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.exec_prefix" title="PyConfig.exec_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.exec_prefix</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.executable</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.module_search_paths_set</span></code></a>,
+<a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.module_search_paths</span></code></a></p></li>
+<li><p><a class="reference internal" href="#c.PyConfig.prefix" title="PyConfig.prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.prefix</span></code></a></p></li>
+</ul>
+</li>
+</ul>
+<p>Si no se establece al menos un «campo de salida», Python calcula la configuración de la ruta para completar los campos no definidos. Si <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths_set</span></code></a> es igual a 0, <a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths</span></code></a> se reemplaza y <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code class="xref c c-member docutils literal notranslate"><span class="pre">module_search_paths_set</span></code></a> se establece en 1.</p>
+<p>Es posible ignorar por completo la función que calcula la configuración de ruta predeterminada al establecer explícitamente todos los campos de salida de configuración de ruta enumerados anteriormente. Una cadena de caracteres se considera como un conjunto, incluso si no está vacía. <code class="docutils literal notranslate"><span class="pre">module_search_paths</span></code> se considera como establecido si <code class="docutils literal notranslate"><span class="pre">module_search_paths_set</span></code> se establece en 1. En este caso, los campos de entrada de configuración de ruta también se ignoran.</p>
+<p>Establezca <a class="reference internal" href="#c.PyConfig.pathconfig_warnings" title="PyConfig.pathconfig_warnings"><code class="xref c c-member docutils literal notranslate"><span class="pre">pathconfig_warnings</span></code></a> en 0 para suprimir las advertencias al calcular la configuración de la ruta (solo Unix, Windows no registra ninguna advertencia).</p>
+<p>Si <a class="reference internal" href="#c.PyConfig.base_prefix" title="PyConfig.base_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">base_prefix</span></code></a> o los campos <a class="reference internal" href="#c.PyConfig.base_exec_prefix" title="PyConfig.base_exec_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">base_exec_prefix</span></code></a> no están establecidos, heredan su valor de <a class="reference internal" href="#c.PyConfig.prefix" title="PyConfig.prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">prefix</span></code></a> y <a class="reference internal" href="#c.PyConfig.exec_prefix" title="PyConfig.exec_prefix"><code class="xref c c-member docutils literal notranslate"><span class="pre">exec_prefix</span></code></a> respectivamente.</p>
+<p><a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a> y <a class="reference internal" href="veryhigh.html#c.Py_Main" title="Py_Main"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_Main()</span></code></a> modifican <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>:</p>
+<ul class="simple">
+<li><p>Si <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code class="xref c c-member docutils literal notranslate"><span class="pre">run_filename</span></code></a> está configurado y es un directorio que contiene un script <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code>, anteponga <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code class="xref c c-member docutils literal notranslate"><span class="pre">run_filename</span></code></a> a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p></li>
+<li><p>Si <a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code class="xref c c-member docutils literal notranslate"><span class="pre">isolated</span></code></a> es cero:</p>
+<ul>
+<li><p>Si <a class="reference internal" href="#c.PyConfig.run_module" title="PyConfig.run_module"><code class="xref c c-member docutils literal notranslate"><span class="pre">run_module</span></code></a> está configurado, anteponga el directorio actual a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>. No haga nada si el directorio actual no se puede leer.</p></li>
+<li><p>Si <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code class="xref c c-member docutils literal notranslate"><span class="pre">run_filename</span></code></a> está configurado, anteponga el directorio del nombre del archivo a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p></li>
+<li><p>De lo contrario, anteponga una cadena de caracteres vacía a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p></li>
+</ul>
+</li>
+</ul>
+<p>Si <a class="reference internal" href="#c.PyConfig.site_import" title="PyConfig.site_import"><code class="xref c c-member docutils literal notranslate"><span class="pre">site_import</span></code></a> no es cero, <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a> puede ser modificado por el módulo <a class="reference internal" href="../library/site.html#module-site" title="site: Module responsible for site-specific configuration."><code class="xref py py-mod docutils literal notranslate"><span class="pre">site</span></code></a>. Si <a class="reference internal" href="#c.PyConfig.user_site_directory" title="PyConfig.user_site_directory"><code class="xref c c-member docutils literal notranslate"><span class="pre">user_site_directory</span></code></a> no es cero y el directorio del paquete del sitio del usuario existe, el módulo <a class="reference internal" href="../library/site.html#module-site" title="site: Module responsible for site-specific configuration."><code class="xref py py-mod docutils literal notranslate"><span class="pre">site</span></code></a> agrega el directorio del paquete del sitio del usuario a <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>.</p>
+<p>La configuración de ruta utiliza los siguientes archivos de configuración:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pyvenv.cfg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python._pth</span></code> (sólo Windows)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pybuilddir.txt</span></code> (sólo Unix)</p></li>
+</ul>
+<p>La variable de entorno <code class="docutils literal notranslate"><span class="pre">__PYVENV_LAUNCHER__</span></code> se usa para establecer <a class="reference internal" href="#c.PyConfig.base_executable" title="PyConfig.base_executable"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.base_executable</span></code></a></p>
+</section>
+<section id="py-runmain">
+<h2>Py_RunMain()<a class="headerlink" href="#py-runmain" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c function">
+<dt id="c.Py_RunMain">
+int <code class="sig-name descname">Py_RunMain</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.Py_RunMain" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Ejecuta el comando (<a class="reference internal" href="#c.PyConfig.run_command" title="PyConfig.run_command"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.run_command</span></code></a>), el script (<a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.run_filename</span></code></a>) o el módulo (<a class="reference internal" href="#c.PyConfig.run_module" title="PyConfig.run_module"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.run_module</span></code></a>) especificado en la línea de comando o en la configuración.</p>
+<p>Por defecto y cuando se usa la opción <a class="reference internal" href="../using/cmdline.html#cmdoption-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">-i</span></code></a>, ejecuta el REPL.</p>
+<p>Finalmente, finaliza Python y retorna un estado de salida que se puede pasar a la función <code class="docutils literal notranslate"><span class="pre">exit()</span></code>.</p>
+</dd></dl>
+
+<p>Consulte <a class="reference internal" href="#init-python-config"><span class="std std-ref">Configuración de Python</span></a> para ver un ejemplo de Python personalizado que siempre se ejecuta en modo aislado usando <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_RunMain()</span></code></a>.</p>
+</section>
+<section id="py-getargcargv">
+<h2>Py_GetArgcArgv()<a class="headerlink" href="#py-getargcargv" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c function">
+<dt id="c.Py_GetArgcArgv">
+void <code class="sig-name descname">Py_GetArgcArgv</code><span class="sig-paren">(</span>int *<em>argc</em>, wchar_t ***<em>argv</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_GetArgcArgv" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Obtiene los argumentos originales de la línea de comandos, antes de que Python los modificara.</p>
+<p>Ver también el miembro <a class="reference internal" href="#c.PyConfig.orig_argv" title="PyConfig.orig_argv"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig.orig_argv</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="multi-phase-initialization-private-provisional-api">
+<h2>API Provisional Privada de Inicialización Multifásica<a class="headerlink" href="#multi-phase-initialization-private-provisional-api" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>This section is a private provisional API introducing multi-phase
+initialization, the core feature of <span class="target" id="index-32"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0432"><strong>PEP 432</strong></a>:</p>
+<ul class="simple">
+<li><p>Fase de inicialización «Core», «Python mínimo»:</p>
+<ul>
+<li><p>Tipos incorporados;</p></li>
+<li><p>Excepciones incorporadas;</p></li>
+<li><p>Módulos incorporados y congelados;</p></li>
+<li><p>El módulo <a class="reference internal" href="../library/sys.html#module-sys" title="sys: Access system-specific parameters and functions."><code class="xref py py-mod docutils literal notranslate"><span class="pre">sys</span></code></a> solo se inicializa parcialmente (por ejemplo <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a> aún no existe).</p></li>
+</ul>
+</li>
+<li><p>Fase de inicialización «principal», Python está completamente inicializado:</p>
+<ul>
+<li><p>Instala y configura <a class="reference internal" href="../library/importlib.html#module-importlib" title="importlib: The implementation of the import machinery."><code class="xref py py-mod docutils literal notranslate"><span class="pre">importlib</span></code></a>;</p></li>
+<li><p>Aplique la <a class="reference internal" href="#init-path-config"><span class="std std-ref">Configuración de ruta</span></a>;</p></li>
+<li><p>Instala manejadores de señal;</p></li>
+<li><p>Finaliza la inicialización del módulo <a class="reference internal" href="../library/sys.html#module-sys" title="sys: Access system-specific parameters and functions."><code class="xref py py-mod docutils literal notranslate"><span class="pre">sys</span></code></a> (por ejemplo: crea <a class="reference internal" href="../library/sys.html#sys.stdout" title="sys.stdout"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdout</span></code></a> y <a class="reference internal" href="../library/sys.html#sys.path" title="sys.path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.path</span></code></a>);</p></li>
+<li><p>Habilita características opcionales como <a class="reference internal" href="../library/faulthandler.html#module-faulthandler" title="faulthandler: Dump the Python traceback."><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code></a> y <a class="reference internal" href="../library/tracemalloc.html#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">tracemalloc</span></code></a>;</p></li>
+<li><p>Importe el módulo <a class="reference internal" href="../library/site.html#module-site" title="site: Module responsible for site-specific configuration."><code class="xref py py-mod docutils literal notranslate"><span class="pre">site</span></code></a>;</p></li>
+<li><p>etc.</p></li>
+</ul>
+</li>
+</ul>
+<p>API provisional privada:</p>
+<ul class="simple">
+<li><p><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig._init_main</span></code>: si se establece en 0, <a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_InitializeFromConfig()</span></code></a> se detiene en la fase de inicialización «Core».</p></li>
+<li><p><code class="xref c c-member docutils literal notranslate"><span class="pre">PyConfig._isolated_interpreter</span></code>: si no es cero, no permite hilos, subprocesos y bifurcaciones.</p></li>
+</ul>
+<dl class="c function">
+<dt id="c._Py_InitializeMain">
+<a class="reference internal" href="#c.PyStatus" title="PyStatus">PyStatus</a> <code class="sig-name descname">_Py_InitializeMain</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c._Py_InitializeMain" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Vaya a la fase de inicialización «Principal», finalice la inicialización de Python.</p>
+</dd></dl>
+
+<p>No se importa ningún módulo durante la fase «Core» y el módulo <code class="docutils literal notranslate"><span class="pre">importlib</span></code> no está configurado: la <a class="reference internal" href="#init-path-config"><span class="std std-ref">Configuración de ruta</span></a> solo se aplica durante la fase «Principal». Puede permitir personalizar Python en Python para anular o ajustar <a class="reference internal" href="#init-path-config"><span class="std std-ref">Configuración de ruta</span></a>, tal vez instale un importador personalizado <a class="reference internal" href="../library/sys.html#sys.meta_path" title="sys.meta_path"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.meta_path</span></code></a> o un enlace de importación, etc.</p>
+<p>Puede ser posible calcular <a class="reference internal" href="#init-path-config"><span class="std std-ref">Configuración de ruta</span></a> en Python, después de la fase Core y antes de la fase Main, que es una de las motivaciones <span class="target" id="index-99"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0432"><strong>PEP 432</strong></a>.</p>
+<p>La fase «Núcleo» no está definida correctamente: lo que debería estar y lo que no debería estar disponible en esta fase aún no se ha especificado. La API está marcada como privada y provisional: la API se puede modificar o incluso eliminar en cualquier momento hasta que se diseñe una API pública adecuada.</p>
+<p>Ejemplo de ejecución de código Python entre las fases de inicialización «Core» y «Main»:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">init_python</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyStatus</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">PyConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_InitPythonConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">config</span><span class="p">.</span><span class="n">_init_main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* ... customize &#39;config&#39; configuration ... */</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_InitializeFromConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyConfig_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Use sys.stderr because sys.stdout is only created</span>
+<span class="cm">       by _Py_InitializeMain() */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyRun_SimpleString</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;import sys; &quot;</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;print(&#39;Run Python code before _Py_InitializeMain&#39;, &quot;</span><span class="w"></span>
+<span class="w">               </span><span class="s">&quot;file=sys.stderr)&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* ... put more configuration code here ... */</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_Py_InitializeMain</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyStatus_Exception</span><span class="p">(</span><span class="n">status</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Py_ExitStatusException</span><span class="p">(</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuración de inicialización de Python</a><ul>
+<li><a class="reference internal" href="#example">Ejemplo</a></li>
+<li><a class="reference internal" href="#pywidestringlist">PyWideStringList</a></li>
+<li><a class="reference internal" href="#pystatus">PyStatus</a></li>
+<li><a class="reference internal" href="#pypreconfig">PyPreConfig</a></li>
+<li><a class="reference internal" href="#preinitialize-python-with-pypreconfig">Preinicialización de Python con PyPreConfig</a></li>
+<li><a class="reference internal" href="#pyconfig">PyConfig</a></li>
+<li><a class="reference internal" href="#initialization-with-pyconfig">Inicialización con PyConfig</a></li>
+<li><a class="reference internal" href="#isolated-configuration">Configuración aislada</a></li>
+<li><a class="reference internal" href="#python-configuration">Configuración de Python</a></li>
+<li><a class="reference internal" href="#python-path-configuration">Configuración de la ruta de Python</a></li>
+<li><a class="reference internal" href="#py-runmain">Py_RunMain()</a></li>
+<li><a class="reference internal" href="#py-getargcargv">Py_GetArgcArgv()</a></li>
+<li><a class="reference internal" href="#multi-phase-initialization-private-provisional-api">API Provisional Privada de Inicialización Multifásica</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="init.html"
+                        title="capítulo anterior">Inicialización, Finalización e Hilos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="memory.html"
+                        title="próximo capítulo">Gestión de la memoria</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/init_config.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="memory.html" title="Gestión de la memoria"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="init.html" title="Inicialización, Finalización e Hilos"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Configuración de inicialización de Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

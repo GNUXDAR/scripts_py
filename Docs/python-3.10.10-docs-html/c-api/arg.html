@@ -1,0 +1,720 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Analizando argumentos y construyendo valores &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Conversión y formato de cadenas de caracteres" href="conversion.html" />
+    <link rel="prev" title="Soporte de empaquetado (marshalling) de datos" href="marshal.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/arg.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Analizando argumentos y construyendo valores</a><ul>
+<li><a class="reference internal" href="#parsing-arguments">Analizando argumentos</a><ul>
+<li><a class="reference internal" href="#strings-and-buffers">Cadena de caracteres y búferes</a></li>
+<li><a class="reference internal" href="#numbers">Números</a></li>
+<li><a class="reference internal" href="#other-objects">Otros objetos</a></li>
+<li><a class="reference internal" href="#api-functions">Funciones API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-values">Construyendo valores</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="marshal.html"
+                        title="capítulo anterior">Soporte de empaquetado (<em>marshalling</em>) de datos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="conversion.html"
+                        title="próximo capítulo">Conversión y formato de cadenas de caracteres</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/arg.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="conversion.html" title="Conversión y formato de cadenas de caracteres"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="marshal.html" title="Soporte de empaquetado (marshalling) de datos"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="utilities.html" accesskey="U">Utilidades</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Analizando argumentos y construyendo valores</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="parsing-arguments-and-building-values">
+<span id="arg-parsing"></span><h1>Analizando argumentos y construyendo valores<a class="headerlink" href="#parsing-arguments-and-building-values" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Estas funciones son útiles al crear sus propias funciones y métodos de extensiones. Información y ejemplos adicionales están disponibles en <a class="reference internal" href="../extending/index.html#extending-index"><span class="std std-ref">Ampliación e incrustación del intérprete de Python</span></a>.</p>
+<p>Las tres primeras de estas funciones descritas, <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a>, <a class="reference internal" href="#c.PyArg_ParseTupleAndKeywords" title="PyArg_ParseTupleAndKeywords"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTupleAndKeywords()</span></code></a>, y <a class="reference internal" href="#c.PyArg_Parse" title="PyArg_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_Parse()</span></code></a>, todas usan <em>cadenas de caracteres de formato</em> que se utilizan para contarle a la función sobre los argumentos esperados. Las cadenas de caracteres de formato utilizan la misma sintaxis para cada una de estas funciones.</p>
+<section id="parsing-arguments">
+<h2>Analizando argumentos<a class="headerlink" href="#parsing-arguments" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una cadena de formato consta de cero o más «unidades de formato.» Una unidad de formato describe un objeto Python; por lo general es un solo carácter o una secuencia de unidades formato entre paréntesis. Con unas pocas excepciones, una unidad de formato que no es una secuencia entre paréntesis normalmente corresponde a un único argumento de dirección de estas funciones. En la siguiente descripción, la forma citada es la unidad de formato; la entrada en paréntesis (redondos) es el tipo de objeto Python que coincida con la unidad de formato; y la entrada entre corchetes [cuadrados] es el tipo de la variable(s) C cuya dirección debe ser pasada.</p>
+<section id="strings-and-buffers">
+<h3>Cadena de caracteres y búferes<a class="headerlink" href="#strings-and-buffers" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Estos formatos permiten acceder a un objeto como un bloque contiguo de memoria. Usted no tiene que proporcionar almacenamiento en bruto para el Unicode o área de bytes retornada.</p>
+<p>A menos que se indique lo contrario, los búferes no son terminados en NULL (<em>NUL-terminated</em>).</p>
+<p>There are three ways strings and buffers can be converted to C:</p>
+<ul>
+<li><p>Formats such as <code class="docutils literal notranslate"><span class="pre">y*</span></code> and <code class="docutils literal notranslate"><span class="pre">s*</span></code> fill a <a class="reference internal" href="buffer.html#c.Py_buffer" title="Py_buffer"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_buffer</span></code></a> structure.
+This locks the underlying buffer so that the caller can subsequently use
+the buffer even inside a <a class="reference internal" href="init.html#c.Py_BEGIN_ALLOW_THREADS" title="Py_BEGIN_ALLOW_THREADS"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_BEGIN_ALLOW_THREADS</span></code></a>
+block without the risk of mutable data being resized or destroyed.
+As a result, <strong>you have to call</strong> <a class="reference internal" href="buffer.html#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a> after you have
+finished processing the data (or in any early abort case).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">es</span></code>, <code class="docutils literal notranslate"><span class="pre">es#</span></code>, <code class="docutils literal notranslate"><span class="pre">et</span></code> and <code class="docutils literal notranslate"><span class="pre">et#</span></code> formats allocate the result buffer.
+<strong>You have to call</strong> <a class="reference internal" href="memory.html#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a> after you have finished
+processing the data (or in any early abort case).</p></li>
+<li><p id="c-arg-borrowed-buffer">Other formats take a <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or a read-only <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>,
+such as <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>, and provide a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*</span></code> pointer to
+its buffer.
+In this case the buffer is «borrowed»: it is managed by the corresponding
+Python object, and shares the lifetime of this object.
+You won’t have to release any memory yourself.</p>
+<p>To ensure that the underlying buffer may be safely borrowed, the object’s
+<a class="reference internal" href="typeobj.html#c.PyBufferProcs.bf_releasebuffer" title="PyBufferProcs.bf_releasebuffer"><code class="xref c c-member docutils literal notranslate"><span class="pre">PyBufferProcs.bf_releasebuffer</span></code></a> field must be <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.
+This disallows common mutable objects such as <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>,
+but also some read-only objects such as <a class="reference internal" href="../library/stdtypes.html#memoryview" title="memoryview"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a> of
+<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p>
+<p>Besides this <code class="docutils literal notranslate"><span class="pre">bf_releasebuffer</span></code> requirement, there is no check to verify
+whether the input object is immutable (e.g. whether it would honor a request
+for a writable buffer, or whether another thread can mutate the data).</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Para todas las variantes de formatos <code class="docutils literal notranslate"><span class="pre">#</span></code> (<code class="docutils literal notranslate"><span class="pre">s#</span></code>, <code class="docutils literal notranslate"><span class="pre">y#</span></code>, etc.), la macro <code class="xref c c-macro docutils literal notranslate"><span class="pre">PY_SSIZE_T_CLEAN</span></code> tiene que estar definida antes de incluir <code class="file docutils literal notranslate"><span class="pre">Python.h</span></code>. En Python 3.9 y versiones anteriores, el tipo del argumento <em>length</em> es <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> si la macro <code class="xref c c-macro docutils literal notranslate"><span class="pre">PY_SSIZE_T_CLEAN</span></code> está definida, o int si no lo está.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">s</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const char *]</dt><dd><p>Convierte un objeto Unicode a un puntero C a una cadena de caracteres. Un puntero a una cadena de caracteres existente se almacena en la variable puntero del carácter cuya dirección se pasa. La cadena de caracteres en C es terminada en NULL. La cadena de caracteres de Python no debe contener puntos de código incrustado nulos; si lo hace, se lanza una excepción <a class="reference internal" href="../library/exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>. Los objetos Unicode se convierten en cadenas de caracteres de C utilizando codificación <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code>. Si esta conversión fallase lanza un <a class="reference internal" href="../library/exceptions.html#UnicodeError" title="UnicodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeError</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Este formato no acepta <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">objetos de tipo bytes</span></a>. Si desea aceptar los caminos del sistema de archivos y convertirlos en cadenas de caracteres C, es preferible utilizar el formato <code class="docutils literal notranslate"><span class="pre">O&amp;</span></code> con <code class="xref py py-func docutils literal notranslate"><span class="pre">PyUnicode_FSConverter()</span></code> como convertidor.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Anteriormente, <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> se lanzó cuando se encontraron puntos de código nulos incrustados en la cadena de caracteres de Python.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">s*</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>) [Py_buffer]</dt><dd><p>Este formato acepta objetos Unicode, así como objetos de tipo bytes. Llena una estructura  <a class="reference internal" href="buffer.html#c.Py_buffer" title="Py_buffer"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_buffer</span></code></a> proporcionada por la persona que llama. En este caso la cadena de caracteres de C resultante puede contener bytes NUL embebidos. Los objetos Unicode se convierten en cadenas de caracteres C utilizando codificación <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">s#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> de sólo lectura) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">s*</span></code>, except that it provides a <a class="reference internal" href="#c-arg-borrowed-buffer"><span class="std std-ref">borrowed buffer</span></a>.
+The result is stored into two C variables,
+the first one a pointer to a C string, the second one its length.
+The string may contain embedded null bytes. Unicode objects are converted
+to C strings using <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> encoding.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *]</dt><dd><p>Como <code class="docutils literal notranslate"><span class="pre">s</span></code>, pero el objeto Python también puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, en cuyo caso el puntero C se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z*</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [Py_buffer]</dt><dd><p>Como <code class="docutils literal notranslate"><span class="pre">s*</span></code>, pero el objeto Python también puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, en cuyo caso el miembro de <code class="docutils literal notranslate"><span class="pre">buf</span></code> de la estructura <a class="reference internal" href="buffer.html#c.Py_buffer" title="Py_buffer"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_buffer</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> de sólo lectura o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Como <code class="docutils literal notranslate"><span class="pre">s#</span></code>, pero el objeto Python también puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, en cuyo caso el puntero C se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y</span></code> (<a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> de sólo lectura) [const char *]</dt><dd><p>This format converts a bytes-like object to a C pointer to a
+<a class="reference internal" href="#c-arg-borrowed-buffer"><span class="std std-ref">borrowed</span></a> character string;
+it does not accept Unicode objects.  The bytes buffer must not
+contain embedded null bytes; if it does, a <a class="reference internal" href="../library/exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>
+exception is raised.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Anteriormente, <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> se lanzó cuando bytes nulos incrustados se encontraron en el buffer de bytes.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y*</span></code> (<a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a>) [Py_buffer]</dt><dd><p>Esta variante de <code class="docutils literal notranslate"><span class="pre">s*</span></code> no acepta objetos Unicode, solamente los objetos de tipo bytes. <strong>Esta es la forma recomendada para aceptar datos binarios.</strong></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y#</span></code> (<a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> de sólo lectura) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Esta variante en <code class="docutils literal notranslate"><span class="pre">s#</span></code> no acepta objetos Unicode, solo objetos similares a bytes.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">S</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>) [PyBytesObject *]</dt><dd><p>Requires that the Python object is a <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> object, without
+attempting any conversion.  Raises <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> if the object is not
+a bytes object.  The C variable may also be declared as <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Y</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>) [PyByteArrayObject *]</dt><dd><p>Requires that the Python object is a <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> object, without
+attempting any conversion.  Raises <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> if the object is not
+a <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> object. The C variable may also be declared as <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">u</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const Py_UNICODE *]</dt><dd><p>Convierte un objeto Unicode de Python a un puntero a un búfer C NUL terminado de caracteres Unicode. Debe pasar la dirección de una variable de puntero <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a>, que se llena con el puntero a un búfer Unicode existente. Tenga en cuenta que el ancho de un carácter <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a> depende de las opciones de compilación (que es  16 o 32 bits). La cadena de Python no debe contener puntos de código incrustado nulos; si lo hace, se lanza una excepción <a class="reference internal" href="../library/exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.5: </span>Anteriormente, <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> se lanzó cuando se encontraron puntos de código nulos incrustados en la cadena de caracteres de Python.</p>
+</div>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.3, se eliminará en la versión 3.12: </span>Parte de la API de viejo estilo <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a>; favor migrar al uso de <a class="reference internal" href="unicode.html#c.PyUnicode_AsWideCharString" title="PyUnicode_AsWideCharString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyUnicode_AsWideCharString()</span></code></a>.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">u#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const Py_UNICODE *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Esta variante en <code class="docutils literal notranslate"><span class="pre">u</span></code> almacena en dos variables de C, el primero un puntero a un búfer de datos Unicode, el segundo de su longitud. Esta variante permite puntos de código nulos.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.3, se eliminará en la versión 3.12: </span>Parte de la API de viejo estilo <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a>; favor migrar al uso de <a class="reference internal" href="unicode.html#c.PyUnicode_AsWideCharString" title="PyUnicode_AsWideCharString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyUnicode_AsWideCharString()</span></code></a>.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Z</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const Py_UNICODE *]</dt><dd><p>Como <code class="docutils literal notranslate"><span class="pre">u</span></code>, pero el objeto Python también puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, en cuyo caso el puntero <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.3, se eliminará en la versión 3.12: </span>Parte de la API de viejo estilo <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a>; favor migrar al uso de <a class="reference internal" href="unicode.html#c.PyUnicode_AsWideCharString" title="PyUnicode_AsWideCharString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyUnicode_AsWideCharString()</span></code></a>.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const Py_UNICODE *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Al igual que <code class="docutils literal notranslate"><span class="pre">u#</span></code>, pero el objeto Python también puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code>, en cuyo caso el puntero <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a> se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.3, se eliminará en la versión 3.12: </span>Parte de la API de viejo estilo <a class="reference internal" href="unicode.html#c.Py_UNICODE" title="Py_UNICODE"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_UNICODE</span></code></a>; favor migrar al uso de <a class="reference internal" href="unicode.html#c.PyUnicode_AsWideCharString" title="PyUnicode_AsWideCharString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyUnicode_AsWideCharString()</span></code></a>.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">U</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [PyObject *]</dt><dd><p>Requires that the Python object is a Unicode object, without attempting
+any conversion.  Raises <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> if the object is not a Unicode
+object.  The C variable may also be declared as <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">w*</span></code> (<a class="reference internal" href="../glossary.html#term-bytes-like-object"><span class="xref std std-term">bytes-like object</span></a> de lectura y escritura) [Py_buffer]</dt><dd><p>Este formato acepta cualquier objeto que implemente la interfaz del búfer de lectura-escritura. Llena la estructura <a class="reference internal" href="buffer.html#c.Py_buffer" title="Py_buffer"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_buffer</span></code></a> proporcionada por quien llama. El búfer puede contener bytes nulos incrustados. Quien llama tiene que llamar <a class="reference internal" href="buffer.html#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a> cuando termina con el búfer.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">es</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const char *encoding, char **buffer]</dt><dd><p>Esta variante en <code class="docutils literal notranslate"><span class="pre">s</span></code> se usa para codificar Unicode en un búfer de caracteres. Solo funciona para datos codificados sin bytes NUL integrados.</p>
+<p>This format requires two arguments.  The first is only used as input, and
+must be a <code class="xref c c-expr docutils literal notranslate"><em class="property"><span class="pre">const</span></em> <span class="pre">char</span><span class="pre">*</span></code> which points to the name of an encoding as a
+NUL-terminated string, or <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, in which case <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> encoding is used.
+An exception is raised if the named encoding is not known to Python.  The
+second argument must be a <code class="xref c c-expr docutils literal notranslate"><span class="pre">char</span><span class="pre">*</span><span class="pre">*</span></code>; the value of the pointer it
+references will be set to a buffer with the contents of the argument text.
+The text will be encoded in the encoding specified by the first argument.</p>
+<p><a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a> asignará un búfer del tamaño necesitado, copiará los datos codificados en este búfer y ajustará <em>*buffer</em> para referenciar el nuevo almacenamiento asignado. Quien llama es responsable para llamar <a class="reference internal" href="memory.html#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a> para liberar el búfer asignado después de su uso.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">et</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> o <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>) [const char *encoding, char **buffer]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">es</span></code>, excepto que los objetos de cadena de caracteres de bytes se pasan sin recodificarlos. En cambio, la implementación supone que el objeto de cadena de caracteres de bytes utiliza la codificación que se pasa como parámetro.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">es#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const char *encoding, char **buffer, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> *buffer_length]</dt><dd><p>Esta variante en <code class="docutils literal notranslate"><span class="pre">s#</span></code> se usa para codificar Unicode en un búfer de caracteres. A diferencia del formato <code class="docutils literal notranslate"><span class="pre">es</span></code>, esta variante permite datos de entrada que contienen caracteres NUL.</p>
+<p>It requires three arguments.  The first is only used as input, and must be a
+<code class="xref c c-expr docutils literal notranslate"><em class="property"><span class="pre">const</span></em> <span class="pre">char</span><span class="pre">*</span></code> which points to the name of an encoding as a
+NUL-terminated string, or <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, in which case <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> encoding is used.
+An exception is raised if the named encoding is not known to Python.  The
+second argument must be a <code class="xref c c-expr docutils literal notranslate"><span class="pre">char</span><span class="pre">*</span><span class="pre">*</span></code>; the value of the pointer it
+references will be set to a buffer with the contents of the argument text.
+The text will be encoded in the encoding specified by the first argument.
+The third argument must be a pointer to an integer; the referenced integer
+will be set to the number of bytes in the output buffer.</p>
+<p>Hay dos modos de operación:</p>
+<p>Si <em>*buffer</em> señala un puntero <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la función asignará un búfer del tamaño necesario, copiará los datos codificados en este búfer y configurará <em>*buffer</em> para hacer referencia al almacenamiento recién asignado. Quien llama es responsable de llamar a <a class="reference internal" href="memory.html#c.PyMem_Free" title="PyMem_Free"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMem_Free()</span></code></a> para liberar el búfer asignado después del uso.</p>
+<p>Si <em>*buffer</em> apunta a un puntero no <code class="docutils literal notranslate"><span class="pre">NULL</span></code> (un búfer ya asignado), <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a> usará esta ubicación como el búfer e interpretará el valor inicial de <em>*buffer_length</em> como el tamaño del búfer. Luego copiará los datos codificados en el búfer y los terminará en NUL. Si el búfer no es lo suficientemente grande, se establecerá a <a class="reference internal" href="../library/exceptions.html#ValueError" title="ValueError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+<p>En ambos casos, <em>*buffer_length</em> se establece a la longitud de los datos codificados sin el byte NUL final.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">et#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> o <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>) [const char *encoding, char **buffer, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> *buffer_length]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">es#</span></code>, excepto que los objetos de cadena de caracteres de bytes se pasan sin recodificarlos. En cambio, la implementación supone que el objeto de cadena de caracteres de bytes utiliza la codificación que se pasa como parámetro.</p>
+</dd>
+</dl>
+</section>
+<section id="numbers">
+<h3>Números<a class="headerlink" href="#numbers" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">b</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned char]</dt><dd><p>Convert a nonnegative Python integer to an unsigned tiny int, stored in a C
+<code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">char</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">B</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned char]</dt><dd><p>Convert a Python integer to a tiny int without overflow checking, stored in a C
+<code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">char</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">h</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [short int]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">short</span> <span class="pre">int</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">H</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned short int]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">short</span> <span class="pre">int</span></code>, without overflow
+checking.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">i</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [int]</dt><dd><p>Convert a Python integer to a plain C <code class="xref c c-expr docutils literal notranslate"><span class="pre">int</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">I</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned int]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span></code>, without overflow
+checking.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">l</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [long int]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">long</span> <span class="pre">int</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">k</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned long]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span></code> without
+overflow checking.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">L</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [long long]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">long</span> <span class="pre">long</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">K</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned long long]</dt><dd><p>Convert a Python integer to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></code>
+without overflow checking.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">n</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Convierte un entero de Python a un <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> de C.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">c</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> o <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> de largo 1) [char]</dt><dd><p>Convert a Python byte, represented as a <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or
+<a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> object of length 1, to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">char</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Permite objetos <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">C</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> de largo 1) [int]</dt><dd><p>Convert a Python character, represented as a <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> object of
+length 1, to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">int</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">f</span></code> (<a class="reference internal" href="../library/functions.html#float" title="float"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) [float]</dt><dd><p>Convert a Python floating point number to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">float</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">d</span></code> (<a class="reference internal" href="../library/functions.html#float" title="float"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) [double]</dt><dd><p>Convert a Python floating point number to a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">double</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">D</span></code> (<a class="reference internal" href="../library/functions.html#complex" title="complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a>) [Py_complex]</dt><dd><p>Convierte un número complejo de Python en una estructura <a class="reference internal" href="complex.html#c.Py_complex" title="Py_complex"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_complex</span></code></a> de C.</p>
+</dd>
+</dl>
+</section>
+<section id="other-objects">
+<h3>Otros objetos<a class="headerlink" href="#other-objects" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">O</span></code> (object) [PyObject *]</dt><dd><p>Almacena un objeto Python (sin ninguna conversión) en un puntero de objeto C. El programa C recibe así el objeto real que se pasó. El recuento de referencia del objeto no aumenta. El puntero almacenado no es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">O!</span></code> (object) [<em>typeobject</em>, PyObject *]</dt><dd><p>Store a Python object in a C object pointer.  This is similar to <code class="docutils literal notranslate"><span class="pre">O</span></code>, but
+takes two C arguments: the first is the address of a Python type object, the
+second is the address of the C variable (of type <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code>) into which
+the object pointer is stored.  If the Python object does not have the required
+type, <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> is raised.</p>
+</dd>
+</dl>
+<dl id="o-ampersand">
+<dt><code class="docutils literal notranslate"><span class="pre">O&amp;</span></code> (object) [<em>converter</em>, <em>anything</em>]</dt><dd><p>Convert a Python object to a C variable through a <em>converter</em> function.  This
+takes two arguments: the first is a function, the second is the address of a C
+variable (of arbitrary type), converted to <code class="xref c c-expr docutils literal notranslate"><span class="pre">void</span><span class="pre">*</span></code>.  The <em>converter</em>
+function in turn is called as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">converter</span><span class="p">(</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="n">address</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>where <em>object</em> is the Python object to be converted and <em>address</em> is the
+<code class="xref c c-expr docutils literal notranslate"><span class="pre">void</span><span class="pre">*</span></code> argument that was passed to the <code class="docutils literal notranslate"><span class="pre">PyArg_Parse*</span></code> function.
+The returned <em>status</em> should be <code class="docutils literal notranslate"><span class="pre">1</span></code> for a successful conversion and <code class="docutils literal notranslate"><span class="pre">0</span></code> if
+the conversion has failed.  When the conversion fails, the <em>converter</em> function
+should raise an exception and leave the content of <em>address</em> unmodified.</p>
+<p>Si el <em>converter</em> retorna <code class="docutils literal notranslate"><span class="pre">Py_CLEANUP_SUPPORTED</span></code>, se puede llamar por segunda vez si el análisis del argumento finalmente falla, dando al convertidor la oportunidad de liberar cualquier memoria que ya haya asignado. En esta segunda llamada, el parámetro <em>object</em> será <code class="docutils literal notranslate"><span class="pre">NULL</span></code>; <em>address</em> tendrá el mismo valor que en la llamada original.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.1: </span><code class="docutils literal notranslate"><span class="pre">Py_CLEANUP_SUPPORTED</span></code> fue agregada.</p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">p</span></code> (<a class="reference internal" href="../library/functions.html#bool" title="bool"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) [int]</dt><dd><p>Prueba el valor pasado por verdad (un booleano predicado <strong>p</strong>) y convierte el resultado a su valor entero C verdadero/falso entero equivalente. Establece int en <code class="docutils literal notranslate"><span class="pre">1</span></code> si la expresión era verdadera y <code class="docutils literal notranslate"><span class="pre">0</span></code> si era falsa. Esto acepta cualquier valor válido de Python. Consulte <a class="reference internal" href="../library/stdtypes.html#truth"><span class="std std-ref">Evaluar como valor verdadero/falso</span></a> para obtener más información sobre cómo Python prueba los valores por verdad.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">(items)</span></code> (<a class="reference internal" href="../library/stdtypes.html#tuple" title="tuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) [<em>matching-items</em>]</dt><dd><p>El objeto debe ser una secuencia de Python cuya longitud es el número de unidades de formato en <em>items</em>. Los argumentos C deben corresponder a las unidades de formato individuales en <em>items</em>. Las unidades de formato para secuencias pueden estar anidadas.</p>
+</dd>
+</dl>
+<p>Es posible pasar enteros «largos» (enteros cuyo valor excede el de la plataforma <code class="xref py py-const docutils literal notranslate"><span class="pre">LONG_MAX</span></code>), sin embargo, no se realiza una verificación de rango adecuada — los bits más significativos se truncan silenciosamente cuando el campo receptor es demasiado pequeño para recibir el valor (en realidad, la semántica se hereda de las descargas en C — su kilometraje puede variar).</p>
+<p>Algunos otros caracteres tienen un significado en una cadena de formato. Esto puede no ocurrir dentro de paréntesis anidados. Son:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">|</span></code></dt><dd><p>Indica que los argumentos restantes en la lista de argumentos de Python son opcionales. Las variables C correspondientes a argumentos opcionales deben inicializarse a su valor predeterminado — cuando no se especifica un argumento opcional, <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a> no toca el contenido de las variables C correspondientes.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">$</span></code></dt><dd><p><a class="reference internal" href="#c.PyArg_ParseTupleAndKeywords" title="PyArg_ParseTupleAndKeywords"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTupleAndKeywords()</span></code></a> solamente: indica que los argumentos restantes en la lista de argumentos de Python son solo palabras clave. Actualmente, todos los argumentos de solo palabras clave también deben ser argumentos opcionales, por lo que <code class="docutils literal notranslate"><span class="pre">|</span></code> siempre debe especificarse antes de <code class="docutils literal notranslate"><span class="pre">$</span></code> en la cadena de formato.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.3.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">:</span></code></dt><dd><p>La lista de unidades de formato termina aquí; la cadena después de los dos puntos se usa como el nombre de la función en los mensajes de error (el «valor asociado» de la excepción que <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a> lanza).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">;</span></code></dt><dd><p>La lista de unidades de formato termina aquí; la cadena después del punto y coma se usa como mensaje de error <em>en lugar de</em> del mensaje de error predeterminado. <code class="docutils literal notranslate"><span class="pre">:</span></code> y <code class="docutils literal notranslate"><span class="pre">;</span></code> se excluyen mutuamente.</p>
+</dd>
+</dl>
+<p>Tenga en cuenta que las referencias de objetos de Python que se proporcionan a la persona que llama son referencias <em>prestadas</em> (<em>borrowed</em>); ¡no disminuya su conteo de referencias!</p>
+<p>Los argumentos adicionales pasados a estas funciones deben ser direcciones de variables cuyo tipo está determinado por la cadena de formato; Estos se utilizan para almacenar valores de la tupla de entrada. Hay algunos casos, como se describe en la lista de unidades de formato anterior, donde estos parámetros se utilizan como valores de entrada; deben coincidir con lo especificado para la unidad de formato correspondiente en ese caso.</p>
+<p>For the conversion to succeed, the <em>arg</em> object must match the format
+and the format must be exhausted.  On success, the
+<code class="docutils literal notranslate"><span class="pre">PyArg_Parse*</span></code> functions return true, otherwise they return
+false and raise an appropriate exception. When the
+<code class="docutils literal notranslate"><span class="pre">PyArg_Parse*</span></code> functions fail due to conversion failure in one
+of the format units, the variables at the addresses corresponding to that
+and the following format units are left untouched.</p>
+</section>
+<section id="api-functions">
+<h3>Funciones API<a class="headerlink" href="#api-functions" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="c function">
+<dt id="c.PyArg_ParseTuple">
+int <code class="sig-name descname">PyArg_ParseTuple</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <em class="property">const</em> char *<em>format</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_ParseTuple" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Analiza los parámetros de una función que solo toma parámetros posicionales en variables locales. Retorna verdadero en el éxito; en caso de fallo, retorna falso y lanza la excepción apropiada.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_VaParse">
+int <code class="sig-name descname">PyArg_VaParse</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <em class="property">const</em> char *<em>format</em>, va_list <em>vargs</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_VaParse" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Idéntico a <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a>, excepto que acepta una <em>va_list</em> en lugar de un número variable de argumentos .</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_ParseTupleAndKeywords">
+int <code class="sig-name descname">PyArg_ParseTupleAndKeywords</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kw</em>, <em class="property">const</em> char *<em>format</em>, char *<em>keywords</em>[], ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_ParseTupleAndKeywords" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Analiza los parámetros de una función que toma parámetros posicionales y de palabras clave en variables locales. El argumento <em>keywords</em> es un arreglo terminado en <code class="docutils literal notranslate"><span class="pre">NULL</span></code> de nombres de parámetros de palabras clave. Los nombres vacíos denotan <a class="reference internal" href="../glossary.html#positional-only-parameter"><span class="std std-ref">parámetros solo posicionales</span></a>. Retorna verdadero cuando hay éxito; en caso de fallo, retorna falso y lanza la excepción apropiada.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.6: </span>Soporte agregado para <a class="reference internal" href="../glossary.html#positional-only-parameter"><span class="std std-ref">sólo parámetros posicionales</span></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_VaParseTupleAndKeywords">
+int <code class="sig-name descname">PyArg_VaParseTupleAndKeywords</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kw</em>, <em class="property">const</em> char *<em>format</em>, char *<em>keywords</em>[], va_list <em>vargs</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_VaParseTupleAndKeywords" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Idéntico a <a class="reference internal" href="#c.PyArg_ParseTupleAndKeywords" title="PyArg_ParseTupleAndKeywords"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTupleAndKeywords()</span></code></a>, excepto que acepta una <em>va_list</em> en lugar de un número variable de argumentos.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_ValidateKeywordArguments">
+int <code class="sig-name descname">PyArg_ValidateKeywordArguments</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a>*<span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_ValidateKeywordArguments" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Asegúrese de que las claves en el diccionario de argumentos de palabras clave son cadenas. Esto solo es necesario si <a class="reference internal" href="#c.PyArg_ParseTupleAndKeywords" title="PyArg_ParseTupleAndKeywords"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTupleAndKeywords()</span></code></a> no se utiliza, ya que este último ya hace esta comprobación.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_Parse">
+int <code class="sig-name descname">PyArg_Parse</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <em class="property">const</em> char *<em>format</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_Parse" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Función utilizada para deconstruir las listas de argumentos de las funciones de «estilo antiguo» — estas son funciones que usan el método de análisis de parámetros <code class="xref py py-const docutils literal notranslate"><span class="pre">METH_OLDARGS</span></code>, que se ha eliminado en Python 3. No se recomienda su uso en el análisis de parámetros en código nuevo, y la mayoría del código en el intérprete estándar se ha modificado para que ya no se use para ese propósito. Sin embargo, sigue siendo una forma conveniente de descomponer otras tuplas, y puede continuar usándose para ese propósito.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyArg_UnpackTuple">
+int <code class="sig-name descname">PyArg_UnpackTuple</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>min</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>max</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyArg_UnpackTuple" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>A simpler form of parameter retrieval which does not use a format string to
+specify the types of the arguments.  Functions which use this method to retrieve
+their parameters should be declared as <a class="reference internal" href="structures.html#METH_VARARGS" title="METH_VARARGS"><code class="xref py py-const docutils literal notranslate"><span class="pre">METH_VARARGS</span></code></a> in function or
+method tables.  The tuple containing the actual parameters should be passed as
+<em>args</em>; it must actually be a tuple.  The length of the tuple must be at least
+<em>min</em> and no more than <em>max</em>; <em>min</em> and <em>max</em> may be equal.  Additional
+arguments must be passed to the function, each of which should be a pointer to a
+<code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code> variable; these will be filled in with the values from
+<em>args</em>; they will contain <a class="reference internal" href="../glossary.html#term-borrowed-reference"><span class="xref std std-term">borrowed references</span></a>.
+The variables which correspond
+to optional parameters not given by <em>args</em> will not be filled in; these should
+be initialized by the caller. This function returns true on success and false if
+<em>args</em> is not a tuple or contains the wrong number of elements; an exception
+will be set if there was a failure.</p>
+<p>Este es un ejemplo del uso de esta función, tomado de las fuentes del módulo auxiliar <code class="xref py py-mod docutils literal notranslate"><span class="pre">_weakref</span></code> para referencias débiles:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="w"></span>
+<span class="nf">weakref_ref</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">args</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">object</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">callback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyArg_UnpackTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ref&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">callback</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyWeakref_NewRef</span><span class="p">(</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="n">callback</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>La llamada a <a class="reference internal" href="#c.PyArg_UnpackTuple" title="PyArg_UnpackTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_UnpackTuple()</span></code></a> en este ejemplo es completamente equivalente a esta llamada a <a class="reference internal" href="#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;O|O:ref&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">callback</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="building-values">
+<h2>Construyendo valores<a class="headerlink" href="#building-values" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c function">
+<dt id="c.Py_BuildValue">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">Py_BuildValue</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>format</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.Py_BuildValue" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Create a new value based on a format string similar to those accepted by the
+<code class="docutils literal notranslate"><span class="pre">PyArg_Parse*</span></code> family of functions and a sequence of values.  Returns
+the value or <code class="docutils literal notranslate"><span class="pre">NULL</span></code> in the case of an error; an exception will be raised if
+<code class="docutils literal notranslate"><span class="pre">NULL</span></code> is returned.</p>
+<p><a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a> no siempre genera una tupla. Construye una tupla solo si su cadena de formato contiene dos o más unidades de formato. Si la cadena de formato está vacía, retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>; si contiene exactamente una unidad de formato, retorna el objeto que describa esa unidad de formato. Para forzarlo a retornar una tupla de tamaño 0 o uno, paréntesis la cadena de formato.</p>
+<p>Cuando los búfer de memoria se pasan como parámetros para suministrar datos para construir objetos, como para los formatos <code class="docutils literal notranslate"><span class="pre">s</span></code> y <code class="docutils literal notranslate"><span class="pre">s#</span></code>, los datos requeridos se copian. Las memorias intermedias proporcionadas por quien llama nunca son referenciadas por los objetos creados por <a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a>. En otras palabras, si su código invoca <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code> y pasa la memoria asignada a <a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a>, su código es responsable de llamar a <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code> para esa memoria una vez retorna <a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a>.</p>
+<p>En la siguiente descripción, la cadena de caracteres entre comillas, <cite>así</cite>, es la unidad de formato; la entrada entre paréntesis (redondos) es el tipo de objeto Python que retornará la unidad de formato; y la entrada entre corchetes [cuadrados] es el tipo de los valores C que se pasarán.</p>
+<p>Los caracteres espacio, tabulación, dos puntos y coma se ignoran en las cadenas de formato (pero no dentro de las unidades de formato como <code class="docutils literal notranslate"><span class="pre">s#</span></code>). Esto se puede usar para hacer que las cadenas de formato largo sean un poco más legibles.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">s</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *]</dt><dd><p>Convierte una cadena de caracteres C terminada en nulo en un objeto Python <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> usando la codificación <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code>. Si el puntero de la cadena de caracteres C es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, se usa <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">s#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Convierte una cadena de caracteres de C y su longitud en un objeto Python <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> utilizando la codificación <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code>. Si el puntero de la cadena de caracteres de C es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la longitud se ignora y se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>) [const char *]</dt><dd><p>Esto convierte una cadena de caracteres de C en un objeto Python <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. Si el puntero de la cadena de caracteres de C es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y#</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Esto convierte una cadena de caracteres de C y sus longitudes en un objeto Python. Si el puntero de la cadena de caracteres de C es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">s</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">s#</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">u</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const wchar_t *]</dt><dd><p>Convert a null-terminated <code class="xref c c-expr docutils literal notranslate"><span class="pre">wchar_t</span></code> buffer of Unicode (UTF-16 or UCS-4)
+data to a Python Unicode object.  If the Unicode buffer pointer is <code class="docutils literal notranslate"><span class="pre">NULL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">u#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) [const wchar_t *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Convierte un búfer de datos Unicode (UTF-16 o UCS-4) y su longitud en un objeto Python Unicode. Si el puntero del búfer Unicode es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, la longitud se ignora y se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">U</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">s</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">z#</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> o <code class="docutils literal notranslate"><span class="pre">None</span></code>) [const char *, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">s#</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">i</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [int]</dt><dd><p>Convert a plain C <code class="xref c c-expr docutils literal notranslate"><span class="pre">int</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">b</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [char]</dt><dd><p>Convert a plain C <code class="xref c c-expr docutils literal notranslate"><span class="pre">char</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">h</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [short int]</dt><dd><p>Convert a plain C <code class="xref c c-expr docutils literal notranslate"><span class="pre">short</span> <span class="pre">int</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">l</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [long int]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">long</span> <span class="pre">int</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">B</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned char]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">char</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">H</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned short int]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">short</span> <span class="pre">int</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">I</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned int]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">int</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">k</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned long]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">L</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [long long]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">long</span> <span class="pre">long</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">K</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [unsigned long long]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></code> to a Python integer object.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">n</span></code> (<a class="reference internal" href="../library/functions.html#int" title="int"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) [<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a>]</dt><dd><p>Convierte un <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> de C a un entero de Python.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">c</span></code> (<a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> de largo 1) [char]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">int</span></code> representing a byte to a Python <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> object of
+length 1.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">C</span></code> (<a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> de largo 1) [int]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">int</span></code> representing a character to Python <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>
+object of length 1.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">d</span></code> (<a class="reference internal" href="../library/functions.html#float" title="float"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) [double]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">double</span></code> to a Python floating point number.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">f</span></code> (<a class="reference internal" href="../library/functions.html#float" title="float"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) [float]</dt><dd><p>Convert a C <code class="xref c c-expr docutils literal notranslate"><span class="pre">float</span></code> to a Python floating point number.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">D</span></code> (<a class="reference internal" href="../library/functions.html#complex" title="complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a>) [Py_complex *]</dt><dd><p>Convierte una estructura <a class="reference internal" href="complex.html#c.Py_complex" title="Py_complex"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_complex</span></code></a> de C en un número complejo de Python.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">O</span></code> (object) [PyObject *]</dt><dd><p>Pasa un objeto Python sin tocarlo (excepto por su recuento de referencia, que se incrementa en uno). Si el objeto pasado es un puntero <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, se supone que esto fue causado porque la llamada que produjo el argumento encontró un error y estableció una excepción. Por lo tanto, <a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a> retornará <code class="docutils literal notranslate"><span class="pre">NULL</span></code> pero no lanzará una excepción. Si aún no se ha producido ninguna excepción, se establece <a class="reference internal" href="../library/exceptions.html#SystemError" title="SystemError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SystemError</span></code></a>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">S</span></code> (object) [PyObject *]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">O</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">N</span></code> (object) [PyObject *]</dt><dd><p>Igual que <code class="docutils literal notranslate"><span class="pre">O</span></code>, excepto que no incrementa el recuento de referencia en el objeto. Útil cuando el objeto se crea mediante una llamada a un constructor de objetos en la lista de argumentos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">O&amp;</span></code> (object) [<em>converter</em>, <em>anything</em>]</dt><dd><p>Convert <em>anything</em> to a Python object through a <em>converter</em> function.  The
+function is called with <em>anything</em> (which should be compatible with <code class="xref c c-expr docutils literal notranslate"><span class="pre">void</span><span class="pre">*</span></code>)
+as its argument and should return a «new» Python object, or <code class="docutils literal notranslate"><span class="pre">NULL</span></code> if an
+error occurred.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">(items)</span></code> (<a class="reference internal" href="../library/stdtypes.html#tuple" title="tuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) [<em>matching-items</em>]</dt><dd><p>Convierta una secuencia de valores C en una tupla de Python con el mismo número de elementos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[items]</span></code> (<a class="reference internal" href="../library/stdtypes.html#list" title="list"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>) [<em>matching-items</em>]</dt><dd><p>Convierte una secuencia de valores C en una lista de Python con el mismo número de elementos.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{items}</span></code> (<a class="reference internal" href="../library/stdtypes.html#dict" title="dict"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) [<em>matching-items</em>]</dt><dd><p>Convierte una secuencia de valores C en un diccionario Python. Cada par de valores C consecutivos agrega un elemento al diccionario, que sirve como clave y valor, respectivamente.</p>
+</dd>
+</dl>
+<p>Si hay un error en la cadena de formato, se establece la excepción <a class="reference internal" href="../library/exceptions.html#SystemError" title="SystemError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SystemError</span></code></a> y se retorna <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.Py_VaBuildValue">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">Py_VaBuildValue</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>format</em>, va_list <em>vargs</em><span class="sig-paren">)</span><a class="headerlink" href="#c.Py_VaBuildValue" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Idéntico a <a class="reference internal" href="#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a>, excepto que acepta una <em>va_list</em> en lugar de un número variable de argumentos.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Analizando argumentos y construyendo valores</a><ul>
+<li><a class="reference internal" href="#parsing-arguments">Analizando argumentos</a><ul>
+<li><a class="reference internal" href="#strings-and-buffers">Cadena de caracteres y búferes</a></li>
+<li><a class="reference internal" href="#numbers">Números</a></li>
+<li><a class="reference internal" href="#other-objects">Otros objetos</a></li>
+<li><a class="reference internal" href="#api-functions">Funciones API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-values">Construyendo valores</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="marshal.html"
+                        title="capítulo anterior">Soporte de empaquetado (<em>marshalling</em>) de datos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="conversion.html"
+                        title="próximo capítulo">Conversión y formato de cadenas de caracteres</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/arg.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="conversion.html" title="Conversión y formato de cadenas de caracteres"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="marshal.html" title="Soporte de empaquetado (marshalling) de datos"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="utilities.html" >Utilidades</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Analizando argumentos y construyendo valores</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

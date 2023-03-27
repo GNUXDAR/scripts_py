@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>1. Incrustando Python en Otra Aplicación &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Manual de referencia de la API en C de Python" href="../c-api/index.html" />
+    <link rel="prev" title="5. Creación de extensiones C y C++ en Windows" href="windows.html" />
+    <link rel="canonical" href="https://docs.python.org/3/extending/embedding.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Incrustando Python en Otra Aplicación</a><ul>
+<li><a class="reference internal" href="#very-high-level-embedding">1.1. Incrustación de muy alto nivel</a></li>
+<li><a class="reference internal" href="#beyond-very-high-level-embedding-an-overview">1.2. Más allá de la incrustación de muy alto nivel: una visión general</a></li>
+<li><a class="reference internal" href="#pure-embedding">1.3. Incrustación pura</a></li>
+<li><a class="reference internal" href="#extending-embedded-python">1.4. Extendiendo Python Incrustado</a></li>
+<li><a class="reference internal" href="#embedding-python-in-c">1.5. Incrustando Python en C++</a></li>
+<li><a class="reference internal" href="#compiling-and-linking-under-unix-like-systems">1.6. Compilar y enlazar bajo sistemas tipo Unix</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="windows.html"
+                        title="capítulo anterior"><span class="section-number">5. </span>Creación de extensiones C y C++ en Windows</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="../c-api/index.html"
+                        title="próximo capítulo">Manual de referencia de la API en C de Python</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/extending/embedding.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="../c-api/index.html" title="Manual de referencia de la API en C de Python"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="windows.html" title="5. Creación de extensiones C y C++ en Windows"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Ampliación e incrustación del intérprete de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Incrustando Python en Otra Aplicación</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="embedding-python-in-another-application">
+<span id="embedding"></span><h1><span class="section-number">1. </span>Incrustando Python en Otra Aplicación<a class="headerlink" href="#embedding-python-in-another-application" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Los capítulos anteriores discutieron cómo extender Python, es decir, cómo extender la funcionalidad de Python al adjuntarle una biblioteca de funciones C. También es posible hacerlo al revés: enriquezca su aplicación C/C++ incrustando Python en ella. La incrustación proporciona a su aplicación la capacidad de implementar parte de la funcionalidad de su aplicación en Python en lugar de C o C++. Esto se puede usar para muchos propósitos; Un ejemplo sería permitir a los usuarios adaptar la aplicación a sus necesidades escribiendo algunos scripts en Python. También puede usarlo usted mismo si parte de la funcionalidad se puede escribir en Python más fácilmente.</p>
+<p>Incrustar Python es similar a extenderlo, pero no del todo. La diferencia es que cuando extiende Python, el programa principal de la aplicación sigue siendo el intérprete de Python, mientras que si incrusta Python, el programa principal puede no tener nada que ver con Python — en cambio, algunas partes de la aplicación ocasionalmente llaman al Intérprete de Python para ejecutar algún código de Python.</p>
+<p>Entonces, si está incrustando Python, está proporcionando su propio programa principal. Una de las cosas que tiene que hacer este programa principal es inicializar el intérprete de Python. Como mínimo, debe llamar a la función <a class="reference internal" href="../c-api/init.html#c.Py_Initialize" title="Py_Initialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_Initialize()</span></code></a>. Hay llamadas opcionales para pasar argumentos de línea de comandos a Python. Luego, puede llamar al intérprete desde cualquier parte de la aplicación.</p>
+<p>Hay varias formas diferentes de llamar al intérprete: puede pasar una cadena que contiene declaraciones de Python a <a class="reference internal" href="../c-api/veryhigh.html#c.PyRun_SimpleString" title="PyRun_SimpleString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyRun_SimpleString()</span></code></a>, o puede pasar un puntero de archivo estándar y un nombre de archivo (solo para identificación en mensajes de error) a <a class="reference internal" href="../c-api/veryhigh.html#c.PyRun_SimpleFile" title="PyRun_SimpleFile"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyRun_SimpleFile()</span></code></a>. También puede llamar a las operaciones de nivel inferior descritas en los capítulos anteriores para construir y usar objetos de Python.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../c-api/index.html#c-api-index"><span class="std std-ref">Manual de referencia de la API en C de Python</span></a></dt><dd><p>Los detalles de la interfaz C de Python se dan en este manual. Una gran cantidad de información necesaria se puede encontrar aquí.</p>
+</dd>
+</dl>
+</div>
+<section id="very-high-level-embedding">
+<span id="high-level-embedding"></span><h2><span class="section-number">1.1. </span>Incrustación de muy alto nivel<a class="headerlink" href="#very-high-level-embedding" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La forma más simple de incrustar Python es el uso de la interfaz de muy alto nivel. Esta interfaz está diseñada para ejecutar un script de Python sin necesidad de interactuar directamente con la aplicación. Esto puede usarse, por ejemplo, para realizar alguna operación en un archivo.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define PY_SSIZE_T_CLEAN</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"></span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">wchar_t</span><span class="w"> </span><span class="o">*</span><span class="n">program</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Py_DecodeLocale</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">program</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Fatal error: cannot decode argv[0]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_SetProgramName</span><span class="p">(</span><span class="n">program</span><span class="p">);</span><span class="w">  </span><span class="cm">/* optional but recommended */</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_Initialize</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyRun_SimpleString</span><span class="p">(</span><span class="s">&quot;from time import time,ctime</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">                       </span><span class="s">&quot;print(&#39;Today is&#39;, ctime(time()))</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Py_FinalizeEx</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">120</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyMem_RawFree</span><span class="p">(</span><span class="n">program</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>La función <a class="reference internal" href="../c-api/init.html#c.Py_SetProgramName" title="Py_SetProgramName"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_SetProgramName()</span></code></a> debe llamarse antes de <a class="reference internal" href="../c-api/init.html#c.Py_Initialize" title="Py_Initialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_Initialize()</span></code></a> para informar al intérprete sobre las rutas a las bibliotecas de tiempo de ejecución de Python. A continuación, el intérprete de Python se inicializa con <a class="reference internal" href="../c-api/init.html#c.Py_Initialize" title="Py_Initialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_Initialize()</span></code></a>, seguido de la ejecución de un script Python codificado que imprime la fecha y la hora. Luego, la llamada <a class="reference internal" href="../c-api/init.html#c.Py_FinalizeEx" title="Py_FinalizeEx"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_FinalizeEx()</span></code></a> cierra el intérprete, seguido por el final del programa. En un programa real, es posible que desee obtener el script de Python de otra fuente, tal vez una rutina de editor de texto, un archivo o una base de datos. Obtener el código Python de un archivo se puede hacer mejor usando la función <a class="reference internal" href="../c-api/veryhigh.html#c.PyRun_SimpleFile" title="PyRun_SimpleFile"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyRun_SimpleFile()</span></code></a>, que le ahorra la molestia de asignar espacio de memoria y cargar el contenido del archivo.</p>
+</section>
+<section id="beyond-very-high-level-embedding-an-overview">
+<span id="lower-level-embedding"></span><h2><span class="section-number">1.2. </span>Más allá de la incrustación de muy alto nivel: una visión general<a class="headerlink" href="#beyond-very-high-level-embedding-an-overview" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La interfaz de alto nivel le permite ejecutar piezas arbitrarias de código Python desde su aplicación, pero el intercambio de valores de datos es bastante engorroso, por decir lo menos. Si lo desea, debe usar llamadas de nivel inferior. A costa de tener que escribir más código C, puede lograr casi cualquier cosa.</p>
+<p>Cabe señalar que extender Python e incrustar Python es la misma actividad, a pesar de la intención diferente. La mayoría de los temas tratados en los capítulos anteriores siguen siendo válidos. Para mostrar esto, considere lo que realmente hace el código de extensión de Python a C:</p>
+<ol class="arabic simple">
+<li><p>Convierte valores de datos de Python a C,</p></li>
+<li><p>Realice una llamada de función a una rutina C usando los valores convertidos, y</p></li>
+<li><p>Convierte los valores de datos de la llamada de C a Python.</p></li>
+</ol>
+<p>Al incrustar Python, el código de interfaz hace:</p>
+<ol class="arabic simple">
+<li><p>Convierte valores de datos de C a Python,</p></li>
+<li><p>Realice una llamada de función a una rutina de interfaz de Python utilizando los valores convertidos, y</p></li>
+<li><p>Convierte los valores de datos de la llamada de Python a C.</p></li>
+</ol>
+<p>Como puede ver, los pasos de conversión de datos simplemente se intercambian para acomodar la dirección diferente de la transferencia de idiomas cruzados. La única diferencia es la rutina que llama entre ambas conversiones de datos. Al extender, llama a una rutina C, al incrustar, llama a una rutina Python.</p>
+<p>Este capítulo no discutirá cómo convertir datos de Python a C y viceversa. Además, se supone que se entiende el uso adecuado de las referencias y el tratamiento de errores. Dado que estos aspectos no difieren de extender el intérprete, puede consultar los capítulos anteriores para obtener la información requerida.</p>
+</section>
+<section id="pure-embedding">
+<span id="id1"></span><h2><span class="section-number">1.3. </span>Incrustación pura<a class="headerlink" href="#pure-embedding" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El primer programa tiene como objetivo ejecutar una función en un script Python. Al igual que en la sección sobre la interfaz de muy alto nivel, el intérprete de Python no interactúa directamente con la aplicación (pero eso cambiará en la siguiente sección).</p>
+<p>El código para ejecutar una función definida en un script de Python es:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define PY_SSIZE_T_CLEAN</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"></span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">pName</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">pModule</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">pFunc</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">pArgs</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">pValue</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="s">&quot;Usage: call pythonfile funcname [args]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">Py_Initialize</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">pName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyUnicode_DecodeFSDefault</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Error checking of pName left out */</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">pModule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyImport_Import</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pModule</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">pFunc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* pFunc is a new reference */</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pFunc</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pFunc</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">pArgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyTuple_New</span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">pValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyLong_FromLong</span><span class="p">(</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">]));</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">pValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pArgs</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cannot convert argument</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="cm">/* pValue reference stolen here: */</span><span class="w"></span>
+<span class="w">                </span><span class="n">PyTuple_SetItem</span><span class="p">(</span><span class="n">pArgs</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">pValue</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="n">pValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pFunc</span><span class="p">,</span><span class="w"> </span><span class="n">pArgs</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pArgs</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pValue</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Result of call: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">PyLong_AsLong</span><span class="p">(</span><span class="n">pValue</span><span class="p">));</span><span class="w"></span>
+<span class="w">                </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pValue</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">PyErr_Print</span><span class="p">();</span><span class="w"></span>
+<span class="w">                </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="s">&quot;Call failed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyErr_Occurred</span><span class="p">())</span><span class="w"></span>
+<span class="w">                </span><span class="n">PyErr_Print</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cannot find function </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">PyErr_Print</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Failed to load </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Py_FinalizeEx</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">120</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Este código carga un script de Python usando <code class="docutils literal notranslate"><span class="pre">argv[1]</span></code> y llama a la función nombrada en <code class="docutils literal notranslate"><span class="pre">argv[2]</span></code>. Sus argumentos enteros son los otros valores del arreglo <code class="docutils literal notranslate"><span class="pre">argv</span></code>. Si usted <a class="reference internal" href="#compiling"><span class="std std-ref">compila y enlaza</span></a> este programa (llamemos al ejecutable terminado <strong class="program">call</strong>), y úselo para ejecutar un script Python, como:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Will compute&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;times&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="k">return</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>entonces el resultado debería ser:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>call multiply multiply <span class="m">3</span> <span class="m">2</span>
+<span class="go">Will compute 3 times 2</span>
+<span class="go">Result of call: 6</span>
+</pre></div>
+</div>
+<p>Aunque el programa es bastante grande por su funcionalidad, la mayor parte del código es para la conversión de datos entre Python y C, y para informes de errores. La parte interesante con respecto a incrustar Python comienza con:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">Py_Initialize</span><span class="p">();</span><span class="w"></span>
+<span class="n">pName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyUnicode_DecodeFSDefault</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="cm">/* Error checking of pName left out */</span><span class="w"></span>
+<span class="n">pModule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyImport_Import</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Después de inicializar el intérprete, el script se carga usando <a class="reference internal" href="../c-api/import.html#c.PyImport_Import" title="PyImport_Import"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyImport_Import()</span></code></a>. Esta rutina necesita una cadena Python como argumento, que se construye utilizando la rutina de conversión de datos <a class="reference internal" href="../c-api/unicode.html#c.PyUnicode_FromString" title="PyUnicode_FromString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyUnicode_FromString()</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">pFunc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
+<span class="cm">/* pFunc is a new reference */</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pFunc</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pFunc</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Una vez que se carga el script, el nombre que estamos buscando se recupera usando <a class="reference internal" href="../c-api/object.html#c.PyObject_GetAttrString" title="PyObject_GetAttrString"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetAttrString()</span></code></a>. Si el nombre existe y el objeto retornado es invocable, puede asumir con seguridad que es una función. Luego, el programa continúa construyendo una tupla de argumentos como de costumbre. La llamada a la función Python se realiza con:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">pValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pFunc</span><span class="p">,</span><span class="w"> </span><span class="n">pArgs</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Al regresar la función, <code class="docutils literal notranslate"><span class="pre">pValue</span></code> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code> o contiene una referencia al valor de retorno de la función. Asegúrese de liberar la referencia después de examinar el valor.</p>
+</section>
+<section id="extending-embedded-python">
+<span id="extending-with-embedding"></span><h2><span class="section-number">1.4. </span>Extendiendo Python Incrustado<a class="headerlink" href="#extending-embedded-python" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hasta ahora, el intérprete de Python incorporado no tenía acceso a la funcionalidad de la aplicación misma. La API de Python lo permite al extender el intérprete incorporado. Es decir, el intérprete incorporado se amplía con las rutinas proporcionadas por la aplicación. Si bien suena complejo, no es tan malo. Simplemente olvide por un momento que la aplicación inicia el intérprete de Python. En cambio, considere que la aplicación es un conjunto de subrutinas y escriba un código de pegamento que le otorgue a Python acceso a esas rutinas, al igual que escribiría una extensión normal de Python. Por ejemplo:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numargs</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="cm">/* Return the number of arguments of the application command line */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="o">*</span><span class="w"></span>
+<span class="nf">emb_numargs</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">args</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:numargs&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyLong_FromLong</span><span class="p">(</span><span class="n">numargs</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">PyMethodDef</span><span class="w"> </span><span class="n">EmbMethods</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;numargs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">emb_numargs</span><span class="p">,</span><span class="w"> </span><span class="n">METH_VARARGS</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="s">&quot;Return the number of arguments received by the process.&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">PyModuleDef</span><span class="w"> </span><span class="n">EmbModule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">PyModuleDef_HEAD_INIT</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;emb&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">EmbMethods</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">PyObject</span><span class="o">*</span><span class="w"></span>
+<span class="nf">PyInit_emb</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PyModule_Create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">EmbModule</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Inserte el código anterior justo encima de la función <code class="xref c c-func docutils literal notranslate"><span class="pre">main()</span></code>. Además, inserte las siguientes dos declaraciones antes de la llamada a <a class="reference internal" href="../c-api/init.html#c.Py_Initialize" title="Py_Initialize"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_Initialize()</span></code></a>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">numargs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"></span>
+<span class="n">PyImport_AppendInittab</span><span class="p">(</span><span class="s">&quot;emb&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">PyInit_emb</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Estas dos líneas inicializan la variable <code class="docutils literal notranslate"><span class="pre">numargs</span></code> y hacen que la función <code class="xref py py-func docutils literal notranslate"><span class="pre">emb.numargs()</span></code> sea accesible para el intérprete de Python incorporado. Con estas extensiones, el script de Python puede hacer cosas como</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">emb</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of arguments&quot;</span><span class="p">,</span> <span class="n">emb</span><span class="o">.</span><span class="n">numargs</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>En una aplicación real, los métodos expondrán una API de la aplicación a Python.</p>
+</section>
+<section id="embedding-python-in-c">
+<span id="embeddingincplusplus"></span><h2><span class="section-number">1.5. </span>Incrustando Python en C++<a class="headerlink" href="#embedding-python-in-c" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>También es posible incrustar Python en un programa C++; precisamente cómo se hace esto dependerá de los detalles del sistema C++ utilizado; en general, necesitará escribir el programa principal en C++ y usar el compilador de C++ para compilar y vincular su programa. No es necesario volver a compilar Python usando C++.</p>
+</section>
+<section id="compiling-and-linking-under-unix-like-systems">
+<span id="compiling"></span><h2><span class="section-number">1.6. </span>Compilar y enlazar bajo sistemas tipo Unix<a class="headerlink" href="#compiling-and-linking-under-unix-like-systems" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>No es necesariamente trivial encontrar los indicadores correctos para pasar a su compilador (y enlazador) para incrustar el intérprete de Python en su aplicación, particularmente porque Python necesita cargar módulos de biblioteca implementados como extensiones dinámicas en C (archivos <code class="file docutils literal notranslate"><span class="pre">.so</span></code>) enlazados en su contra.</p>
+<p>Para conocer los indicadores necesarios del compilador y el enlazador, puede ejecutar el script <code class="file docutils literal notranslate"><span class="pre">python</span><em><span class="pre">X.Y</span></em><span class="pre">-config</span></code> que se genera como parte del proceso de instalación (también puede estar disponible un script <code class="file docutils literal notranslate"><span class="pre">python3-config</span></code> ) Este script tiene varias opciones, de las cuales las siguientes serán directamente útiles para usted:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">pythonX.Y-config</span> <span class="pre">--cflags</span></code> le dará las banderas recomendadas al compilar:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>/opt/bin/python3.11-config --cflags
+<span class="go">-I/opt/include/python3.11 -I/opt/include/python3.11 -Wsign-compare  -DNDEBUG -g -fwrapv -O3 -Wall</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pythonX.Y-config</span> <span class="pre">--ldflags</span> <span class="pre">--embed</span></code> will give you the recommended flags
+when linking:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>/opt/bin/python3.11-config --ldflags --embed
+<span class="go">-L/opt/lib/python3.11/config-3.11-x86_64-linux-gnu -L/opt/lib -lpython3.11 -lpthread -ldl  -lutil -lm</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Para evitar confusiones entre varias instalaciones de Python (y especialmente entre el sistema Python y su propio Python compilado), se recomienda que use la ruta absoluta a <code class="file docutils literal notranslate"><span class="pre">python</span><em><span class="pre">X.Y</span></em><span class="pre">-config</span></code>, como en el ejemplo anterior.</p>
+</div>
+<p>Si este procedimiento no funciona para usted (no se garantiza que funcione para todas las plataformas tipo Unix; sin embargo, le damos la bienvenida <a class="reference internal" href="../bugs.html#reporting-bugs"><span class="std std-ref">informes de errores</span></a>) deberá leer la documentación de su sistema sobre dinámica vincular o examinar Python <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> (use <a class="reference internal" href="../library/sysconfig.html#sysconfig.get_makefile_filename" title="sysconfig.get_makefile_filename"><code class="xref py py-func docutils literal notranslate"><span class="pre">sysconfig.get_makefile_filename()</span></code></a> para encontrar su ubicación) y las opciones de compilación. En este caso, el módulo <a class="reference internal" href="../library/sysconfig.html#module-sysconfig" title="sysconfig: Python's configuration information"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sysconfig</span></code></a> es una herramienta útil para extraer mediante programación los valores de configuración que querrá combinar. Por ejemplo:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sysconfig</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_var</span><span class="p">(</span><span class="s1">&#39;LIBS&#39;</span><span class="p">)</span>
+<span class="go">&#39;-lpthread -ldl  -lutil&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_var</span><span class="p">(</span><span class="s1">&#39;LINKFORSHARED&#39;</span><span class="p">)</span>
+<span class="go">&#39;-Xlinker -export-dynamic&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Incrustando Python en Otra Aplicación</a><ul>
+<li><a class="reference internal" href="#very-high-level-embedding">1.1. Incrustación de muy alto nivel</a></li>
+<li><a class="reference internal" href="#beyond-very-high-level-embedding-an-overview">1.2. Más allá de la incrustación de muy alto nivel: una visión general</a></li>
+<li><a class="reference internal" href="#pure-embedding">1.3. Incrustación pura</a></li>
+<li><a class="reference internal" href="#extending-embedded-python">1.4. Extendiendo Python Incrustado</a></li>
+<li><a class="reference internal" href="#embedding-python-in-c">1.5. Incrustando Python en C++</a></li>
+<li><a class="reference internal" href="#compiling-and-linking-under-unix-like-systems">1.6. Compilar y enlazar bajo sistemas tipo Unix</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="windows.html"
+                        title="capítulo anterior"><span class="section-number">5. </span>Creación de extensiones C y C++ en Windows</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="../c-api/index.html"
+                        title="próximo capítulo">Manual de referencia de la API en C de Python</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/extending/embedding.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="../c-api/index.html" title="Manual de referencia de la API en C de Python"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="windows.html" title="5. Creación de extensiones C y C++ en Windows"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Ampliación e incrustación del intérprete de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Incrustando Python en Otra Aplicación</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

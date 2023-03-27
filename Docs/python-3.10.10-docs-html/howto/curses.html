@@ -1,0 +1,566 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Programación de Curses con Python &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Guía práctica de uso de los descriptores" href="descriptor.html" />
+    <link rel="prev" title="Portar módulos de extensión a Python 3" href="cporting.html" />
+    <link rel="canonical" href="https://docs.python.org/3/howto/curses.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Programación de Curses con Python</a><ul>
+<li><a class="reference internal" href="#what-is-curses">Qué es curses?</a><ul>
+<li><a class="reference internal" href="#the-python-curses-module">El módulo curses de Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#starting-and-ending-a-curses-application">Iniciar y finalizar una aplicación de curses</a></li>
+<li><a class="reference internal" href="#windows-and-pads">Ventanas y pads</a></li>
+<li><a class="reference internal" href="#displaying-text">Mostrando el texto</a><ul>
+<li><a class="reference internal" href="#attributes-and-color">Atributos y color</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-input"><em>Input</em> del usuario</a></li>
+<li><a class="reference internal" href="#for-more-information">Para más información</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="cporting.html"
+                        title="capítulo anterior">Portar módulos de extensión a Python 3</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="descriptor.html"
+                        title="próximo capítulo">Guía práctica de uso de los descriptores</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/curses.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="descriptor.html" title="Guía práctica de uso de los descriptores"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="Portar módulos de extensión a Python 3"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Programación de Curses con Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="curses-programming-with-python">
+<span id="curses-howto"></span><h1>Programación de Curses con Python<a class="headerlink" href="#curses-programming-with-python" title="Enlazar permanentemente con este título">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Autor</dt>
+<dd class="field-odd"><p>A.M. Kuchling, Eric S. Raymond</p>
+</dd>
+<dt class="field-even">Versión</dt>
+<dd class="field-even"><p>2.04</p>
+</dd>
+</dl>
+<div class="topic">
+<p class="topic-title">Resumen</p>
+<p>Este documento describe cómo usar el módulo de extensión <a class="reference internal" href="../library/curses.html#module-curses" title="curses: An interface to the curses library, providing portable terminal handling. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses</span></code></a> para controlar las pantallas en modo texto.</p>
+</div>
+<section id="what-is-curses">
+<h2>Qué es curses?<a class="headerlink" href="#what-is-curses" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La biblioteca curses proporciona una instalación independiente del terminal para manejo de teclado e impresión de pantalla en terminales basados en texto; tales terminales incluyen VT100, la consola de Linux y el terminal simulado proporcionado por varios programas. Los terminales de pantalla admiten varios códigos de control para realizar operaciones comunes, como mover el cursor, desplazar la pantalla y borrar áreas. Diferentes terminales utilizan códigos muy diferentes y, a menudo, tienen sus propias peculiaridades menores.</p>
+<p>En un mundo de pantallas gráficas, uno podría preguntarse « ¿por qué molestarse »? Es cierto que los terminales de pantalla de celdas de caracteres son una tecnología obsoleta, pero hay nichos en los que poder hacer cosas elegantes con ellos sigue siendo valioso. Un nicho está en pequeños <em>Unix</em> incrustados o pequeñas marcas que no ejecutan un servidor X. Por otro lado herramientas como los instaladores del sistema operativo y los configuradores de kernel que pueden tener que ejecutarse antes de que haya soporte gráfico disponible.</p>
+<p>La biblioteca curses proporciona una funcionalidad bastante básica, proporcionando al programador una abstracción de una pantalla que contiene múltiples ventanas de texto no superpuestas. El contenido de una ventana se puede cambiar de varias maneras (agregando texto, borrándolo, cambiando su apariencia) y la biblioteca curses descubrirá que códigos de control deben enviarse al terminal para producir la salida correcta. curses no proporciona muchos conceptos de interfaz de usuario como botones, casillas de verificación o cuadros de diálogo; Si necesita tales funciones, considere una biblioteca de interfaz de usuario como <cite>Urwid &lt;https://pypi.org/project/urwid/&gt;</cite> _.</p>
+<p>La biblioteca curses se escribió originalmente para BSD Unix; Las versiones posteriores de Unix de <em>System V</em> de AT&amp;T agregaron muchas mejoras y nuevas funciones. BSD curses ya no se mantiene, ya que ha sido reemplazado por ncurses, que es una implementación de código abierto de la interfaz AT&amp;T. Si está utilizando un Unix de código abierto como Linux o FreeBSD, su sistema casi seguro usa ncurses. Como la mayoría de las versiones comerciales actuales de Unix se basan en el código del Sistema V, todas las funciones descritas aquí probablemente estarán disponibles. Sin embargo, las versiones anteriores de curses llevadas por algunos Unix propietarios no pueden admitir todo.</p>
+<p>The Windows version of Python doesn’t include the <a class="reference internal" href="../library/curses.html#module-curses" title="curses: An interface to the curses library, providing portable terminal handling. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses</span></code></a>
+module.  A ported version called <a class="reference external" href="https://pypi.org/project/UniCurses">UniCurses</a> is available.</p>
+<section id="the-python-curses-module">
+<h3>El módulo curses de Python<a class="headerlink" href="#the-python-curses-module" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El módulo Python es un envoltorio bastante simple sobre las funciones C proporcionadas por curses; si ya está familiarizado con la programación de curses en C, es muy fácil transferir ese conocimiento a Python. La mayor diferencia es que la interfaz de Python simplifica las cosas al combinar diferentes funciones de C como <code class="xref c c-func docutils literal notranslate"><span class="pre">addtr()</span></code> , <code class="xref c c-func docutils literal notranslate"><span class="pre">mvaddstr()</span></code> , y <code class="xref c c-func docutils literal notranslate"><span class="pre">mvwaddstr()</span></code> en un solo método <a class="reference internal" href="../library/curses.html#curses.window.addstr" title="curses.window.addstr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addstr()</span></code></a>. Verá esto cubierto con más detalle más adelante.</p>
+<p>Este HOWTO es una introducción a la escritura de programas en modo texto con curses y Python. No intenta ser una guía completa de la API de curses; para eso, vea la sección de la guía de la biblioteca de Python sobre ncurses, y las páginas del manual de C para ncurses. Sin embargo, le dará las ideas básicas.</p>
+</section>
+</section>
+<section id="starting-and-ending-a-curses-application">
+<h2>Iniciar y finalizar una aplicación de curses<a class="headerlink" href="#starting-and-ending-a-curses-application" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Antes de hacer cualquier cosa, curses deben ser inicializadas. Esto se realiza llamando a la función <a class="reference internal" href="../library/curses.html#curses.initscr" title="curses.initscr"><code class="xref py py-func docutils literal notranslate"><span class="pre">initscr()</span></code></a>, que determinará el tipo de terminal, enviará los códigos de configuración necesarios al terminal y creará varias estructuras de datos internas. Si tiene éxito, <code class="xref py py-func docutils literal notranslate"><span class="pre">initscr()</span></code> retorna un objeto de ventana que representa la pantalla completa; Esto generalmente se llama <code class="docutils literal notranslate"><span class="pre">stdscr</span></code> después del nombre de la variable C correspondiente.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">curses</span>
+<span class="n">stdscr</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">initscr</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Por lo general, las aplicaciones de curses desactivan el eco automático de las teclas en la pantalla, para poder leer las teclas y solo mostrarlas bajo ciertas circunstancias. Esto requiere llamar a la función <a class="reference internal" href="../library/curses.html#curses.noecho" title="curses.noecho"><code class="xref py py-func docutils literal notranslate"><span class="pre">noecho()</span></code></a> function.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">noecho</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Las aplicaciones también tendrán que reaccionar a las teclas al instante, sin necesidad de presionar la tecla Intro; Esto se llama modo cbreak, en oposición al modo de entrada almacenado en memoria intermedia habitual.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">cbreak</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Los terminales generalmente retornan teclas especiales, como las teclas del cursor o las teclas de navegación, como Re Pág e Inicio, como una secuencia de escape multibyte. Si bien puede escribir su aplicación para esperar tales secuencias y procesarlas en consecuencia, curses pueden hacerlo por usted, retornando un valor especial como <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.KEY_LEFT</span></code>. Para obtener que curses haga el trabajo, deberá habilitar el modo de teclado.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">stdscr</span><span class="o">.</span><span class="n">keypad</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Terminar una aplicación de curses es mucho más fácil que iniciar una. Tendrás que llamar a</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">nocbreak</span><span class="p">()</span>
+<span class="n">stdscr</span><span class="o">.</span><span class="n">keypad</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">curses</span><span class="o">.</span><span class="n">echo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>para revertir la configuración de terminal amigable de curses. Llame luego a la función <a class="reference internal" href="../library/curses.html#curses.endwin" title="curses.endwin"><code class="xref py py-func docutils literal notranslate"><span class="pre">endwin()</span></code></a> para restaurar el terminal a su modo operativo original.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">endwin</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Un problema común al depurar una aplicación curses es hacer que su terminal se estropee cuando la aplicación muere sin restaurar el terminal a su estado anterior. En Python, esto ocurre comúnmente cuando su código tiene errores y genera una excepción no detectada. Las teclas ya no se repiten en la pantalla cuando las escribe, por ejemplo, lo que dificulta el uso del shell.</p>
+<p>En Python puede evitar estas complicaciones y facilitar la depuración importando la función <a class="reference internal" href="../library/curses.html#curses.wrapper" title="curses.wrapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">curses.wrapper()</span></code></a> y usándola así:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">curses</span> <span class="kn">import</span> <span class="n">wrapper</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">stdscr</span><span class="p">):</span>
+    <span class="c1"># Clear screen</span>
+    <span class="n">stdscr</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="c1"># This raises ZeroDivisionError when i == 10.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">i</span><span class="o">-</span><span class="mi">10</span>
+        <span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;10 divided by </span><span class="si">{}</span><span class="s1"> is </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">10</span><span class="o">/</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+    <span class="n">stdscr</span><span class="o">.</span><span class="n">getkey</span><span class="p">()</span>
+
+<span class="n">wrapper</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>La función <a class="reference internal" href="../library/curses.html#curses.wrapper" title="curses.wrapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">wrapper()</span></code></a> toma un objeto invocable y realiza las inicializaciones descritas anteriormente, también inicializa los colores si hay soporte de color. <code class="xref py py-func docutils literal notranslate"><span class="pre">wrapper()</span></code> luego ejecuta su invocable proporcionado. Una vez que vuelve a llamarse, <code class="xref py py-func docutils literal notranslate"><span class="pre">wrapper()</span></code> restaurará el estado original del terminal. El invocable se llama dentro de <a class="reference internal" href="../reference/compound_stmts.html#try"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">try</span></code></a>…<a class="reference internal" href="../reference/compound_stmts.html#except"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">except</span></code></a> que captura excepciones, restaura el estado del terminal y luego vuelve a generar la excepción. Por lo tanto, su terminal no se quedará en un estado extraño de excepción y podrá leer el mensaje de la excepción y el rastreo.</p>
+</section>
+<section id="windows-and-pads">
+<h2>Ventanas y pads<a class="headerlink" href="#windows-and-pads" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las ventanas son la abstracción básica en curses. Un objeto de ventana representa un área rectangular de la pantalla y admite métodos para mostrar texto, borrarlo, permitir al usuario ingresar cadenas, etc.</p>
+<p>El objeto <code class="docutils literal notranslate"><span class="pre">stdscr</span></code> retornado por la función <a class="reference internal" href="../library/curses.html#curses.initscr" title="curses.initscr"><code class="xref py py-func docutils literal notranslate"><span class="pre">initscr()</span></code></a> es un objeto de ventana que cubre toda la pantalla. Es posible que muchos programas solo necesiten esta única ventana, pero es posible que desee dividir la pantalla en ventanas más pequeñas para volver a dibujarlas o borrarlas por separado. La función <a class="reference internal" href="../library/curses.html#curses.newwin" title="curses.newwin"><code class="xref py py-func docutils literal notranslate"><span class="pre">newwin()</span></code></a> crea una nueva ventana de un tamaño dado, retornando el nuevo objeto de ventana.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">begin_x</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span> <span class="n">begin_y</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newwin</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">begin_y</span><span class="p">,</span> <span class="n">begin_x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Tenga en cuenta que el sistema de coordenadas utilizado en curses es inusual. Las coordenadas siempre se pasan en el orden <em>y,x</em>, y la esquina superior izquierda de una ventana es la coordenada (0,0). Esto rompe la convención normal para manejar coordenadas donde la coordenada <em>x</em> es lo primero. Esta es una desafortunada diferencia de la mayoría de las otras aplicaciones informáticas, pero ha sido parte de curses desde que se escribió por primera vez, y ahora es demasiado tarde para cambiar las cosas.</p>
+<p>Su aplicación puede determinar el tamaño de la pantalla utilizando las variables <code class="xref py py-data docutils literal notranslate"><span class="pre">curses.LINES</span></code> y <code class="xref py py-data docutils literal notranslate"><span class="pre">curses.COLS</span></code> para obtener los tamaños <em>y</em> y <em>x</em>. Las coordenadas legales se extenderán de <code class="docutils literal notranslate"><span class="pre">(0,0)</span></code> a <code class="docutils literal notranslate"><span class="pre">(curses.LINES</span> <span class="pre">-</span> <span class="pre">1,</span> <span class="pre">curses.COLS</span> <span class="pre">-</span> <span class="pre">1)</span></code>.</p>
+<p>Cuando llama a un método para mostrar o borrar texto, el efecto no aparece inmediatamente en la pantalla. En su lugar, debe llamar al método <a class="reference internal" href="../library/curses.html#curses.window.refresh" title="curses.window.refresh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">refresh()</span></code></a> de los objetos de ventana para actualizar la pantalla.</p>
+<p>Esto se debe a que curses se escribieron originalmente teniendo en cuenta las conexiones de terminales lentas de 300 baudios; con estos terminales, era muy importante minimizar el tiempo requerido para volver a dibujar la pantalla. En cambio, curses acumula cambios en la pantalla y los muestra de la manera más eficiente cuando llama <code class="xref py py-meth docutils literal notranslate"><span class="pre">refresh()</span></code>. Por ejemplo, si su programa muestra algo de texto en una ventana y luego borra la ventana, no hay necesidad de enviar el texto original porque nunca son visibles.</p>
+<p>En la práctica, decirle explícitamente a curses que vuelva a dibujar una ventana no complica mucho la programación con curses. La mayoría de los programas entran en una gran cantidad de actividad y luego se detienen a la espera de que se presione una tecla u otra acción por parte del usuario. Todo lo que tiene que hacer es asegurarse de que la pantalla se haya re-dibujado antes de hacer una pausa para esperar la entrada del usuario, llamando primero a <code class="docutils literal notranslate"><span class="pre">stdscr.refresh()</span></code> o al método <code class="xref py py-meth docutils literal notranslate"><span class="pre">refresh()</span></code> de alguna otra ventana relevante.</p>
+<p>Un pad es un caso especial de una ventana; puede ser más grande que la pantalla de visualización real, y solo se muestra una parte del pad a la vez. La creación de un pad requiere la altura y el ancho del pad, mientras que la actualización de un pad requiere dar las coordenadas del área en pantalla donde se mostrará una subsección del pad.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">pad</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newpad</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="c1"># These loops fill the pad with letters; addch() is</span>
+<span class="c1"># explained in the next section</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">99</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">99</span><span class="p">):</span>
+        <span class="n">pad</span><span class="o">.</span><span class="n">addch</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+
+<span class="c1"># Displays a section of the pad in the middle of the screen.</span>
+<span class="c1"># (0,0) : coordinate of upper-left corner of pad area to display.</span>
+<span class="c1"># (5,5) : coordinate of upper-left corner of window area to be filled</span>
+<span class="c1">#         with pad content.</span>
+<span class="c1"># (20, 75) : coordinate of lower-right corner of window area to be</span>
+<span class="c1">#          : filled with pad content.</span>
+<span class="n">pad</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="mi">75</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>La llamada <code class="xref py py-meth docutils literal notranslate"><span class="pre">refresh()</span></code> muestra una sección del pad en el rectángulo que se extiende desde la coordenada (5,5) hasta la coordenada (20,75) en la pantalla; la esquina superior izquierda de la sección mostrada es la coordenada (0,0) en el pad. Más allá de esa diferencia, los pads son exactamente como las ventanas normales y admiten los mismos métodos.</p>
+<p>Si tiene varias ventanas y almohadillas en la pantalla, hay una manera más eficiente de actualizar la pantalla y evitar el molesto parpadeo de la pantalla a medida que se actualiza cada parte de la pantalla. <code class="xref py py-meth docutils literal notranslate"><span class="pre">refresh()</span></code> en realidad hace dos cosas:</p>
+<ol class="arabic simple">
+<li><p>Llama al método <a class="reference internal" href="../library/curses.html#curses.window.noutrefresh" title="curses.window.noutrefresh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">noutrefresh()</span></code></a> de cada ventana para actualizar una estructura de datos subyacente que representa el estado deseado de la pantalla.</p></li>
+<li><p>Llama a la función <a class="reference internal" href="../library/curses.html#curses.doupdate" title="curses.doupdate"><code class="xref py py-func docutils literal notranslate"><span class="pre">doupdate()</span></code></a> para cambiar la pantalla física para que coincida con el estado deseado registrado en la estructura de datos.</p></li>
+</ol>
+<p>En su lugar, puede llamar a <code class="xref py py-meth docutils literal notranslate"><span class="pre">noutrefresh()</span></code> en varias ventanas para actualizar la estructura de datos, y luego llamar a <code class="xref py py-func docutils literal notranslate"><span class="pre">doupdate()</span></code> para actualizar la pantalla.</p>
+</section>
+<section id="displaying-text">
+<h2>Mostrando el texto<a class="headerlink" href="#displaying-text" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Desde el punto de vista de un programador en C, curses a veces puede parecer un laberinto retorcido de funciones, todas sutilmente diferentes. Por ejemplo, <code class="xref c c-func docutils literal notranslate"><span class="pre">addtr()</span></code> muestra una cadena en la ubicación actual del cursor en la ventana <code class="docutils literal notranslate"><span class="pre">stdscr</span></code>, mientras que <code class="xref c c-func docutils literal notranslate"><span class="pre">mvaddstr()</span></code> se mueve a una determinada coordenada y, x primero antes de mostrar la cadena . <code class="xref c c-func docutils literal notranslate"><span class="pre">waddstr()</span></code> es como <code class="xref c c-func docutils literal notranslate"><span class="pre">addtr()</span></code>, pero permite especificar una ventana para usar en lugar de usar <code class="docutils literal notranslate"><span class="pre">stdscr</span></code> por defecto. <code class="xref c c-func docutils literal notranslate"><span class="pre">mvwaddstr()</span></code> permite especificar tanto una ventana como una coordenada.</p>
+<p>Afortunadamente, la interfaz de Python oculta todos estos detalles. <code class="docutils literal notranslate"><span class="pre">stdscr</span></code> es un objeto de ventana como cualquier otro, y métodos como <a class="reference internal" href="../library/curses.html#curses.window.addstr" title="curses.window.addstr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addstr()</span></code></a> aceptan múltiples formas de argumento. Por lo general, hay cuatro formas diferentes.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Formas</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>str</em> o <em>ch</em></p></td>
+<td><p>Mostrar la cadena <em>str</em> o el carácter <em>ch</em> en la posición actual</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>str</em> o <em>ch</em>, <em>attr</em></p></td>
+<td><p>Muestra la cadena <em>str</em> o el carácter <em>ch</em>, utilizando el atributo <em>attr</em> en la posición actual</p></td>
+</tr>
+<tr class="row-even"><td><p><em>y</em>, <em>x</em>, <em>str</em> o <em>ch</em></p></td>
+<td><p>Moverse a la posición <em>y,x</em> dentro de la ventana, y mostrar <em>st</em> o <em>ch</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><em>y</em>, <em>x</em>, <em>str</em> o <em>ch</em>, <em>attr</em></p></td>
+<td><p>Muévase a la posición <em>y, x</em> dentro de la ventana y muestre <em>str</em> o <em>ch</em>, usando el atributo <em>attr</em></p></td>
+</tr>
+</tbody>
+</table>
+<p>Los atributos permiten mostrar texto en formas resaltadas como negrita, subrayado, código inverso o en color. Se explicarán con más detalle en la siguiente subsección.</p>
+<p>El método <a class="reference internal" href="../library/curses.html#curses.window.addstr" title="curses.window.addstr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addstr()</span></code></a> toma una cadena de Python o una cadena de bytes como el valor que se mostrará. El contenido de las cadenas de bytes se envía al terminal tal como está. Las cadenas se codifican en bytes utilizando el valor del atributo de la ventana <code class="xref py py-attr docutils literal notranslate"><span class="pre">encoding</span></code>; Esto se establece de manera predeterminada en la codificación predeterminada del sistema que retorna <a class="reference internal" href="../library/locale.html#locale.getpreferredencoding" title="locale.getpreferredencoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">locale.getpreferredencoding()</span></code></a>.</p>
+<p>Los métodos <a class="reference internal" href="../library/curses.html#curses.window.addch" title="curses.window.addch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addch()</span></code></a> toman un carácter, que puede ser una cadena de longitud 1, una cadena de bytes de longitud 1 o un entero.</p>
+<p>Se proporcionan constantes para los caracteres de extensión; estas constantes son enteros mayores que 255. Por ejemplo <code class="xref py py-const docutils literal notranslate"><span class="pre">ACS_PLMINUS</span></code> es un símbolo +/-, y <code class="xref py py-const docutils literal notranslate"><span class="pre">ACS_ULCORNER</span></code> es la esquina superior izquierda de un cuadro (útil para dibujar bordes). También puede usar el carácter Unicode apropiado.</p>
+<p>Windows recuerda dónde se dejó el cursor después de la última operación, por lo que si deja de lado las coordenadas <em>y, x</em>, la cadena o el carácter se mostrarán donde se haya quedado la última operación. También puede mover el cursor con el método <code class="docutils literal notranslate"><span class="pre">move(y,</span> <span class="pre">x)</span></code>. Debido a que algunos terminales siempre muestran un cursor parpadeante, es posible que desee asegurarse de que el cursor esté ubicado en algún lugar donde no distraiga; Puede ser confuso tener el cursor parpadeando en alguna ubicación aparentemente aleatoria.</p>
+<p>Si su aplicación no necesita un cursor parpadeante, puede llamar a <code class="docutils literal notranslate"><span class="pre">curs_set</span> <span class="pre">(False)</span></code> para hacerla invisible. Para compatibilidad con versiones anteriores de curses, hay una función <code class="docutils literal notranslate"><span class="pre">jeaveok</span> <span class="pre">(bool)</span></code> que es sinónimo de <a class="reference internal" href="../library/curses.html#curses.curs_set" title="curses.curs_set"><code class="xref py py-func docutils literal notranslate"><span class="pre">curs_set()</span></code></a>. Cuando <em>bool</em> es verdadero, la biblioteca curses intentará suprimir el cursor parpadeante, y no tendrá que preocuparse por dejarlo en ubicaciones extrañas.</p>
+<section id="attributes-and-color">
+<h3>Atributos y color<a class="headerlink" href="#attributes-and-color" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los caracteres se pueden mostrar de diferentes maneras. Las líneas de estado en una aplicación basada en texto se muestran comúnmente en video inverso, o un visor de texto puede necesitar resaltar ciertas palabras. curses admite esto al permitirle especificar un atributo para cada celda en la pantalla.</p>
+<p>Un atributo es un entero, cada bit representa un atributo diferente. Puede intentar mostrar texto con múltiples conjuntos de bits de atributos, pero curses no garantizan que todas las combinaciones posibles estén disponibles, o que todas sean visualmente distintas. Eso depende de la capacidad del terminal que se utilice, por lo que es más seguro apegarse a los atributos más comúnmente disponibles, enumerados aquí.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Atributo</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_BLINK</span></code></p></td>
+<td><p>Texto parpadeante</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_BOLD</span></code></p></td>
+<td><p>Texto extra brillante o en negrita</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_DIM</span></code></p></td>
+<td><p>Texto medio brillante</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_REVERSE</span></code></p></td>
+<td><p>Texto de video inverso</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_STANDOUT</span></code></p></td>
+<td><p>El mejor modo de resaltado disponible</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">A_UNDERLINE</span></code></p></td>
+<td><p>Texto subrayado</p></td>
+</tr>
+</tbody>
+</table>
+<p>Entonces, para mostrar una línea de estado de video inverso en la línea superior de la pantalla, puede codificar:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Current mode: Typing mode&quot;</span><span class="p">,</span>
+              <span class="n">curses</span><span class="o">.</span><span class="n">A_REVERSE</span><span class="p">)</span>
+<span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>La biblioteca curses también admite color en los terminales que lo proporcionen. El terminal más común es probablemente la consola de Linux, seguido de <em>xterms</em> en color.</p>
+<p>Para usar el color, debe llamar a la función <a class="reference internal" href="../library/curses.html#curses.start_color" title="curses.start_color"><code class="xref py py-func docutils literal notranslate"><span class="pre">start_color()</span></code></a> poco después de llamar <a class="reference internal" href="../library/curses.html#curses.initscr" title="curses.initscr"><code class="xref py py-func docutils literal notranslate"><span class="pre">initscr()</span></code></a>, para inicializar el conjunto de colores predeterminado (la función <a class="reference internal" href="../library/curses.html#curses.wrapper" title="curses.wrapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">curses.wrapper()</span></code></a> hace esto automáticamente). Una vez hecho esto, la función <a class="reference internal" href="../library/curses.html#curses.has_colors" title="curses.has_colors"><code class="xref py py-func docutils literal notranslate"><span class="pre">has_colors()</span></code></a> retorna TRUE si el terminal en uso realmente puede mostrar color. (Nota: curses usa el ‘color’ de la ortografía estadounidense, en lugar del ‘color’ de la ortografía canadiense/británica. Si está acostumbrado a la ortografía británica, tendrá que resignarse a escribir mal por el bien de estas funciones. )</p>
+<p>La biblioteca curses mantiene un número finito de pares de colores, que contienen un color de primer plano (o texto) y un color de fondo. Puede obtener el valor del atributo correspondiente a un par de colores con la función <a class="reference internal" href="../library/curses.html#curses.color_pair" title="curses.color_pair"><code class="xref py py-func docutils literal notranslate"><span class="pre">color_pair()</span></code></a>; esto puede ser operado bit a bit con otros atributos como <code class="xref py py-const docutils literal notranslate"><span class="pre">A_REVERSE</span></code>, pero nuevamente, no se garantiza que tales combinaciones funcionen en todos los terminales.</p>
+<p>Un ejemplo, que muestra una línea de texto usando el par de colores 1</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="s2">&quot;Pretty text&quot;</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Como dije antes, un par de colores consiste en un color de primer plano y de fondo. La función <code class="docutils literal notranslate"><span class="pre">init_pair</span> <span class="pre">(n,</span> <span class="pre">f,</span> <span class="pre">b)</span></code> cambia la definición del par de colores <em>n</em>, a color de primer plano f y color de fondo b. El par de colores 0 está cableado a blanco sobre negro, y no se puede cambiar.</p>
+<p>Los colores están numerados y <code class="xref py py-func docutils literal notranslate"><span class="pre">start_color()</span></code> inicializa 8 colores básicos cuando activa el modo de color. Son: 0:negro, 1:rojo, 2:verde, 3:amarillo, 4:azul, 5:magenta, 6:cian y 7:blanco. El módulo <a class="reference internal" href="../library/curses.html#module-curses" title="curses: An interface to the curses library, providing portable terminal handling. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses</span></code></a> define constantes con nombre para cada uno de estos colores: <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.COLOR_BLACK</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.COLOR_RED</span></code>, y así sucesivamente.</p>
+<p>Pongamos todo esto juntos. Para cambiar el color 1 al texto rojo sobre un fondo blanco, debe llamar a:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_WHITE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cuando cambia un par de colores, cualquier texto que ya se muestre usando ese par de colores cambiará a los nuevos colores. También puede mostrar texto nuevo en este color con:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;RED ALERT!&quot;</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Los terminales muy elegantes pueden cambiar las definiciones de los colores reales a un valor RGB dado. Esto le permite cambiar el color 1, que generalmente es rojo, a púrpura o azul o cualquier otro color que desee. Desafortunadamente, la consola de Linux no admite esto, por lo que no puedo probarlo y no puedo proporcionar ningún ejemplo. Puede verificar si su terminal puede hacer esto llamando a <a class="reference internal" href="../library/curses.html#curses.can_change_color" title="curses.can_change_color"><code class="xref py py-func docutils literal notranslate"><span class="pre">can_change_color()</span></code></a>, que retorna <code class="docutils literal notranslate"><span class="pre">Verdadero</span></code> si la capacidad está ahí. Si tiene la suerte de tener un terminal tan talentoso, consulte las páginas de manual de su sistema para obtener más información.</p>
+</section>
+</section>
+<section id="user-input">
+<h2><em>Input</em> del usuario<a class="headerlink" href="#user-input" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>La biblioteca C curses ofrece solo mecanismos de entrada muy simples. El módulo Python <a class="reference internal" href="../library/curses.html#module-curses" title="curses: An interface to the curses library, providing portable terminal handling. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses</span></code></a> agrega un widget básico de entrada de texto. (Otras bibliotecas como <a class="reference external" href="https://pypi.org/project/urwid/">Urwid</a> tienen colecciones más extensas de widgets).</p>
+<p>Hay dos métodos para obtener información desde una ventana:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../library/curses.html#curses.window.getch" title="curses.window.getch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getch()</span></code></a> actualiza la pantalla y luego espera a que el usuario presione una tecla, mostrando la tecla si <a class="reference internal" href="../library/curses.html#curses.echo" title="curses.echo"><code class="xref py py-func docutils literal notranslate"><span class="pre">echo()</span></code></a> ha sido llamado anteriormente. Opcionalmente, puede especificar una coordenada a la que se debe mover el cursor antes de pausar.</p></li>
+<li><p><a class="reference internal" href="../library/curses.html#curses.window.getkey" title="curses.window.getkey"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getkey()</span></code></a> hace lo mismo pero convierte el entero en una cadena. Los caracteres individuales se retornan como cadenas de 1 carácter, y las teclas especiales como las teclas de función retornan cadenas más largas que contienen un nombre de tecla como <code class="docutils literal notranslate"><span class="pre">KEY_UP</span></code> o <code class="docutils literal notranslate"><span class="pre">^</span> <span class="pre">G</span></code>.</p></li>
+</ul>
+<p>Es posible no esperar al usuario utilizando el método de ventana <code class="xref py py-meth docutils literal notranslate"><span class="pre">nodelay()</span></code>. Después de <code class="docutils literal notranslate"><span class="pre">nodelay(True)</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">getch()</span></code> y <code class="xref py py-meth docutils literal notranslate"><span class="pre">getkey()</span></code> para que la ventana no se bloquee. Para indicar que no hay ninguna entrada lista, <code class="xref py py-meth docutils literal notranslate"><span class="pre">getch()</span></code> retorna <code class="docutils literal notranslate"><span class="pre">curses.ERR</span></code> (un valor de -1) y <code class="xref py py-meth docutils literal notranslate"><span class="pre">getkey()</span></code> genera una excepción. También hay una función <a class="reference internal" href="../library/curses.html#curses.halfdelay" title="curses.halfdelay"><code class="xref py py-func docutils literal notranslate"><span class="pre">halfdelay()</span></code></a>, que se puede usar para (en efecto) establecer un temporizador en cada <code class="xref py py-meth docutils literal notranslate"><span class="pre">getch()</span></code>; Si no hay entrada disponible dentro de un retraso especificado (medido en décimas de segundo), curses generan una excepción.</p>
+<p>El método <code class="xref py py-meth docutils literal notranslate"><span class="pre">getch()</span></code> retorna un entero; si está entre 0 y 255, representa el código ASCII de la tecla presionada. Los valores superiores a 255 son teclas especiales como Re Pág, Inicio o las teclas del cursor. Puede comparar el valor retornado a constantes como <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.KEY_PPAGE</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.KEY_HOME</span></code>, o <code class="xref py py-const docutils literal notranslate"><span class="pre">curses.KEY_LEFT</span></code>. El bucle principal de su programa puede verse así:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">stdscr</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">):</span>
+        <span class="n">PrintDocument</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">):</span>
+        <span class="k">break</span>  <span class="c1"># Exit the while loop</span>
+    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="n">curses</span><span class="o">.</span><span class="n">KEY_HOME</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>El módulo <a class="reference internal" href="../library/curses.ascii.html#module-curses.ascii" title="curses.ascii: Constants and set-membership functions for ASCII characters."><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses.ascii</span></code></a> proporciona funciones de membresía de clase ASCII que toman argumentos de cadena de entero o de 1 carácter; Estos pueden ser útiles para escribir pruebas más legibles para dichos bucles. También proporciona funciones de conversión que toman argumentos enteros o de cadena de 1 carácter y retornen el mismo tipo. Por ejemplo, <a class="reference internal" href="../library/curses.ascii.html#curses.ascii.ctrl" title="curses.ascii.ctrl"><code class="xref py py-func docutils literal notranslate"><span class="pre">curses.ascii.ctrl()</span></code></a> retorna el carácter de control correspondiente a su argumento.</p>
+<p>También hay un método para recuperar una cadena completa, <a class="reference internal" href="../library/curses.html#curses.window.getstr" title="curses.window.getstr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getstr()</span></code></a>. No se usa con mucha frecuencia, porque su funcionalidad es bastante limitada; Las únicas teclas de edición disponibles son la tecla de retroceso y la tecla Intro, que termina la cadena. Opcionalmente, puede limitarse a un número fijo de caracteres.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">curses</span><span class="o">.</span><span class="n">echo</span><span class="p">()</span>            <span class="c1"># Enable echoing of characters</span>
+
+<span class="c1"># Get a 15-character string, with the cursor on the top line</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">stdscr</span><span class="o">.</span><span class="n">getstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El módulo <a class="reference internal" href="../library/curses.html#module-curses.textpad" title="curses.textpad: Emacs-like input editing in a curses window."><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses.textpad</span></code></a> proporciona un cuadro de texto que admite un conjunto de teclas tipo Emacs. Varios métodos de la clase <a class="reference internal" href="../library/curses.html#curses.textpad.Textbox" title="curses.textpad.Textbox"><code class="xref py py-class docutils literal notranslate"><span class="pre">Textbox</span></code></a> admiten la edición con validación de entrada y recopilan los resultados de edición con o sin espacios finales. Aquí hay un ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">curses</span>
+<span class="kn">from</span> <span class="nn">curses.textpad</span> <span class="kn">import</span> <span class="n">Textbox</span><span class="p">,</span> <span class="n">rectangle</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">stdscr</span><span class="p">):</span>
+    <span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Enter IM message: (hit Ctrl-G to send)&quot;</span><span class="p">)</span>
+
+    <span class="n">editwin</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newwin</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rectangle</span><span class="p">(</span><span class="n">stdscr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">5</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">30</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+    <span class="n">box</span> <span class="o">=</span> <span class="n">Textbox</span><span class="p">(</span><span class="n">editwin</span><span class="p">)</span>
+
+    <span class="c1"># Let the user edit until Ctrl-G is struck.</span>
+    <span class="n">box</span><span class="o">.</span><span class="n">edit</span><span class="p">()</span>
+
+    <span class="c1"># Get resulting contents</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">gather</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Consulte la documentación de la biblioteca sobre <a class="reference internal" href="../library/curses.html#module-curses.textpad" title="curses.textpad: Emacs-like input editing in a curses window."><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses.textpad</span></code></a> para más detalles.</p>
+</section>
+<section id="for-more-information">
+<h2>Para más información<a class="headerlink" href="#for-more-information" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Este CÓMO no cubre algunos temas avanzados, como leer el contenido de la pantalla o capturar eventos del mouse desde una instancia de xterm, pero la página de la biblioteca de Python para el módulo <a class="reference internal" href="../library/curses.html#module-curses" title="curses: An interface to the curses library, providing portable terminal handling. (Unix)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">curses</span></code></a> ahora está razonablemente completa. Deberías buscarlo posteriormente.</p>
+<p>Si tiene dudas sobre el comportamiento detallado de las funciones de curses, consulte las páginas del manual para su implementación de curses, ya sea ncurses o un proveedor exclusivo de Unix. Las páginas del manual documentarán cualquier peculiaridad y proporcionarán listas completas de todas las funciones, atributos y caracteres <code class="xref py py-const docutils literal notranslate"><span class="pre">ACS_*</span></code> disponibles para usted.</p>
+<p>Debido a que la API de curses es tan grande, algunas funciones no son compatibles con la interfaz de Python. A menudo, esto no se debe a que sean difíciles de implementar, sino a que nadie los ha necesitado todavía. Además, Python aún no admite la biblioteca de menús asociada con ncurses. Los parches que agregan soporte para estos serían bienvenidos; consulte <a class="reference external" href="https://devguide.python.org/">la Guía del desarrollador de Python</a> para obtener más información sobre cómo enviar parches a Python.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://invisible-island.net/ncurses/ncurses-intro.html">Writing Programs with NCURSES</a>:
+a lengthy tutorial for C programmers.</p></li>
+<li><p><a class="reference external" href="https://linux.die.net/man/3/ncurses">La página web con el manual de  ncurses</a></p></li>
+<li><p><a class="reference external" href="https://invisible-island.net/ncurses/ncurses.faq.html">The ncurses FAQ</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=eN1eZtjLEnU">«Use curses… don’t swear»</a>: video de una charla de PyCon 2013 sobre el control de terminales usando curses o Urwid.</p></li>
+<li><p><a class="reference external" href="https://pyvideo.org/video/1568/console-applications-with-urwid">«Console Applications with Urwid»</a>:
+video of a PyCon CA 2012 talk demonstrating some applications written using
+Urwid.</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Programación de Curses con Python</a><ul>
+<li><a class="reference internal" href="#what-is-curses">Qué es curses?</a><ul>
+<li><a class="reference internal" href="#the-python-curses-module">El módulo curses de Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#starting-and-ending-a-curses-application">Iniciar y finalizar una aplicación de curses</a></li>
+<li><a class="reference internal" href="#windows-and-pads">Ventanas y pads</a></li>
+<li><a class="reference internal" href="#displaying-text">Mostrando el texto</a><ul>
+<li><a class="reference internal" href="#attributes-and-color">Atributos y color</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-input"><em>Input</em> del usuario</a></li>
+<li><a class="reference internal" href="#for-more-information">Para más información</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="cporting.html"
+                        title="capítulo anterior">Portar módulos de extensión a Python 3</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="descriptor.html"
+                        title="próximo capítulo">Guía práctica de uso de los descriptores</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/curses.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="descriptor.html" title="Guía práctica de uso de los descriptores"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="Portar módulos de extensión a Python 3"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Programación de Curses con Python</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

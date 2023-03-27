@@ -1,0 +1,819 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Protocolo Búfer &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Protocolo de búfer antiguo" href="objbuffer.html" />
+    <link rel="prev" title="Protocolo iterador" href="iter.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/buffer.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Protocolo Búfer</a><ul>
+<li><a class="reference internal" href="#buffer-structure">Estructura de búfer</a></li>
+<li><a class="reference internal" href="#buffer-request-types">Tipos de solicitud búfer</a><ul>
+<li><a class="reference internal" href="#request-independent-fields">campos independientes de solicitud</a></li>
+<li><a class="reference internal" href="#readonly-format">formato de sólo lectura</a></li>
+<li><a class="reference internal" href="#shape-strides-suboffsets">formas, <em>strides</em>, <em>suboffsets</em></a></li>
+<li><a class="reference internal" href="#contiguity-requests">solicitudes de contigüidad</a></li>
+<li><a class="reference internal" href="#compound-requests">solicitudes compuestas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#complex-arrays">Arreglos complejos</a><ul>
+<li><a class="reference internal" href="#numpy-style-shape-and-strides">Estilo NumPy: forma y <em>strides</em></a></li>
+<li><a class="reference internal" href="#pil-style-shape-strides-and-suboffsets">Estilo PIL: forma, <em>strides</em> y <em>suboffsets</em></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#buffer-related-functions">Funciones relacionadas a búfer</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="iter.html"
+                        title="capítulo anterior">Protocolo iterador</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="objbuffer.html"
+                        title="próximo capítulo">Protocolo de búfer antiguo</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/buffer.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="objbuffer.html" title="Protocolo de búfer antiguo"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="iter.html" title="Protocolo iterador"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="abstract.html" accesskey="U">Capa de objetos abstractos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Protocolo Búfer</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="buffer-protocol">
+<span id="bufferobjects"></span><span id="index-0"></span><h1>Protocolo Búfer<a class="headerlink" href="#buffer-protocol" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Ciertos objetos disponibles en Python ajustan el acceso a un arreglo de memoria subyacente o <em>buffer</em>. Dichos objetos incluyen el incorporado <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> y <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>, y algunos tipos de extensión como <a class="reference internal" href="../library/array.html#array.array" title="array.array"><code class="xref py py-class docutils literal notranslate"><span class="pre">array.array</span></code></a>. Las bibliotecas de terceros pueden definir sus propios tipos para fines especiales, como el procesamiento de imágenes o el análisis numérico.</p>
+<p>Si bien cada uno de estos tipos tiene su propia semántica, comparten la característica común de estar respaldados por un búfer de memoria posiblemente grande. Es deseable, en algunas situaciones, acceder a ese búfer directamente y sin copia intermedia.</p>
+<p>Python proporciona una instalación de este tipo en el nivel C en la forma de <a class="reference internal" href="#bufferobjects"><span class="std std-ref">protocolo búfer</span></a>. Este protocolo tiene dos lados:</p>
+<ul class="simple" id="index-1">
+<li><p>en el lado del productor, un tipo puede exportar una «interfaz de búfer» que permite a los objetos de ese tipo exponer información sobre su búfer subyacente. Esta interfaz se describe en la sección <a class="reference internal" href="typeobj.html#buffer-structs"><span class="std std-ref">Estructuras de Objetos Búfer</span></a>;</p></li>
+<li><p>en el lado del consumidor, hay varios medios disponibles para obtener un puntero a los datos subyacentes sin procesar de un objeto (por ejemplo, un parámetro de método).</p></li>
+</ul>
+<p>Los objetos simples como <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> y <a class="reference internal" href="../library/stdtypes.html#bytearray" title="bytearray"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> exponen su búfer subyacente en forma orientada a bytes. Otras formas son posibles; por ejemplo, los elementos expuestos por un <a class="reference internal" href="../library/array.html#array.array" title="array.array"><code class="xref py py-class docutils literal notranslate"><span class="pre">array.array</span></code></a> pueden ser valores de varios bytes.</p>
+<p>Un consumidor de ejemplo de la interfaz del búfer es el método <a class="reference internal" href="../library/io.html#io.BufferedIOBase.write" title="io.BufferedIOBase.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> de objetos de archivo: cualquier objeto que pueda exportar una serie de bytes a través de la interfaz del búfer puede escribirse en un archivo. Mientras que <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> solo necesita acceso de solo lectura a los contenidos internos del objeto que se le pasa, otros métodos como <a class="reference internal" href="../library/io.html#io.BufferedIOBase.readinto" title="io.BufferedIOBase.readinto"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readinto()</span></code></a> necesitan acceso de escritura a los contenidos de su argumento. La interfaz del búfer permite que los objetos permitan o rechacen selectivamente la exportación de búferes de lectura-escritura y solo lectura.</p>
+<p>Hay dos formas para que un consumidor de la interfaz del búfer adquiera un búfer sobre un objeto de destino:</p>
+<ul class="simple">
+<li><p>llamar <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a> con los parámetros correctos;</p></li>
+<li><p>llamar <a class="reference internal" href="arg.html#c.PyArg_ParseTuple" title="PyArg_ParseTuple"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyArg_ParseTuple()</span></code></a> (o uno de sus hermanos) con uno de los <code class="docutils literal notranslate"><span class="pre">y*</span></code>, <code class="docutils literal notranslate"><span class="pre">w*</span></code> o <code class="docutils literal notranslate"><span class="pre">s*</span></code> <a class="reference internal" href="arg.html#arg-parsing"><span class="std std-ref">códigos de formato</span></a>.</p></li>
+</ul>
+<p>En ambos casos, se debe llamar a <a class="reference internal" href="#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a> cuando ya no se necesita el búfer. De lo contrario, podrían surgir varios problemas, como pérdidas de recursos.</p>
+<section id="buffer-structure">
+<span id="id1"></span><h2>Estructura de búfer<a class="headerlink" href="#buffer-structure" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las estructuras de búfer (o simplemente «búferes») son útiles como una forma de exponer los datos binarios de otro objeto al programador de Python. También se pueden usar como un mecanismo de corte de copia cero. Usando su capacidad para hacer referencia a un bloque de memoria, es posible exponer cualquier información al programador Python con bastante facilidad. La memoria podría ser una matriz grande y constante en una extensión C, podría ser un bloque de memoria sin procesar para su manipulación antes de pasar a una biblioteca del sistema operativo, o podría usarse para pasar datos estructurados en su formato nativo en memoria .</p>
+<p>Contrariamente a la mayoría de los tipos de datos expuestos por el intérprete de Python, los búferes no son punteros <a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyObject</span></code></a> sino estructuras C simples. Esto les permite ser creados y copiados de manera muy simple. Cuando se necesita un contenedor genérico alrededor de un búfer, un objeto <a class="reference internal" href="memoryview.html#memoryview-objects"><span class="std std-ref">memoryview</span></a> puede ser creado.</p>
+<p>Para obtener instrucciones breves sobre cómo escribir un objeto de exportación, consulte <a class="reference internal" href="typeobj.html#buffer-structs"><span class="std std-ref">Estructuras de objetos búfer</span></a>. Para obtener un búfer, consulte <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a>.</p>
+<dl class="c type">
+<dt id="c.Py_buffer">
+<em class="property">type </em><code class="sig-name descname">Py_buffer</code><a class="headerlink" href="#c.Py_buffer" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><dl class="c member">
+<dt id="c.Py_buffer.buf">
+void *<code class="sig-name descname">buf</code><a class="headerlink" href="#c.Py_buffer.buf" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Un puntero al inicio de la estructura lógica descrita por los campos del búfer. Puede ser cualquier ubicación dentro del bloque de memoria física subyacente del exportador. Por ejemplo, con negativo <a class="reference internal" href="#c.Py_buffer.strides" title="Py_buffer.strides"><code class="xref c c-member docutils literal notranslate"><span class="pre">strides</span></code></a> el valor puede apuntar al final del bloque de memoria.</p>
+<p>Para arreglos <a class="reference internal" href="../glossary.html#term-contiguous"><span class="xref std std-term">contiguous</span></a>, el valor apunta al comienzo del bloque de memoria.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.obj">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">obj</code><a class="headerlink" href="#c.Py_buffer.obj" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Una nueva referencia al objeto exportador. La referencia es propiedad del consumidor y automáticamente disminuye y se establece en <code class="docutils literal notranslate"><span class="pre">NULL</span></code> por <a class="reference internal" href="#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a>. El campo es el equivalente del valor de retorno de cualquier función estándar de C-API.</p>
+<p>Como un caso especial, para los búferes <em>temporary</em> que están envueltos por <a class="reference internal" href="memoryview.html#c.PyMemoryView_FromBuffer" title="PyMemoryView_FromBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyMemoryView_FromBuffer()</span></code></a> o <a class="reference internal" href="#c.PyBuffer_FillInfo" title="PyBuffer_FillInfo"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_FillInfo()</span></code></a> este campo es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. En general, los objetos de exportación NO DEBEN usar este esquema.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.len">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <code class="sig-name descname">len</code><a class="headerlink" href="#c.Py_buffer.len" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">product(shape)</span> <span class="pre">*</span> <span class="pre">itemize</span></code>. Para arreglos contiguos, esta es la longitud del bloque de memoria subyacente. Para arreglos no contiguos, es la longitud que tendría la estructura lógica si se copiara en una representación contigua.</p>
+<p>Accede a <code class="docutils literal notranslate"><span class="pre">((char</span> <span class="pre">*)buf)[0]</span> <span class="pre">hasta</span> <span class="pre">((char</span> <span class="pre">*)buf)[len-1]</span></code> solo es válido si el búfer se ha obtenido mediante una solicitud que garantiza la contigüidad. En la mayoría de los casos, dicha solicitud será <a class="reference internal" href="#c.PyBUF_SIMPLE" title="PyBUF_SIMPLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_SIMPLE</span></code></a> o <a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.readonly">
+int <code class="sig-name descname">readonly</code><a class="headerlink" href="#c.Py_buffer.readonly" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Un indicador de si el búfer es de solo lectura. Este campo está controlado por el indicador <a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.itemsize">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <code class="sig-name descname">itemsize</code><a class="headerlink" href="#c.Py_buffer.itemsize" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Tamaño del elemento en bytes de un solo elemento. Igual que el valor de <a class="reference internal" href="../library/struct.html#struct.calcsize" title="struct.calcsize"><code class="xref py py-func docutils literal notranslate"><span class="pre">struct.calcsize()</span></code></a> invocado en valores no <code class="docutils literal notranslate"><span class="pre">NULL</span></code> <a class="reference internal" href="#c.Py_buffer.format" title="Py_buffer.format"><code class="xref c c-member docutils literal notranslate"><span class="pre">format</span></code></a>.</p>
+<p>Excepción importante: si un consumidor solicita un búfer sin el indicador <a class="reference internal" href="#c.PyBUF_FORMAT" title="PyBUF_FORMAT"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_FORMAT</span></code></a>, <a class="reference internal" href="#c.Py_buffer.format" title="Py_buffer.format"><code class="xref c c-member docutils literal notranslate"><span class="pre">format</span></code></a> se establecerá en <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, pero <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a> todavía tiene el valor para el formato original.</p>
+<p>Si <a class="reference internal" href="#c.Py_buffer.shape" title="Py_buffer.shape"><code class="xref c c-member docutils literal notranslate"><span class="pre">shape</span></code></a> está presente, la igualdad <code class="docutils literal notranslate"><span class="pre">product(shape)</span> <span class="pre">*</span> <span class="pre">itemsize</span> <span class="pre">==</span> <span class="pre">len</span></code> aún se mantiene y el consumidor puede usar <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a> para navegar el búfer.</p>
+<p>Si <a class="reference internal" href="#c.Py_buffer.shape" title="Py_buffer.shape"><code class="xref c c-member docutils literal notranslate"><span class="pre">shape</span></code></a> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code> como resultado de un <a class="reference internal" href="#c.PyBUF_SIMPLE" title="PyBUF_SIMPLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_SIMPLE</span></code></a> o un <a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a>, el consumidor debe ignorar <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a> y asume <code class="docutils literal notranslate"><span class="pre">itemsize</span> <span class="pre">==</span> <span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.format">
+<em class="property">const</em> char *<code class="sig-name descname">format</code><a class="headerlink" href="#c.Py_buffer.format" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Una cadena de caracteres terminada en <em>NUL</em> en sintaxis de estilo del modulo <a class="reference internal" href="../library/struct.html#module-struct" title="struct: Interpret bytes as packed binary data."><code class="xref py py-mod docutils literal notranslate"><span class="pre">struct</span></code></a> que describe el contenido de un solo elemento. Si esto es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, se supone <code class="docutils literal notranslate"><span class="pre">&quot;B&quot;</span></code> (bytes sin signo).</p>
+<p>Este campo está controlado por el indicador <a class="reference internal" href="#c.PyBUF_FORMAT" title="PyBUF_FORMAT"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_FORMAT</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.ndim">
+int <code class="sig-name descname">ndim</code><a class="headerlink" href="#c.Py_buffer.ndim" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>El número de dimensiones que representa la memoria como un arreglo n-dimensional. Si es `` 0``, <a class="reference internal" href="#c.Py_buffer.buf" title="Py_buffer.buf"><code class="xref c c-member docutils literal notranslate"><span class="pre">buf</span></code></a> apunta a un solo elemento que representa un escalar. En este caso, <a class="reference internal" href="#c.Py_buffer.shape" title="Py_buffer.shape"><code class="xref c c-member docutils literal notranslate"><span class="pre">shape</span></code></a>, <a class="reference internal" href="#c.Py_buffer.strides" title="Py_buffer.strides"><code class="xref c c-member docutils literal notranslate"><span class="pre">strides</span></code></a> y <a class="reference internal" href="#c.Py_buffer.suboffsets" title="Py_buffer.suboffsets"><code class="xref c c-member docutils literal notranslate"><span class="pre">suboffsets</span></code></a> DEBE ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>La macro <code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_MAX_NDIM</span></code> limita el número máximo de dimensiones a 64. Los exportadores DEBEN respetar este límite, los consumidores de búfer multidimensionales DEBEN poder manejar hasta dimensiones <code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_MAX_NDIM</span></code>.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.shape">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<code class="sig-name descname">shape</code><a class="headerlink" href="#c.Py_buffer.shape" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Un arreglo de <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> de longitud <a class="reference internal" href="#c.Py_buffer.ndim" title="Py_buffer.ndim"><code class="xref c c-member docutils literal notranslate"><span class="pre">ndim</span></code></a> que indica la forma de la memoria como un arreglo n-dimensional. Tenga en cuenta que <code class="docutils literal notranslate"><span class="pre">shape[0]</span> <span class="pre">*</span> <span class="pre">...</span> <span class="pre">*</span> <span class="pre">shape[ndim-1]</span> <span class="pre">*</span> <span class="pre">itemsize</span></code> DEBE ser igual a <a class="reference internal" href="#c.Py_buffer.len" title="Py_buffer.len"><code class="xref c c-member docutils literal notranslate"><span class="pre">len</span></code></a>.</p>
+<p>Los valores de forma están restringidos a <code class="docutils literal notranslate"><span class="pre">shape[n]</span> <span class="pre">&gt;=</span> <span class="pre">0</span></code>. El caso <code class="docutils literal notranslate"><span class="pre">shape[n]</span> <span class="pre">==</span> <span class="pre">0</span></code> requiere atención especial. Vea arreglos complejos (<a class="reference internal" href="#complex-arrays">complex arrays</a>) para más información.</p>
+<p>El arreglo de formas es de sólo lectura para el consumidor.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.strides">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<code class="sig-name descname">strides</code><a class="headerlink" href="#c.Py_buffer.strides" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Un arreglo de <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> de longitud <a class="reference internal" href="#c.Py_buffer.ndim" title="Py_buffer.ndim"><code class="xref c c-member docutils literal notranslate"><span class="pre">ndim</span></code></a> que proporciona el número de bytes que se omiten para llegar a un nuevo elemento en cada dimensión.</p>
+<p>Los valores de <em>stride</em> pueden ser cualquier número entero. Para los arreglos regulares, los pasos son generalmente positivos, pero un consumidor DEBE ser capaz de manejar el caso <code class="docutils literal notranslate"><span class="pre">strides[n]</span> <span class="pre">&lt;=</span> <span class="pre">0</span></code>. Ver <a class="reference internal" href="#complex-arrays">complex arrays</a> para más información.</p>
+<p>El arreglo <em>strides</em> es de sólo lectura para el consumidor.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.suboffsets">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<code class="sig-name descname">suboffsets</code><a class="headerlink" href="#c.Py_buffer.suboffsets" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Un arreglo de <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t"><code class="xref c c-type docutils literal notranslate"><span class="pre">Py_ssize_t</span></code></a> de longitud <a class="reference internal" href="#c.Py_buffer.ndim" title="Py_buffer.ndim"><code class="xref c c-member docutils literal notranslate"><span class="pre">ndim</span></code></a>. Si <code class="docutils literal notranslate"><span class="pre">suboffsets[n]</span> <span class="pre">&gt;=</span> <span class="pre">0</span></code>, los valores almacenados a lo largo de la enésima dimensión son punteros y el valor del <em>suboffsets</em> dicta cuántos bytes agregar a cada puntero después de desreferenciarlos. Un valor de <em>suboffsets</em> negativo indica que no debe producirse una desreferenciación (<em>striding</em> en un bloque de memoria contiguo).</p>
+<p>Si todos los <em>suboffsets</em> son negativos (es decir, no se necesita desreferenciar), entonces este campo debe ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code> (el valor predeterminado).</p>
+<p><em>Python Imaging Library (PIL)</em> utiliza este tipo de representación de arreglos. Consulte <a class="reference internal" href="#complex-arrays">complex arrays</a> para obtener más información sobre cómo acceder a los elementos de dicho arreglo.</p>
+<p>El arreglo de <em>suboffsets</em> es de sólo lectura para el consumidor.</p>
+</dd></dl>
+
+<dl class="c member">
+<dt id="c.Py_buffer.internal">
+void *<code class="sig-name descname">internal</code><a class="headerlink" href="#c.Py_buffer.internal" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Esto es para uso interno del objeto exportador. Por ejemplo, el exportador podría volver a emitirlo como un número entero y utilizarlo para almacenar indicadores sobre si las matrices de forma, <em>strides</em> y <em>suboffsets</em> deben liberarse cuando se libera el búfer. El consumidor NO DEBE alterar este valor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="buffer-request-types">
+<span id="id2"></span><h2>Tipos de solicitud búfer<a class="headerlink" href="#buffer-request-types" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Los búferes obtienen generalmente enviando una solicitud de búfer a un objeto de exportación a través de <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a>. Dado que la complejidad de la estructura lógica de la memoria puede variar drásticamente, el consumidor usa el argumento <em>flags</em> para especificar el tipo de búfer exacto que puede manejar.</p>
+<p>Todos los campos <a class="reference internal" href="#c.Py_buffer" title="Py_buffer"><code class="xref c c-data docutils literal notranslate"><span class="pre">Py_buffer</span></code></a> están definidos inequívocamente por el tipo de solicitud.</p>
+<section id="request-independent-fields">
+<h3>campos independientes de solicitud<a class="headerlink" href="#request-independent-fields" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los siguientes campos no están influenciados por <em>flags</em> y siempre deben completarse con los valores correctos: <a class="reference internal" href="#c.Py_buffer.obj" title="Py_buffer.obj"><code class="xref c c-member docutils literal notranslate"><span class="pre">obj</span></code></a>, <a class="reference internal" href="#c.Py_buffer.buf" title="Py_buffer.buf"><code class="xref c c-member docutils literal notranslate"><span class="pre">buf</span></code></a>, <a class="reference internal" href="#c.Py_buffer.len" title="Py_buffer.len"><code class="xref c c-member docutils literal notranslate"><span class="pre">len</span></code></a>, <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a>, <a class="reference internal" href="#c.Py_buffer.ndim" title="Py_buffer.ndim"><code class="xref c c-member docutils literal notranslate"><span class="pre">ndim</span></code></a>.</p>
+</section>
+<section id="readonly-format">
+<h3>formato de sólo lectura<a class="headerlink" href="#readonly-format" title="Enlazar permanentemente con este título">¶</a></h3>
+<blockquote>
+<div><dl class="c macro">
+<dt id="c.PyBUF_WRITABLE">
+<code class="sig-name descname">PyBUF_WRITABLE</code><a class="headerlink" href="#c.PyBUF_WRITABLE" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Controla el campo <a class="reference internal" href="#c.Py_buffer.readonly" title="Py_buffer.readonly"><code class="xref c c-member docutils literal notranslate"><span class="pre">readonly</span></code></a>. Si se establece, el exportador DEBE proporcionar un búfer de escritura o, de lo contrario, informar de un error. De lo contrario, el exportador PUEDE proporcionar un búfer de solo lectura o de escritura, pero la elección DEBE ser coherente para todos los consumidores.</p>
+</dd></dl>
+
+<dl class="c macro">
+<dt id="c.PyBUF_FORMAT">
+<code class="sig-name descname">PyBUF_FORMAT</code><a class="headerlink" href="#c.PyBUF_FORMAT" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Controla el campo <a class="reference internal" href="#c.Py_buffer.format" title="Py_buffer.format"><code class="xref c c-member docutils literal notranslate"><span class="pre">format</span></code></a>. Si se establece, este campo DEBE completarse correctamente. De lo contrario, este campo DEBE ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+</div></blockquote>
+<p><a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a> puede ser |”d a cualquiera de las banderas en la siguiente sección. Dado que <a class="reference internal" href="#c.PyBUF_SIMPLE" title="PyBUF_SIMPLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_SIMPLE</span></code></a> se define como 0, <a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a> puede usarse como un indicador independiente para solicitar un búfer de escritura simple.</p>
+<p><a class="reference internal" href="#c.PyBUF_FORMAT" title="PyBUF_FORMAT"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_FORMAT</span></code></a> puede ser |”d para cualquiera de las banderas excepto <a class="reference internal" href="#c.PyBUF_SIMPLE" title="PyBUF_SIMPLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_SIMPLE</span></code></a>. Este último ya implica el formato <code class="docutils literal notranslate"><span class="pre">B</span></code> (bytes sin signo).</p>
+</section>
+<section id="shape-strides-suboffsets">
+<h3>formas, <em>strides</em>, <em>suboffsets</em><a class="headerlink" href="#shape-strides-suboffsets" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las banderas que controlan la estructura lógica de la memoria se enumeran en orden decreciente de complejidad. Tenga en cuenta que cada bandera contiene todos los bits de las banderas debajo de ella.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Solicitud</p></th>
+<th class="head"><p>forma</p></th>
+<th class="head"><p><em>strides</em></p></th>
+<th class="head"><p><em>suboffsets</em></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_INDIRECT">
+<code class="sig-name descname">PyBUF_INDIRECT</code><a class="headerlink" href="#c.PyBUF_INDIRECT" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>si es necesario</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_STRIDES">
+<code class="sig-name descname">PyBUF_STRIDES</code><a class="headerlink" href="#c.PyBUF_STRIDES" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+</tr>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_ND">
+<code class="sig-name descname">PyBUF_ND</code><a class="headerlink" href="#c.PyBUF_ND" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_SIMPLE">
+<code class="sig-name descname">PyBUF_SIMPLE</code><a class="headerlink" href="#c.PyBUF_SIMPLE" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="contiguity-requests">
+<span id="index-2"></span><h3>solicitudes de contigüidad<a class="headerlink" href="#contiguity-requests" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La <a class="reference internal" href="../glossary.html#term-contiguous"><span class="xref std std-term">contigüidad</span></a> C o Fortran se puede solicitar explícitamente, con y sin información de paso. Sin información de paso, el búfer debe ser C-contiguo.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 10%" />
+<col style="width: 13%" />
+<col style="width: 17%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Solicitud</p></th>
+<th class="head"><p>forma</p></th>
+<th class="head"><p><em>strides</em></p></th>
+<th class="head"><p><em>suboffsets</em></p></th>
+<th class="head"><p>contig</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_C_CONTIGUOUS">
+<code class="sig-name descname">PyBUF_C_CONTIGUOUS</code><a class="headerlink" href="#c.PyBUF_C_CONTIGUOUS" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>C</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_F_CONTIGUOUS">
+<code class="sig-name descname">PyBUF_F_CONTIGUOUS</code><a class="headerlink" href="#c.PyBUF_F_CONTIGUOUS" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>F</p></td>
+</tr>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_ANY_CONTIGUOUS">
+<code class="sig-name descname">PyBUF_ANY_CONTIGUOUS</code><a class="headerlink" href="#c.PyBUF_ANY_CONTIGUOUS" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>C o F</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyBUF_ND" title="PyBUF_ND"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_ND</span></code></a></p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+<td><p>C</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="compound-requests">
+<h3>solicitudes compuestas<a class="headerlink" href="#compound-requests" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Todas las solicitudes posibles están completamente definidas por alguna combinación de las banderas en la sección anterior. Por conveniencia, el protocolo de memoria intermedia proporciona combinaciones de uso frecuente como indicadores únicos.</p>
+<p>En la siguiente tabla <em>U</em> significa contigüidad indefinida. El consumidor tendría que llamar a <a class="reference internal" href="#c.PyBuffer_IsContiguous" title="PyBuffer_IsContiguous"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_IsContiguous()</span></code></a> para determinar la contigüidad.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 8%" />
+<col style="width: 11%" />
+<col style="width: 14%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Solicitud</p></th>
+<th class="head"><p>forma</p></th>
+<th class="head"><p><em>strides</em></p></th>
+<th class="head"><p><em>suboffsets</em></p></th>
+<th class="head"><p>contig</p></th>
+<th class="head"><p>sólo lectura</p></th>
+<th class="head"><p>formato</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_FULL">
+<code class="sig-name descname">PyBUF_FULL</code><a class="headerlink" href="#c.PyBUF_FULL" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>si es necesario</p></td>
+<td><p>U</p></td>
+<td><p>0</p></td>
+<td><p>sí</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_FULL_RO">
+<code class="sig-name descname">PyBUF_FULL_RO</code><a class="headerlink" href="#c.PyBUF_FULL_RO" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>si es necesario</p></td>
+<td><p>U</p></td>
+<td><p>1 o 0</p></td>
+<td><p>sí</p></td>
+</tr>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_RECORDS">
+<code class="sig-name descname">PyBUF_RECORDS</code><a class="headerlink" href="#c.PyBUF_RECORDS" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>U</p></td>
+<td><p>0</p></td>
+<td><p>sí</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_RECORDS_RO">
+<code class="sig-name descname">PyBUF_RECORDS_RO</code><a class="headerlink" href="#c.PyBUF_RECORDS_RO" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>U</p></td>
+<td><p>1 o 0</p></td>
+<td><p>sí</p></td>
+</tr>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_STRIDED">
+<code class="sig-name descname">PyBUF_STRIDED</code><a class="headerlink" href="#c.PyBUF_STRIDED" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>U</p></td>
+<td><p>0</p></td>
+<td><p>NULL</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_STRIDED_RO">
+<code class="sig-name descname">PyBUF_STRIDED_RO</code><a class="headerlink" href="#c.PyBUF_STRIDED_RO" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>U</p></td>
+<td><p>1 o 0</p></td>
+<td><p>NULL</p></td>
+</tr>
+<tr class="row-even"><td><dl class="c macro">
+<dt id="c.PyBUF_CONTIG">
+<code class="sig-name descname">PyBUF_CONTIG</code><a class="headerlink" href="#c.PyBUF_CONTIG" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+<td><p>C</p></td>
+<td><p>0</p></td>
+<td><p>NULL</p></td>
+</tr>
+<tr class="row-odd"><td><dl class="c macro">
+<dt id="c.PyBUF_CONTIG_RO">
+<code class="sig-name descname">PyBUF_CONTIG_RO</code><a class="headerlink" href="#c.PyBUF_CONTIG_RO" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+</td>
+<td><p>sí</p></td>
+<td><p>NULL</p></td>
+<td><p>NULL</p></td>
+<td><p>C</p></td>
+<td><p>1 o 0</p></td>
+<td><p>NULL</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="complex-arrays">
+<h2>Arreglos complejos<a class="headerlink" href="#complex-arrays" title="Enlazar permanentemente con este título">¶</a></h2>
+<section id="numpy-style-shape-and-strides">
+<h3>Estilo NumPy: forma y <em>strides</em><a class="headerlink" href="#numpy-style-shape-and-strides" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La estructura lógica de las matrices de estilo NumPy está definida por <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a>, <a class="reference internal" href="#c.Py_buffer.ndim" title="Py_buffer.ndim"><code class="xref c c-member docutils literal notranslate"><span class="pre">ndim</span></code></a>, <a class="reference internal" href="#c.Py_buffer.shape" title="Py_buffer.shape"><code class="xref c c-member docutils literal notranslate"><span class="pre">shape</span></code></a> y <a class="reference internal" href="#c.Py_buffer.strides" title="Py_buffer.strides"><code class="xref c c-member docutils literal notranslate"><span class="pre">strides</span></code></a>.</p>
+<p>Si <code class="docutils literal notranslate"><span class="pre">ndim</span> <span class="pre">==</span> <span class="pre">0</span></code>, la ubicación de memoria señalada por <a class="reference internal" href="#c.Py_buffer.buf" title="Py_buffer.buf"><code class="xref c c-member docutils literal notranslate"><span class="pre">buf</span></code></a> se interpreta como un escalar de tamaño <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-member docutils literal notranslate"><span class="pre">itemsize</span></code></a>. En ese caso, tanto <a class="reference internal" href="#c.Py_buffer.shape" title="Py_buffer.shape"><code class="xref c c-member docutils literal notranslate"><span class="pre">shape</span></code></a> como <a class="reference internal" href="#c.Py_buffer.strides" title="Py_buffer.strides"><code class="xref c c-member docutils literal notranslate"><span class="pre">strides</span></code></a> son <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+<p>Si <a class="reference internal" href="#c.Py_buffer.strides" title="Py_buffer.strides"><code class="xref c c-member docutils literal notranslate"><span class="pre">strides</span></code></a> es <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, el arreglo se interpreta como un arreglo C n-dimensional estándar. De lo contrario, el consumidor debe acceder a un arreglo n-dimensional de la siguiente manera:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">strides</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indices</span><span class="p">[</span><span class="n">n</span><span class="mi">-1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">strides</span><span class="p">[</span><span class="n">n</span><span class="mi">-1</span><span class="p">];</span><span class="w"></span>
+<span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">typeof</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ptr</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Como se señaló anteriormente, <a class="reference internal" href="#c.Py_buffer.buf" title="Py_buffer.buf"><code class="xref c c-member docutils literal notranslate"><span class="pre">buf</span></code></a> puede apuntar a cualquier ubicación dentro del bloque de memoria real. Un exportador puede verificar la validez de un búfer con esta función:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">verify_structure</span><span class="p">(</span><span class="n">memlen</span><span class="p">,</span> <span class="n">itemsize</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Verify that the parameters represent a valid array within</span>
+<span class="sd">       the bounds of the allocated memory:</span>
+<span class="sd">           char *mem: start of the physical memory block</span>
+<span class="sd">           memlen: length of the physical memory block</span>
+<span class="sd">           offset: (char *)buf - mem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">offset</span> <span class="o">%</span> <span class="n">itemsize</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">offset</span><span class="o">+</span><span class="n">itemsize</span> <span class="o">&gt;</span> <span class="n">memlen</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="o">%</span> <span class="n">itemsize</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">strides</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shape</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">strides</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="n">imin</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">strides</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">strides</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">imax</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">strides</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">strides</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">offset</span><span class="o">+</span><span class="n">imin</span> <span class="ow">and</span> <span class="n">offset</span><span class="o">+</span><span class="n">imax</span><span class="o">+</span><span class="n">itemsize</span> <span class="o">&lt;=</span> <span class="n">memlen</span>
+</pre></div>
+</div>
+</section>
+<section id="pil-style-shape-strides-and-suboffsets">
+<h3>Estilo PIL: forma, <em>strides</em> y <em>suboffsets</em><a class="headerlink" href="#pil-style-shape-strides-and-suboffsets" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Además de los elementos normales, los arreglos de estilo PIL pueden contener punteros que deben seguirse para llegar al siguiente elemento en una dimensión. Por ejemplo, el arreglo C tridimensional regular <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">v[2][2][3]</span></code> también se puede ver como un arreglo de 2 punteros a 2 arreglos bidimensionales: <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(*v[2])[2][3]</span></code>. En la representación de <em>suboffsets</em>, esos dos punteros pueden incrustarse al comienzo de <a class="reference internal" href="#c.Py_buffer.buf" title="Py_buffer.buf"><code class="xref c c-member docutils literal notranslate"><span class="pre">buf</span></code></a>, apuntando a dos matrices <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">x[2][3]</span></code> que pueden ubicarse en cualquier lugar de la memoria.</p>
+<p>Aquí hay una función que retorna un puntero al elemento en un arreglo N-D a la que apunta un índice N-dimensional cuando hay <em>strides</em> y <em>suboffsets</em> no <code class="docutils literal notranslate"><span class="pre">NULL</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="nf">get_item_pointer</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ndim</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">Py_ssize_t</span><span class="w"> </span><span class="o">*</span><span class="n">strides</span><span class="p">,</span><span class="w"></span>
+<span class="w">                       </span><span class="n">Py_ssize_t</span><span class="w"> </span><span class="o">*</span><span class="n">suboffsets</span><span class="p">,</span><span class="w"> </span><span class="n">Py_ssize_t</span><span class="w"> </span><span class="o">*</span><span class="n">indices</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">pointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ndim</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">pointer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">suboffsets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">pointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="kt">char</span><span class="o">**</span><span class="p">)</span><span class="n">pointer</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">suboffsets</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pointer</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="buffer-related-functions">
+<h2>Funciones relacionadas a búfer<a class="headerlink" href="#buffer-related-functions" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c function">
+<dt id="c.PyObject_CheckBuffer">
+int <code class="sig-name descname">PyObject_CheckBuffer</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CheckBuffer" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">1</span></code> si <em>obj</em> admite la interfaz de búfer; de lo contrario, <code class="docutils literal notranslate"><span class="pre">0</span></code> cuando se retorna <code class="docutils literal notranslate"><span class="pre">1</span></code>, no garantiza que <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a> tenga éxito. Esta función siempre finaliza con éxito.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_GetBuffer">
+int <code class="sig-name descname">PyObject_GetBuffer</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>exporter</em>, <a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em>, int <em>flags</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_GetBuffer" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Envía una solicitud al <em>exporter</em> para completar la <em>view</em> según lo especificado por <em>flags</em>. Si el exportador no puede proporcionar un búfer del tipo exacto, DEBE lanzar <code class="xref c c-data docutils literal notranslate"><span class="pre">PyExc_BufferError</span></code>, establecer <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code> en <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y retornar <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<p>Si tiene éxito, completa <em>view</em>, establece <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code> en una nueva referencia a <em>exporter</em> y retorna 0. En el caso de proveedores de búfer encadenados que redirigen las solicitudes a un solo objeto, <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code> PUEDE referirse a este objeto en lugar de <em>exporter</em> (Ver <a class="reference internal" href="typeobj.html#buffer-structs"><span class="std std-ref">Estructuras de objetos de búfer</span></a>).</p>
+<p>Las llamadas exitosas a <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a> deben combinarse con las llamadas a <a class="reference internal" href="#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a>, similar a <code class="xref c c-func docutils literal notranslate"><span class="pre">malloc()</span></code> y <code class="xref c c-func docutils literal notranslate"><span class="pre">free()</span></code>. Por lo tanto, después de que el consumidor haya terminado con el búfer, <a class="reference internal" href="#c.PyBuffer_Release" title="PyBuffer_Release"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyBuffer_Release()</span></code></a> debe llamarse exactamente una vez.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_Release">
+void <code class="sig-name descname">PyBuffer_Release</code><span class="sig-paren">(</span><a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_Release" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Libera el búfer <em>view</em> y disminuye el conteo de referencias para <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code>. Esta función DEBE llamarse cuando el búfer ya no se utiliza, de lo contrario, pueden producirse fugas de referencia.</p>
+<p>Es un error llamar a esta función en un búfer que no se obtuvo a través de <a class="reference internal" href="#c.PyObject_GetBuffer" title="PyObject_GetBuffer"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_GetBuffer()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_SizeFromFormat">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <code class="sig-name descname">PyBuffer_SizeFromFormat</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>format</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_SizeFromFormat" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Retorna el <a class="reference internal" href="#c.Py_buffer.itemsize" title="Py_buffer.itemsize"><code class="xref c c-data docutils literal notranslate"><span class="pre">itemsize</span></code></a> implícito de <a class="reference internal" href="#c.Py_buffer.format" title="Py_buffer.format"><code class="xref c c-data docutils literal notranslate"><span class="pre">format</span></code></a>. En caso de error, lanza una excepción y retorna -1.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_IsContiguous">
+int <code class="sig-name descname">PyBuffer_IsContiguous</code><span class="sig-paren">(</span><a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em>, char <em>order</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_IsContiguous" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">1</span></code> si la memoria definida por <em>view</em> es de estilo C (<em>order</em> es <code class="docutils literal notranslate"><span class="pre">'C'</span></code>) o de estilo Fortran (<em>order</em> es <code class="docutils literal notranslate"><span class="pre">'F'</span></code>) <a class="reference internal" href="../glossary.html#term-contiguous"><span class="xref std std-term">contiguous</span></a> o uno cualquiera (<em>order</em> es <code class="docutils literal notranslate"><span class="pre">'A'</span></code>). Retorna <code class="docutils literal notranslate"><span class="pre">0</span></code> de lo contrario. Esta función siempre finaliza con éxito.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_GetPointer">
+void *<code class="sig-name descname">PyBuffer_GetPointer</code><span class="sig-paren">(</span><a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<em>indices</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_GetPointer" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Obtiene el área de memoria señalada por los <em>indices</em> dentro del <em>view</em> dado. <em>indices</em> deben apuntar a un arreglo de índices <code class="docutils literal notranslate"><span class="pre">view-&gt;ndim</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_FromContiguous">
+int <code class="sig-name descname">PyBuffer_FromContiguous</code><span class="sig-paren">(</span><a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em>, void *<em>buf</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>len</em>, char <em>fort</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_FromContiguous" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Copia <em>len</em> bytes contiguos de <em>buf</em> a <em>view</em>. <em>fort</em> puede ser <code class="docutils literal notranslate"><span class="pre">'C'</span></code> o <code class="docutils literal notranslate"><span class="pre">'F'</span></code> (para pedidos al estilo C o al estilo Fortran). <code class="docutils literal notranslate"><span class="pre">0</span></code> se retorna en caso de éxito, <code class="docutils literal notranslate"><span class="pre">-1</span></code> en caso de error.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_ToContiguous">
+int <code class="sig-name descname">PyBuffer_ToContiguous</code><span class="sig-paren">(</span>void *<em>buf</em>, <a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>src</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>len</em>, char <em>order</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_ToContiguous" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Copia <em>len</em> bytes de <em>src</em> a su representación contigua en <em>buf</em>. <em>order</em> puede ser <code class="docutils literal notranslate"><span class="pre">'C'</span></code> o <code class="docutils literal notranslate"><span class="pre">'F'</span></code> o <code class="docutils literal notranslate"><span class="pre">''A'</span></code> (para pedidos al estilo C o al estilo Fortran o cualquiera) <code class="docutils literal notranslate"><span class="pre">0</span></code> se retorna en caso de éxito, <code class="docutils literal notranslate"><span class="pre">-1</span></code> en caso de error.</p>
+<p>Esta función falla si <em>len</em> != <em>src-&gt;len</em>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_FillContiguousStrides">
+void <code class="sig-name descname">PyBuffer_FillContiguousStrides</code><span class="sig-paren">(</span>int <em>ndims</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<em>shape</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> *<em>strides</em>, int <em>itemsize</em>, char <em>order</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_FillContiguousStrides" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Rellena el arreglo <em>strides</em> con bytes de paso de un <a class="reference internal" href="../glossary.html#term-contiguous"><span class="xref std std-term">contiguous</span></a> (estilo C si <em>order</em> es <code class="docutils literal notranslate"><span class="pre">'C'</span></code> o estilo Fortran si <em>order</em> es <code class="docutils literal notranslate"><span class="pre">'F</span> <span class="pre">'</span></code> ) arreglo de la forma dada con el número dado de bytes por elemento.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyBuffer_FillInfo">
+int <code class="sig-name descname">PyBuffer_FillInfo</code><span class="sig-paren">(</span><a class="reference internal" href="#c.Py_buffer" title="Py_buffer">Py_buffer</a> *<em>view</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>exporter</em>, void *<em>buf</em>, <a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <em>len</em>, int <em>readonly</em>, int <em>flags</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyBuffer_FillInfo" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Maneje las solicitudes de búfer para un exportador que quiera exponer <em>buf</em> de tamaño <em>len</em> con capacidad de escritura establecida de acuerdo con <em>readonly</em>. <em>buf</em> se interpreta como una secuencia de bytes sin signo.</p>
+<p>El argumento <em>flags</em> indica el tipo de solicitud. Esta función siempre llena <em>view</em> según lo especificado por <em>flags</em>, a menos que <em>buf</em> haya sido designado como solo lectura y <a class="reference internal" href="#c.PyBUF_WRITABLE" title="PyBUF_WRITABLE"><code class="xref c c-macro docutils literal notranslate"><span class="pre">PyBUF_WRITABLE</span></code></a> esté configurado en <em>flags</em>.</p>
+<p>Si tiene éxito, establece <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code> en una nueva referencia a <em>exporter</em> y retorna 0. De lo contrario, aumenta <code class="xref c c-data docutils literal notranslate"><span class="pre">PyExc_BufferError</span></code>, establece <code class="docutils literal notranslate"><span class="pre">view-&gt;obj</span></code> en <code class="docutils literal notranslate"><span class="pre">NULL</span></code> y retorna <code class="docutils literal notranslate"><span class="pre">-1</span></code>;</p>
+<p>Si esta función se usa como parte de a <a class="reference internal" href="typeobj.html#buffer-structs"><span class="std std-ref">getbufferproc</span></a>, <em>exporter</em> DEBE establecerse en el objeto exportador y <em>flags</em> deben pasarse sin modificaciones. De lo contrario, <em>exporter</em> DEBE ser <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Protocolo Búfer</a><ul>
+<li><a class="reference internal" href="#buffer-structure">Estructura de búfer</a></li>
+<li><a class="reference internal" href="#buffer-request-types">Tipos de solicitud búfer</a><ul>
+<li><a class="reference internal" href="#request-independent-fields">campos independientes de solicitud</a></li>
+<li><a class="reference internal" href="#readonly-format">formato de sólo lectura</a></li>
+<li><a class="reference internal" href="#shape-strides-suboffsets">formas, <em>strides</em>, <em>suboffsets</em></a></li>
+<li><a class="reference internal" href="#contiguity-requests">solicitudes de contigüidad</a></li>
+<li><a class="reference internal" href="#compound-requests">solicitudes compuestas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#complex-arrays">Arreglos complejos</a><ul>
+<li><a class="reference internal" href="#numpy-style-shape-and-strides">Estilo NumPy: forma y <em>strides</em></a></li>
+<li><a class="reference internal" href="#pil-style-shape-strides-and-suboffsets">Estilo PIL: forma, <em>strides</em> y <em>suboffsets</em></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#buffer-related-functions">Funciones relacionadas a búfer</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="iter.html"
+                        title="capítulo anterior">Protocolo iterador</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="objbuffer.html"
+                        title="próximo capítulo">Protocolo de búfer antiguo</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/buffer.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="objbuffer.html" title="Protocolo de búfer antiguo"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="iter.html" title="Protocolo iterador"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="abstract.html" >Capa de objetos abstractos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Protocolo Búfer</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

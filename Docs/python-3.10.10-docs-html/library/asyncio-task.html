@@ -1,0 +1,1154 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Corrutinas y Tareas &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Streams" href="asyncio-stream.html" />
+    <link rel="prev" title="asyncio — E/S Asíncrona" href="asyncio.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/asyncio-task.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Corrutinas y Tareas</a><ul>
+<li><a class="reference internal" href="#coroutines">Corrutinas</a></li>
+<li><a class="reference internal" href="#awaitables">Esperables</a></li>
+<li><a class="reference internal" href="#running-an-asyncio-program">Ejecutando un programa asyncio</a></li>
+<li><a class="reference internal" href="#creating-tasks">Creando Tareas</a></li>
+<li><a class="reference internal" href="#sleeping">Durmiendo</a></li>
+<li><a class="reference internal" href="#running-tasks-concurrently">Ejecutando Tareas Concurrentemente</a></li>
+<li><a class="reference internal" href="#shielding-from-cancellation">Protección contra Cancelación</a></li>
+<li><a class="reference internal" href="#timeouts">Tiempo agotado</a></li>
+<li><a class="reference internal" href="#waiting-primitives">Esperando Primitivas</a></li>
+<li><a class="reference internal" href="#running-in-threads">Ejecutando en Hilos</a></li>
+<li><a class="reference internal" href="#scheduling-from-other-threads">Planificación Desde Otros Hilos</a></li>
+<li><a class="reference internal" href="#introspection">Introspección</a></li>
+<li><a class="reference internal" href="#task-object">Objeto Task</a></li>
+<li><a class="reference internal" href="#generator-based-coroutines">Corrutinas basadas en generadores</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="asyncio.html"
+                        title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="asyncio-stream.html"
+                        title="próximo capítulo">Streams</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/asyncio-task.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-stream.html" title="Streams"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio.html" title="asyncio — E/S Asíncrona"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Corrutinas y Tareas</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="coroutines-and-tasks">
+<h1>Corrutinas y Tareas<a class="headerlink" href="#coroutines-and-tasks" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>Esta sección describe las API de asyncio de alto nivel para trabajar con corrutinas y tareas.</p>
+<div class="contents local topic" id="contenido">
+<ul class="simple">
+<li><p><a class="reference internal" href="#coroutines" id="id1">Corrutinas</a></p></li>
+<li><p><a class="reference internal" href="#awaitables" id="id2">Esperables</a></p></li>
+<li><p><a class="reference internal" href="#running-an-asyncio-program" id="id3">Ejecutando un programa asyncio</a></p></li>
+<li><p><a class="reference internal" href="#creating-tasks" id="id4">Creando Tareas</a></p></li>
+<li><p><a class="reference internal" href="#sleeping" id="id5">Durmiendo</a></p></li>
+<li><p><a class="reference internal" href="#running-tasks-concurrently" id="id6">Ejecutando Tareas Concurrentemente</a></p></li>
+<li><p><a class="reference internal" href="#shielding-from-cancellation" id="id7">Protección contra Cancelación</a></p></li>
+<li><p><a class="reference internal" href="#timeouts" id="id8">Tiempo agotado</a></p></li>
+<li><p><a class="reference internal" href="#waiting-primitives" id="id9">Esperando Primitivas</a></p></li>
+<li><p><a class="reference internal" href="#running-in-threads" id="id10">Ejecutando en Hilos</a></p></li>
+<li><p><a class="reference internal" href="#scheduling-from-other-threads" id="id11">Planificación Desde Otros Hilos</a></p></li>
+<li><p><a class="reference internal" href="#introspection" id="id12">Introspección</a></p></li>
+<li><p><a class="reference internal" href="#task-object" id="id13">Objeto Task</a></p></li>
+<li><p><a class="reference internal" href="#generator-based-coroutines" id="id14">Corrutinas basadas en generadores</a></p></li>
+</ul>
+</div>
+<section id="coroutines">
+<span id="coroutine"></span><h2><a class="toc-backref" href="#id1">Corrutinas</a><a class="headerlink" href="#coroutines" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><strong>Source code:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Lib/asyncio/coroutines.py">Lib/asyncio/coroutines.py</a></p>
+<hr class="docutils" />
+<p><a class="reference internal" href="../glossary.html#term-coroutine"><span class="xref std std-term">Coroutines</span></a> declared with the async/await syntax is the
+preferred way of writing asyncio applications.  For example, the following
+snippet of code prints «hello», waits 1 second,
+and then prints «world»:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;world&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+<span class="go">hello</span>
+<span class="go">world</span>
+</pre></div>
+</div>
+<p>Tenga en cuenta que simplemente llamando a una corrutina no programará para que se ejecute:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">main</span><span class="p">()</span>
+<span class="go">&lt;coroutine object main at 0x1053bb7c8&gt;</span>
+</pre></div>
+</div>
+<p>Para ejecutar realmente una corrutina, asyncio proporciona tres mecanismos principales:</p>
+<ul>
+<li><p>La función <a class="reference internal" href="#asyncio.run" title="asyncio.run"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.run()</span></code></a> para ejecutar la función de punto de entrada de nivel superior «main()» (consulte el ejemplo anterior.)</p></li>
+<li><p>Esperando en una corrutina. El siguiente fragmento de código imprimirá «hola» después de esperar 1 segundo y luego imprimirá «mundo» después de esperar <em>otros</em> 2 segundos:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">say_after</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;started at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">await</span> <span class="n">say_after</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">say_after</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;finished at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Salida esperada:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">started</span> <span class="n">at</span> <span class="mi">17</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">52</span>
+<span class="n">hello</span>
+<span class="n">world</span>
+<span class="n">finished</span> <span class="n">at</span> <span class="mi">17</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">55</span>
+</pre></div>
+</div>
+</li>
+<li><p>La función <a class="reference internal" href="#asyncio.create_task" title="asyncio.create_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.create_task()</span></code></a> para ejecutar corrutinas concurrentemente como asyncio <a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tasks</span></code></a>.</p>
+<p>Modifiquemos el ejemplo anterior y ejecutemos dos corrutinas <code class="docutils literal notranslate"><span class="pre">say_after</span></code> <em>concurrentemente</em>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">task1</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+        <span class="n">say_after</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;hello&#39;</span><span class="p">))</span>
+
+    <span class="n">task2</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+        <span class="n">say_after</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;started at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Wait until both tasks are completed (should take</span>
+    <span class="c1"># around 2 seconds.)</span>
+    <span class="k">await</span> <span class="n">task1</span>
+    <span class="k">await</span> <span class="n">task2</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;finished at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Tenga en cuenta que la salida esperada ahora muestra que el fragmento de código se ejecuta 1 segundo más rápido que antes:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">started</span> <span class="n">at</span> <span class="mi">17</span><span class="p">:</span><span class="mi">14</span><span class="p">:</span><span class="mi">32</span>
+<span class="n">hello</span>
+<span class="n">world</span>
+<span class="n">finished</span> <span class="n">at</span> <span class="mi">17</span><span class="p">:</span><span class="mi">14</span><span class="p">:</span><span class="mi">34</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="awaitables">
+<span id="asyncio-awaitables"></span><h2><a class="toc-backref" href="#id2">Esperables</a><a class="headerlink" href="#awaitables" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Decimos que un objeto es un objeto <strong>esperable</strong> si se puede utilizar en una expresión <a class="reference internal" href="../reference/expressions.html#await"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">await</span></code></a>. Muchas API de asyncio están diseñadas para aceptar los valores esperables.</p>
+<p>Hay tres tipos principales de objetos <em>esperables</em>: <strong>corrutinas</strong>, <strong>Tareas</strong> y <strong>Futures</strong>.</p>
+<p class="rubric">Corrutinas</p>
+<p>Las corrutinas de Python son <em>esperables</em> y por lo tanto se pueden esperar de otras corrutinas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">nested</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">42</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Nothing happens if we just call &quot;nested()&quot;.</span>
+    <span class="c1"># A coroutine object is created but not awaited,</span>
+    <span class="c1"># so it *won&#39;t run at all*.</span>
+    <span class="n">nested</span><span class="p">()</span>
+
+    <span class="c1"># Let&#39;s do it differently now and await it:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">nested</span><span class="p">())</span>  <span class="c1"># will print &quot;42&quot;.</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>En esta documentación se puede utilizar el término «corrutina» para dos conceptos estrechamente relacionados:</p>
+<ul class="simple">
+<li><p>una <em>función corrutina</em>: una función <a class="reference internal" href="../reference/compound_stmts.html#async-def"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code></a>;</p></li>
+<li><p>un <em>objeto corrutina</em>: un objeto retornado llamando a una <em>función corrutina</em>.</p></li>
+</ul>
+</div>
+<p>asyncio también es compatible con corrutinas heredadas <a class="reference internal" href="#asyncio-generator-based-coro"><span class="std std-ref">generator-based</span></a>.</p>
+<p class="rubric">Tareas</p>
+<p><em>Las tareas</em> se utilizan para programar corrutinas <em>concurrentemente</em>.</p>
+<p>Cuando una corrutina se envuelve en una <em>Tarea</em> con funciones como <a class="reference internal" href="#asyncio.create_task" title="asyncio.create_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.create_task()</span></code></a> la corrutina se programa automáticamente para ejecutarse pronto:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">nested</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">42</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Schedule nested() to run soon concurrently</span>
+    <span class="c1"># with &quot;main()&quot;.</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">nested</span><span class="p">())</span>
+
+    <span class="c1"># &quot;task&quot; can now be used to cancel &quot;nested()&quot;, or</span>
+    <span class="c1"># can simply be awaited to wait until it is complete:</span>
+    <span class="k">await</span> <span class="n">task</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p class="rubric">Futures</p>
+<p>Un <a class="reference internal" href="asyncio-future.html#asyncio.Future" title="asyncio.Future"><code class="xref py py-class docutils literal notranslate"><span class="pre">Future</span></code></a> es un objeto esperable especial de <strong>bajo-nivel</strong> que representa un <strong>resultado eventual</strong> de una operación asíncrona.</p>
+<p>Cuando un objeto Future es <em>esperado</em> significa que la corrutina esperará hasta que el Future se resuelva en algún otro lugar.</p>
+<p>Los objetos Future de asyncio son necesarios para permitir que el código basado en retro llamada se use con async/await.</p>
+<p>Normalmente , <strong>no es necesario</strong> crear objetos Future en el código de nivel de aplicación.</p>
+<p>Los objetos Future, a veces expuestos por bibliotecas y algunas API de asyncio, pueden ser esperados:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">function_that_returns_a_future_object</span><span class="p">()</span>
+
+    <span class="c1"># this is also valid:</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+        <span class="n">function_that_returns_a_future_object</span><span class="p">(),</span>
+        <span class="n">some_python_coroutine</span><span class="p">()</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Un buen ejemplo de una función de bajo nivel que retorna un objeto Future es <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.run_in_executor" title="asyncio.loop.run_in_executor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.run_in_executor()</span></code></a>.</p>
+</section>
+<section id="running-an-asyncio-program">
+<h2><a class="toc-backref" href="#id3">Ejecutando un programa asyncio</a><a class="headerlink" href="#running-an-asyncio-program" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.run">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.run" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecuta la <a class="reference internal" href="../glossary.html#term-coroutine"><span class="xref std std-term">coroutine</span></a> <em>coro</em> y retornando el resultado.</p>
+<p>Esta función ejecuta la corrutina pasada, encargándose de administrar el bucle de eventos asyncio, <em>finalizing asynchronous generators</em> y cerrando el threadpool.</p>
+<p>Esta función no se puede llamar cuando otro bucle de eventos asyncio se está ejecutando en el mismo hilo.</p>
+<p>Si <em>debug</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, el bucle de eventos se ejecutará en modo debug.</p>
+<p>Esta función siempre crea un nuevo ciclo de eventos y lo cierra al final. Debe usarse como un punto de entrada principal para los programas asyncio, e idealmente solo debe llamarse una vez.</p>
+<p>Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Actualizado para usar <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.shutdown_default_executor" title="asyncio.loop.shutdown_default_executor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.shutdown_default_executor()</span></code></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>El código fuente para <code class="docutils literal notranslate"><span class="pre">asyncio.run()</span></code> se puede encontrar en <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Lib/asyncio/runners.py">Lib/asyncio/runners.py</a>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="creating-tasks">
+<h2><a class="toc-backref" href="#id4">Creando Tareas</a><a class="headerlink" href="#creating-tasks" title="Enlazar permanentemente con este título">¶</a></h2>
+<p><strong>Source code:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Lib/asyncio/tasks.py">Lib/asyncio/tasks.py</a></p>
+<hr class="docutils" />
+<dl class="py function">
+<dt id="asyncio.create_task">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">create_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.create_task" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envuelve una <a class="reference internal" href="#coroutine"><span class="std std-ref">coroutine</span></a> <em>coro</em> en una <a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a> y programa su ejecución. Retorna el objeto Tarea.</p>
+<p>Si <em>name</em> no es <code class="docutils literal notranslate"><span class="pre">None</span></code>, se establece como el nombre de la tarea mediante <a class="reference internal" href="#asyncio.Task.set_name" title="asyncio.Task.set_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Task.set_name()</span></code></a>.</p>
+<p>La tarea se ejecuta en el bucle retornado por <a class="reference internal" href="asyncio-eventloop.html#asyncio.get_running_loop" title="asyncio.get_running_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_running_loop()</span></code></a>, <a class="reference internal" href="exceptions.html#RuntimeError" title="RuntimeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> se genera si no hay ningún bucle en ejecución en el subproceso actual.</p>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>Save a reference to the result of this function, to avoid
+a task disappearing mid-execution. The event loop only keeps
+weak references to tasks. A task that isn’t referenced elsewhere
+may get garbage collected at any time, even before it’s done.
+For reliable «fire-and-forget» background tasks, gather them in
+a collection:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">background_tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">some_coro</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="c1"># Add task to the set. This creates a strong reference.</span>
+    <span class="n">background_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+    <span class="c1"># To prevent keeping references to finished tasks forever,</span>
+    <span class="c1"># make each task remove its own reference from the set after</span>
+    <span class="c1"># completion:</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="n">background_tasks</span><span class="o">.</span><span class="n">discard</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Added the <em>name</em> parameter.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="sleeping">
+<h2><a class="toc-backref" href="#id5">Durmiendo</a><a class="headerlink" href="#sleeping" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.sleep">
+<em class="property">coroutine </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">sleep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delay</span></em>, <em class="sig-param"><span class="n">result</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.sleep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Bloquea por <em>delay</em> segundos.</p>
+<p>Si se proporciona <em>result</em>, se retorna al autor de la llamada cuando se completa la corrutina.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sleep()</span></code> siempre suspende la tarea actual, permitiendo que se ejecuten otras tareas.</p>
+<p>Establecer el retraso en 0 proporciona una ruta optimizada para permitir que se ejecuten otras tareas. Esto puede ser utilizado por funciones de ejecución prolongada para evitar bloquear el bucle de eventos durante toda la duración de la llamada a la función.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Deprecated since version 3.8, removed in version 3.10: </span>El parámetro <code class="docutils literal notranslate"><span class="pre">loop</span></code>. Esta función ha estado obteniendo implícitamente el ciclo en ejecución actual desde 3.7. Consulte <a class="reference internal" href="../whatsnew/3.10.html#whatsnew310-removed"><span class="std std-ref">What’s New in 3.10’s Removed section</span></a> para obtener más información.</p>
+</div>
+<p id="asyncio-example-sleep">Ejemplo de una rutina que muestra la fecha actual cada segundo durante 5 segundos:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">display_date</span><span class="p">():</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">5.0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">display_date</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="running-tasks-concurrently">
+<h2><a class="toc-backref" href="#id6">Ejecutando Tareas Concurrentemente</a><a class="headerlink" href="#running-tasks-concurrently" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.gather">
+<em class="property">awaitable </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">gather</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">aws</span></em>, <em class="sig-param"><span class="n">return_exceptions</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.gather" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecute <a class="reference internal" href="#asyncio-awaitables"><span class="std std-ref">objetos esperables</span></a> en la secuencia <em>aws</em> de forma <em>concurrently</em>.</p>
+<p>Si cualquier esperable en <em>aws</em> es una corrutina, se programa automáticamente como una Tarea.</p>
+<p>Si todos los esperables se completan correctamente, el resultado es una lista agregada de valores retornados. El orden de los valores de resultado corresponde al orden de esperables en <em>aws</em>.</p>
+<p>Si <em>return_exceptions</em> es <code class="docutils literal notranslate"><span class="pre">False</span></code> (valor predeterminado), la primera excepción provocada se propaga inmediatamente a la tarea que espera en <code class="docutils literal notranslate"><span class="pre">gather()</span></code>. Otros esperables en la secuencia <em>aws</em> <strong>no se cancelarán</strong> y continuarán ejecutándose.</p>
+<p>Si <em>return_exceptions</em> es <code class="docutils literal notranslate"><span class="pre">True</span></code>, las excepciones se tratan igual que los resultados correctos y se agregan en la lista de resultados.</p>
+<p>Si <code class="docutils literal notranslate"><span class="pre">gather()</span></code> es <em>cancelado</em>, todos los esperables enviados (que aún no se han completado) también se <em>cancelan</em>.</p>
+<p>Si alguna Tarea o Future de la secuencia <em>aws</em> se <em>cancela</em>, se trata como si se lanzara <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a> – la llamada <code class="docutils literal notranslate"><span class="pre">gather()</span></code> <strong>no</strong> se cancela en este caso. Esto es para evitar la cancelación de una Tarea/Future enviada para hacer que otras Tareas/Futures sean canceladas.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<p id="asyncio-example-gather">Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: Compute factorial(</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">), currently i=</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">*=</span> <span class="n">i</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: factorial(</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Schedule three calls *concurrently*:</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+        <span class="n">factorial</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">factorial</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">factorial</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+
+<span class="c1"># Expected output:</span>
+<span class="c1">#</span>
+<span class="c1">#     Task A: Compute factorial(2), currently i=2...</span>
+<span class="c1">#     Task B: Compute factorial(3), currently i=2...</span>
+<span class="c1">#     Task C: Compute factorial(4), currently i=2...</span>
+<span class="c1">#     Task A: factorial(2) = 2</span>
+<span class="c1">#     Task B: Compute factorial(3), currently i=3...</span>
+<span class="c1">#     Task C: Compute factorial(4), currently i=3...</span>
+<span class="c1">#     Task B: factorial(3) = 6</span>
+<span class="c1">#     Task C: Compute factorial(4), currently i=4...</span>
+<span class="c1">#     Task C: factorial(4) = 24</span>
+<span class="c1">#     [2, 6, 24]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Si <em>return_exceptions</em> es False, cancelar gather() después de que se haya marcado como hecho no cancelará ninguna espera enviada. Por ejemplo, la recopilación se puede marcar como hecha después de propagar una excepción a la persona que llama, por lo tanto, llamar a <code class="docutils literal notranslate"><span class="pre">gather.cancel()</span></code> después de detectar una excepción (generada por uno de los elementos pendientes) de recopilación no cancelará ningún otro elemento pendiente.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Si se cancela el propio <em>gather</em>, la cancelación se propaga independientemente de <em>return_exceptions</em>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10: </span>Se emite una advertencia de obsolescencia si no se proporcionan argumentos posicionales o no todos los argumentos posicionales son objetos de tipo Future y no hay un bucle de eventos en ejecución.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="shielding-from-cancellation">
+<h2><a class="toc-backref" href="#id7">Protección contra Cancelación</a><a class="headerlink" href="#shielding-from-cancellation" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.shield">
+<em class="property">awaitable </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">shield</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">aw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.shield" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Protege un <a class="reference internal" href="#asyncio-awaitables"><span class="std std-ref">objeto esperable</span></a> de ser <a class="reference internal" href="#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancelado</span></code></a>.</p>
+<p>Si <em>aw</em> es una corrutina, se programa automáticamente como una Tarea.</p>
+<p>La declaración:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">something</span><span class="p">())</span>
+<span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">shield</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>es equivalente a:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><em>excepto</em> que si la corrutina que lo contiene se cancela, la tarea que se ejecuta en <code class="docutils literal notranslate"><span class="pre">something()</span></code> no se cancela. Desde el punto de vista de <code class="docutils literal notranslate"><span class="pre">something()</span></code>, la cancelación no ocurrió. Aunque su invocador siga cancelado, por lo que la expresión «await» sigue generando un <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a>.</p>
+<p>Si <code class="docutils literal notranslate"><span class="pre">something()</span></code> se cancela por otros medios (es decir, desde dentro de sí mismo) eso también cancelaría <code class="docutils literal notranslate"><span class="pre">shield()</span></code>.</p>
+<p>Si se desea ignorar por completo la cancelación (no se recomienda) la función <code class="docutils literal notranslate"><span class="pre">shield()</span></code> debe combinarse con una cláusula try/except, como se indica a continuación:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">something</span><span class="p">())</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">shield</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">CancelledError</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Importante</p>
+<p>Save a reference to tasks passed to this function, to avoid
+a task disappearing mid-execution. The event loop only keeps
+weak references to tasks. A task that isn’t referenced elsewhere
+may get garbage collected at any time, even before it’s done.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10: </span>Se emite una advertencia de obsolescencia si <em>aw</em> no es un objeto similares a Futures y no hay un bucle de eventos en ejecución.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="timeouts">
+<h2><a class="toc-backref" href="#id8">Tiempo agotado</a><a class="headerlink" href="#timeouts" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.wait_for">
+<em class="property">coroutine </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">wait_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">aw</span></em>, <em class="sig-param"><span class="n">timeout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.wait_for" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Espere a que el <em>aw</em> <a class="reference internal" href="#asyncio-awaitables"><span class="std std-ref">esperable</span></a> se complete con un tiempo agotado.</p>
+<p>Si <em>aw</em> es una corrutina, se programa automáticamente como una Tarea.</p>
+<p><em>timeout</em> puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code> o punto flotante o un número entero de segundos a esperar. Si <em>timeout</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>, se bloquea hasta que Future se completa.</p>
+<p>Si se produce un agotamiento de tiempo, cancela la tarea y genera <a class="reference internal" href="asyncio-exceptions.html#asyncio.TimeoutError" title="asyncio.TimeoutError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">asyncio.TimeoutError</span></code></a>.</p>
+<p>Para evitar la <a class="reference internal" href="#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancelación</span></code></a> de la tarea , envuélvala en <a class="reference internal" href="#asyncio.shield" title="asyncio.shield"><code class="xref py py-func docutils literal notranslate"><span class="pre">shield()</span></code></a>.</p>
+<p>La función esperará hasta que se cancele el Future, por lo que el tiempo de espera total puede exceder el <em>timeout</em>. Si ocurre una excepción durante la cancelación, se propaga.</p>
+<p>Si se cancela la espera, el Future <em>aw</em> también se cancela.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<p id="asyncio-example-waitfor">Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">eternity</span><span class="p">():</span>
+    <span class="c1"># Sleep for one hour</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;yay!&#39;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Wait for at most 1 second</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">eternity</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timeout!&#39;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+
+<span class="c1"># Expected output:</span>
+<span class="c1">#</span>
+<span class="c1">#     timeout!</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Cuando <em>aw</em> se cancela debido a un agotamiento de tiempo, <code class="docutils literal notranslate"><span class="pre">wait_for</span></code> espera a que se cancele <em>aw</em>. Anteriormente, se lanzó inmediatamente <a class="reference internal" href="asyncio-exceptions.html#asyncio.TimeoutError" title="asyncio.TimeoutError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">asyncio.TimeoutError</span></code></a>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="waiting-primitives">
+<h2><a class="toc-backref" href="#id9">Esperando Primitivas</a><a class="headerlink" href="#waiting-primitives" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.wait">
+<em class="property">coroutine </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">wait</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">aws</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_when</span><span class="o">=</span><span class="default_value">ALL_COMPLETED</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.wait" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecuta <a class="reference internal" href="#asyncio-awaitables"><span class="std std-ref">objetos en espera</span></a> en el <em>aws</em> iterable simultáneamente y bloquee hasta la condición especificada por <em>return_when</em>.</p>
+<p>El iterable <em>aws</em> no debe estar vacío.</p>
+<p>Retorna dos conjuntos de Tareas/Futures: <code class="docutils literal notranslate"><span class="pre">(done,</span> <span class="pre">pending)</span></code>.</p>
+<p>Uso:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">done</span><span class="p">,</span> <span class="n">pending</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">aws</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>timeout</em> (un punto flotante o int), si se especifica, se puede utilizar para controlar el número máximo de segundos que hay que esperar antes de retornar.</p>
+<p>Tenga en cuenta que esta función no lanza <a class="reference internal" href="asyncio-exceptions.html#asyncio.TimeoutError" title="asyncio.TimeoutError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">asyncio.TimeoutError</span></code></a>. Los Futures o Tareas que no terminan cuando se agota el tiempo simplemente se retornan en el segundo conjunto.</p>
+<p><em>return_when</em> indica cuándo debe retornar esta función. Debe ser una de las siguientes constantes:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Constante</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">FIRST_COMPLETED</span></code></p></td>
+<td><p>La función retornará cuando cualquier Future termine o se cancele.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">FIRST_EXCEPTION</span></code></p></td>
+<td><p>La función retornará cuando cualquier Future finalice lanzando una excepción. Si ningún Future lanza una excepción, entonces es equivalente a <code class="xref py py-const docutils literal notranslate"><span class="pre">ALL_COMPLETED</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-const docutils literal notranslate"><span class="pre">ALL_COMPLETED</span></code></p></td>
+<td><p>La función retornará cuando todos los Futures terminen o se cancelen.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A diferencia de <a class="reference internal" href="#asyncio.wait_for" title="asyncio.wait_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">wait_for()</span></code></a>, <code class="docutils literal notranslate"><span class="pre">wait()</span></code> no cancela los Futures cuando se produce un agotamiento de tiempo.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.8: </span>Si cualquier aguardable en <em>aws</em> es una corrutina, se programa automáticamente como una Tarea. El paso de objetos corrutinas a <code class="docutils literal notranslate"><span class="pre">wait()</span></code> directamente está en desuso, ya que conduce a <a class="reference internal" href="#asyncio-example-wait-coroutine"><span class="std std-ref">comportamiento confuso</span></a>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<div class="admonition note" id="asyncio-example-wait-coroutine">
+<p class="admonition-title">Nota</p>
+<p><code class="docutils literal notranslate"><span class="pre">wait()</span></code> programa las corrutinas como Tareas automáticamente y posteriormente retorna los objetos Tarea creados implícitamente en conjuntos <code class="docutils literal notranslate"><span class="pre">(done,</span> <span class="pre">pending)</span></code>. Por lo tanto, el código siguiente no funcionará como se esperaba:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">42</span>
+
+<span class="n">coro</span> <span class="o">=</span> <span class="n">foo</span><span class="p">()</span>
+<span class="n">done</span><span class="p">,</span> <span class="n">pending</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">({</span><span class="n">coro</span><span class="p">})</span>
+
+<span class="k">if</span> <span class="n">coro</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+    <span class="c1"># This branch will never be run!</span>
+</pre></div>
+</div>
+<p>Aquí es cómo se puede arreglar el fragmento de código anterior:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">42</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">foo</span><span class="p">())</span>
+<span class="n">done</span><span class="p">,</span> <span class="n">pending</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">({</span><span class="n">task</span><span class="p">})</span>
+
+<span class="k">if</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+    <span class="c1"># Everything will work as expected now.</span>
+</pre></div>
+</div>
+</div>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.8, se eliminará en la versión 3.11: </span>El paso de objetos corrutina a <code class="docutils literal notranslate"><span class="pre">wait()</span></code> directamente está en desuso.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asyncio.as_completed">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">as_completed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">aws</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.as_completed" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecuta <a class="reference internal" href="#asyncio-awaitables"><span class="std std-ref">objetos en espera</span></a> en el <em>aws</em> iterable al mismo tiempo. Devuelve un iterador de corrutinas. Se puede esperar a cada corrutina devuelta para obtener el siguiente resultado más temprano del iterable de los esperables restantes.</p>
+<p>Lanza <a class="reference internal" href="asyncio-exceptions.html#asyncio.TimeoutError" title="asyncio.TimeoutError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">asyncio.TimeoutError</span></code></a> si el agotamiento de tiempo ocurre antes que todos los Futures terminen.</p>
+<p>Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">coro</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">aws</span><span class="p">):</span>
+    <span class="n">earliest_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">coro</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.10: </span>Removed the <em>loop</em> parameter.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10: </span>Se emite una advertencia de obsolescencia si no todos los objetos en espera en el iterable <em>aws</em> son objetos de tipo Future y no hay un bucle de eventos en ejecución.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="running-in-threads">
+<h2><a class="toc-backref" href="#id10">Ejecutando en Hilos</a><a class="headerlink" href="#running-in-threads" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.to_thread">
+<em class="property">coroutine </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">to_thread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">/</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.to_thread" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ejecutar asincrónicamente la función <em>func</em> en un hilo separado.</p>
+<p>Cualquier *args y **kwargs suministrados para esta función se pasan directamente a <em>func</em>. Además, el current <a class="reference internal" href="contextvars.html#contextvars.Context" title="contextvars.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a> se propaga, lo que permite acceder a las variables de contexto del subproceso del bucle de eventos en el subproceso separado.</p>
+<p>Retorna una corrutina que se puede esperar para obtener el resultado final de <em>func</em>.</p>
+<p>Esta función de corrutina está destinada principalmente a ser utilizada para ejecutar funciones/métodos vinculados a IO que de otro modo bloquearían el bucle de eventos si se ejecutaran en el hilo principal. Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">blocking_io</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;start blocking_io at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Note that time.sleep() can be replaced with any blocking</span>
+    <span class="c1"># IO-bound operation, such as file operations.</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;blocking_io complete at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;started main at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">blocking_io</span><span class="p">),</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;finished main at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+
+<span class="c1"># Expected output:</span>
+<span class="c1">#</span>
+<span class="c1"># started main at 19:50:53</span>
+<span class="c1"># start blocking_io at 19:50:53</span>
+<span class="c1"># blocking_io complete at 19:50:54</span>
+<span class="c1"># finished main at 19:50:54</span>
+</pre></div>
+</div>
+<p>Directly calling <code class="docutils literal notranslate"><span class="pre">blocking_io()</span></code> in any coroutine would block the event loop
+for its duration, resulting in an additional 1 second of run time. Instead,
+by using <code class="docutils literal notranslate"><span class="pre">asyncio.to_thread()</span></code>, we can run it in a separate thread without
+blocking the event loop.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Due to the <a class="reference internal" href="../glossary.html#term-GIL"><span class="xref std std-term">GIL</span></a>, <code class="docutils literal notranslate"><span class="pre">asyncio.to_thread()</span></code> can typically only be used
+to make IO-bound functions non-blocking. However, for extension modules
+that release the GIL or alternative Python implementations that don’t
+have one, <code class="docutils literal notranslate"><span class="pre">asyncio.to_thread()</span></code> can also be used for CPU-bound functions.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="scheduling-from-other-threads">
+<h2><a class="toc-backref" href="#id11">Planificación Desde Otros Hilos</a><a class="headerlink" href="#scheduling-from-other-threads" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.run_coroutine_threadsafe">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">run_coroutine_threadsafe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="n">loop</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.run_coroutine_threadsafe" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía una corrutina al bucle de eventos especificado. Seguro para Hilos.</p>
+<p>Retorna <a class="reference internal" href="concurrent.futures.html#concurrent.futures.Future" title="concurrent.futures.Future"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.Future</span></code></a> para esperar el resultado de otro hilo del SO (Sistema Operativo).</p>
+<p>Esta función está pensada para llamarse desde un hilo del SO diferente al que se ejecuta el bucle de eventos. Ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a coroutine</span>
+<span class="n">coro</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Submit the coroutine to a given loop</span>
+<span class="n">future</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run_coroutine_threadsafe</span><span class="p">(</span><span class="n">coro</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+
+<span class="c1"># Wait for the result with an optional timeout argument</span>
+<span class="k">assert</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<p>Si se lanza una excepción en la corrutina, el Future retornado será notificado. También se puede utilizar para cancelar la tarea en el bucle de eventos:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The coroutine took too long, cancelling the task...&#39;</span><span class="p">)</span>
+    <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The coroutine raised an exception: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The coroutine returned: </span><span class="si">{</span><span class="n">result</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Consulte la sección de la documentación <a class="reference internal" href="asyncio-dev.html#asyncio-multithreading"><span class="std std-ref">Concurrencia y multi hilos</span></a>.</p>
+<p>A diferencia de otras funciones asyncio, esta función requiere que el argumento <em>loop</em> se pase explícitamente.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.5.1.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="introspection">
+<h2><a class="toc-backref" href="#id12">Introspección</a><a class="headerlink" href="#introspection" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py function">
+<dt id="asyncio.current_task">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">current_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.current_task" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la instancia <a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a> actualmente en ejecución o <code class="docutils literal notranslate"><span class="pre">None</span></code> si no se está ejecutando ninguna tarea.</p>
+<p>Si <em>loop</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code> <a class="reference internal" href="asyncio-eventloop.html#asyncio.get_running_loop" title="asyncio.get_running_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_running_loop()</span></code></a> se utiliza para obtener el bucle actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asyncio.all_tasks">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">all_tasks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.all_tasks" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna un conjunto de objetos <a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a> que se ejecutan por el bucle.</p>
+<p>Si <em>loop</em> es <code class="docutils literal notranslate"><span class="pre">None</span></code>, <a class="reference internal" href="asyncio-eventloop.html#asyncio.get_running_loop" title="asyncio.get_running_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_running_loop()</span></code></a> se utiliza para obtener el bucle actual.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.7.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="task-object">
+<h2><a class="toc-backref" href="#id13">Objeto Task</a><a class="headerlink" href="#task-object" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="py class">
+<dt id="asyncio.Task">
+<em class="property">class </em><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">Task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un objeto <a class="reference internal" href="asyncio-future.html#asyncio.Future" title="asyncio.Future"><code class="xref py py-class docutils literal notranslate"><span class="pre">similar</span> <span class="pre">a</span> <span class="pre">Future</span></code></a> que ejecuta Python <a class="reference internal" href="#coroutine"><span class="std std-ref">coroutine</span></a>. No es seguro hilos.</p>
+<p>Las tareas se utilizan para ejecutar corrutinas en bucles de eventos. Si una corrutina aguarda en un Future, la Tarea suspende la ejecución de la corrutina y espera la finalización del Future. Cuando el Future <em>termina</em>, se reanuda la ejecución de la corrutina envuelta.</p>
+<p>Los bucles de eventos usan la programación cooperativa: un bucle de eventos ejecuta una tarea a la vez. Mientras una Tarea espera para la finalización de un Future, el bucle de eventos ejecuta otras tareas, retorno de llamada o realiza operaciones de E/S.</p>
+<p>Utilice la función de alto nivel <a class="reference internal" href="#asyncio.create_task" title="asyncio.create_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">asyncio.create_task()</span></code></a> para crear Tareas, o las funciones de bajo nivel <a class="reference internal" href="asyncio-eventloop.html#asyncio.loop.create_task" title="asyncio.loop.create_task"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loop.create_task()</span></code></a> o <a class="reference internal" href="asyncio-future.html#asyncio.ensure_future" title="asyncio.ensure_future"><code class="xref py py-func docutils literal notranslate"><span class="pre">ensure_future()</span></code></a>. Se desaconseja la creación de instancias manuales de Tareas.</p>
+<p>Para cancelar una Tarea en ejecución, utilice el método <a class="reference internal" href="#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancel()</span></code></a>. Llamarlo hará que la tarea lance una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a> en la corrutina contenida. Si una corrutina está esperando en un objeto Future durante la cancelación, se cancelará el objeto Future.</p>
+<p><a class="reference internal" href="#asyncio.Task.cancelled" title="asyncio.Task.cancelled"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancelled()</span></code></a> se puede utilizar para comprobar si la Tarea fue cancelada. El método devuelve <code class="docutils literal notranslate"><span class="pre">True</span></code> si la corrutina contenida no suprimió la excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a> y se canceló realmente.</p>
+<p><a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">asyncio.Task</span></code></a> hereda de <a class="reference internal" href="asyncio-future.html#asyncio.Future" title="asyncio.Future"><code class="xref py py-class docutils literal notranslate"><span class="pre">Future</span></code></a> todas sus API excepto <a class="reference internal" href="asyncio-future.html#asyncio.Future.set_result" title="asyncio.Future.set_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Future.set_result()</span></code></a> y <a class="reference internal" href="asyncio-future.html#asyncio.Future.set_exception" title="asyncio.Future.set_exception"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Future.set_exception()</span></code></a>.</p>
+<p>Las tareas admiten el módulo <a class="reference internal" href="contextvars.html#module-contextvars" title="contextvars: Context Variables"><code class="xref py py-mod docutils literal notranslate"><span class="pre">contextvars</span></code></a>. Cuando se crea una Tarea, copia el contexto actual y, posteriormente, ejecuta su corrutina en el contexto copiado.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.7: </span>Agregado soporte para el módulo <a class="reference internal" href="contextvars.html#module-contextvars" title="contextvars: Context Variables"><code class="xref py py-mod docutils literal notranslate"><span class="pre">contextvars</span></code></a>.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.8: </span>Added the <em>name</em> parameter.</p>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.10: </span>Se emite una advertencia de obsolescencia si no se especifica <em>loop</em> y no hay un bucle de eventos en ejecución.</p>
+</div>
+<dl class="py method">
+<dt id="asyncio.Task.cancel">
+<code class="sig-name descname">cancel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.cancel" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Solicita que se cancele la Tarea.</p>
+<p>Esto hace que una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a> sea lanzada a la corrutina contenida en el próximo ciclo del bucle de eventos.</p>
+<p>La corrutina entonces tiene la oportunidad de limpiar o incluso denegar la solicitud suprimiendo la excepción con un bloque <a class="reference internal" href="../reference/compound_stmts.html#try"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">try</span></code></a> … …``except CancelledError`` … <a class="reference internal" href="../reference/compound_stmts.html#finally"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">finally</span></code></a>. Por lo tanto, a diferencia de <a class="reference internal" href="asyncio-future.html#asyncio.Future.cancel" title="asyncio.Future.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Future.cancel()</span></code></a>, <a class="reference internal" href="#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Task.cancel()</span></code></a> no garantiza que la tarea será cancelada, aunque suprimir la cancelación por completo no es común y se desalienta activamente.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.9: </span>Added the <em>msg</em> parameter.</p>
+</div>
+<p id="asyncio-example-task-cancel">En el ejemplo siguiente se muestra cómo las corrutinas pueden interceptar la solicitud de cancelación:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">cancel_me</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cancel_me(): before sleep&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Wait for 1 hour</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cancel_me(): cancel sleep&#39;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cancel_me(): after sleep&#39;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Create a &quot;cancel_me&quot; Task</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">cancel_me</span><span class="p">())</span>
+
+    <span class="c1"># Wait for 1 second</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">task</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;main(): cancel_me is cancelled now&quot;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+
+<span class="c1"># Expected output:</span>
+<span class="c1">#</span>
+<span class="c1">#     cancel_me(): before sleep</span>
+<span class="c1">#     cancel_me(): cancel sleep</span>
+<span class="c1">#     cancel_me(): after sleep</span>
+<span class="c1">#     main(): cancel_me is cancelled now</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.cancelled">
+<code class="sig-name descname">cancelled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.cancelled" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si la Tarea se <em>cancela</em>.</p>
+<p>La tarea se <em>cancela</em> cuando se solicitó la cancelación con <a class="reference internal" href="#asyncio.Task.cancel" title="asyncio.Task.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cancel()</span></code></a> y la corrutina contenida propagó la excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a> que se le ha lanzado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.done">
+<code class="sig-name descname">done</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.done" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si la Tarea está <em>finalizada</em>.</p>
+<p>Una tarea está <em>finalizada</em> cuando la corrutina contenida retornó un valor, lanzó una excepción, o se canceló la Tarea.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.result">
+<code class="sig-name descname">result</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.result" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el resultado de la Tarea.</p>
+<p>Si la tarea está <em>terminada</em>, se devuelve el resultado de la corrutina contenida (o si la corrutina lanzó una excepción, esa excepción se vuelve a relanzar.)</p>
+<p>Si la Tarea ha sido <em>cancelada</em>, este método lanza una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a>.</p>
+<p>Si el resultado de la Tarea aún no está disponible, este método lanza una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.InvalidStateError" title="asyncio.InvalidStateError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidStateError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.exception">
+<code class="sig-name descname">exception</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.exception" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la excepción de la Tarea.</p>
+<p>Si la corrutina contenida lanzó una excepción, esa excepción es retornada. Si la corrutina contenida retorna normalmente, este método retorna <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Si la Tarea ha sido <em>cancelada</em>, este método lanza una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.CancelledError" title="asyncio.CancelledError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CancelledError</span></code></a>.</p>
+<p>Si la Tarea aún no está <em>terminada</em>, este método lanza una excepción <a class="reference internal" href="asyncio-exceptions.html#asyncio.InvalidStateError" title="asyncio.InvalidStateError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidStateError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.add_done_callback">
+<code class="sig-name descname">add_done_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.add_done_callback" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Agrega una retro llamada que se ejecutará cuando la Tarea esté <em>terminada</em>.</p>
+<p>Este método solo se debe usar en código basado en retrollamada de bajo nivel.</p>
+<p>Consulte la documentación de <a class="reference internal" href="asyncio-future.html#asyncio.Future.add_done_callback" title="asyncio.Future.add_done_callback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Future.add_done_callback()</span></code></a> para obtener más detalles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.remove_done_callback">
+<code class="sig-name descname">remove_done_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.remove_done_callback" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Remueve la <em>retrollamada</em> de la lista de retrollamadas.</p>
+<p>Este método solo se debe usar en código basado en retrollamada de bajo nivel.</p>
+<p>Consulte la documentación de <a class="reference internal" href="asyncio-future.html#asyncio.Future.remove_done_callback" title="asyncio.Future.remove_done_callback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Future.remove_done_callback()</span></code></a> para obtener más detalles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.get_stack">
+<code class="sig-name descname">get_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.get_stack" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna la lista de marcos de pila para esta tarea.</p>
+<p>Si la corrutina contenida no se termina, esto retorna la pila donde se suspende. Si la corrutina se ha completado correctamente o se ha cancelado, retorna una lista vacía. Si la corrutina terminó por una excepción, esto retorna la lista de marcos de seguimiento.</p>
+<p>Los marcos siempre se ordenan de más antiguo a más nuevo.</p>
+<p>Solo se retorna un marco de pila para una corrutina suspendida.</p>
+<p>El argumento opcional <em>limit</em> establece el número máximo de marcos que se retornarán; de forma predeterminada se retornan todos los marcos disponibles. El orden de la lista devuelta varía en función de si se retorna una pila o un <em>traceback</em>: se devuelven los marcos más recientes de una pila, pero se devuelven los marcos más antiguos de un <em>traceback</em>. (Esto coincide con el comportamiento del módulo traceback.)ss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.print_stack">
+<code class="sig-name descname">print_stack</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.print_stack" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Imprime la pila o el seguimiento de esta tarea.</p>
+<p>Esto produce una salida similar a la del módulo traceback para los marcos recuperados por <a class="reference internal" href="#asyncio.Task.get_stack" title="asyncio.Task.get_stack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_stack()</span></code></a>.</p>
+<p>El argumento <em>limit</em> se pasa directamente a <a class="reference internal" href="#asyncio.Task.get_stack" title="asyncio.Task.get_stack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_stack()</span></code></a>.</p>
+<p>The <em>file</em> argument is an I/O stream to which the output
+is written; by default output is written to <a class="reference internal" href="sys.html#sys.stdout" title="sys.stdout"><code class="xref py py-data docutils literal notranslate"><span class="pre">sys.stdout</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.get_coro">
+<code class="sig-name descname">get_coro</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.get_coro" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el objeto corrutina contenido por <a class="reference internal" href="#asyncio.Task" title="asyncio.Task"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.get_name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna el nombre de la Tarea.</p>
+<p>Si no se ha asignado explícitamente ningún nombre a la Tarea, la implementación de Tarea asyncio predeterminada genera un nombre predeterminado durante la creación de instancias.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncio.Task.set_name">
+<code class="sig-name descname">set_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.Task.set_name" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Establece el nombre de la Tarea.</p>
+<p>El argumento <em>value</em> puede ser cualquier objeto, que luego se convierte en una cadena.</p>
+<p>En la implementación de Task predeterminada, el nombre será visible en la salida <a class="reference internal" href="functions.html#repr" title="repr"><code class="xref py py-func docutils literal notranslate"><span class="pre">repr()</span></code></a> de un objeto de tarea.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="generator-based-coroutines">
+<span id="asyncio-generator-based-coro"></span><h2><a class="toc-backref" href="#id14">Corrutinas basadas en generadores</a><a class="headerlink" href="#generator-based-coroutines" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Support for generator-based coroutines is <strong>deprecated</strong> and
+is removed in Python 3.11.</p>
+</div>
+<p>Las corrutinas basadas en generadores son anteriores a la sintaxis async/await. Son generadores de Python que utilizan expresiones <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span></code> para esperar en Futures y otras corrutinas.</p>
+<p>Las corrutinas basadas en generadores deben estar decoradas con <a class="reference internal" href="#asyncio.coroutine" title="asyncio.coroutine"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;asyncio.coroutine</span></code></a>, aunque esto no se aplica.</p>
+<dl class="py function">
+<dt id="asyncio.coroutine">
+<code class="sig-prename descclassname">&#64;</code><code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">coroutine</code><a class="headerlink" href="#asyncio.coroutine" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Decorador para marcar corrutinas basadas en generadores.</p>
+<p>Este decorador permite que las corrutinas basadas en generadores de versiones anteriores (<em>legacy</em>) sean compatibles con el código async/await:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@asyncio</span><span class="o">.</span><span class="n">coroutine</span>
+<span class="k">def</span> <span class="nf">old_style_coroutine</span><span class="p">():</span>
+    <span class="k">yield from</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">old_style_coroutine</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Este decorador no debe utilizarse para corrutinas <a class="reference internal" href="../reference/compound_stmts.html#async-def"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code></a>.</p>
+<div class="deprecated-removed">
+<p><span class="versionmodified">Obsoleto desde la versión 3.8, se eliminará en la versión 3.11: </span>Usar <a class="reference internal" href="../reference/compound_stmts.html#async-def"><code class="xref std std-keyword docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code></a> en su lugar.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asyncio.iscoroutine">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">iscoroutine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.iscoroutine" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si <em>obj</em> es un <a class="reference internal" href="#coroutine"><span class="std std-ref">coroutine object</span></a>.</p>
+<p>Este método es diferente de <a class="reference internal" href="inspect.html#inspect.iscoroutine" title="inspect.iscoroutine"><code class="xref py py-func docutils literal notranslate"><span class="pre">inspect.iscoroutine()</span></code></a> porque retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> para corrutinas basadas en generadores.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asyncio.iscoroutinefunction">
+<code class="sig-prename descclassname">asyncio.</code><code class="sig-name descname">iscoroutinefunction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncio.iscoroutinefunction" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> si <em>func</em> es una <a class="reference internal" href="#coroutine"><span class="std std-ref">coroutine function</span></a>.</p>
+<p>Este método es diferente de <a class="reference internal" href="inspect.html#inspect.iscoroutinefunction" title="inspect.iscoroutinefunction"><code class="xref py py-func docutils literal notranslate"><span class="pre">inspect.iscoroutinefunction()</span></code></a> porque retorna <code class="docutils literal notranslate"><span class="pre">True</span></code> para funciones de corrutinas basadas en generadores decoradas con <a class="reference internal" href="#asyncio.coroutine" title="asyncio.coroutine"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;coroutine</span></code></a>.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Corrutinas y Tareas</a><ul>
+<li><a class="reference internal" href="#coroutines">Corrutinas</a></li>
+<li><a class="reference internal" href="#awaitables">Esperables</a></li>
+<li><a class="reference internal" href="#running-an-asyncio-program">Ejecutando un programa asyncio</a></li>
+<li><a class="reference internal" href="#creating-tasks">Creando Tareas</a></li>
+<li><a class="reference internal" href="#sleeping">Durmiendo</a></li>
+<li><a class="reference internal" href="#running-tasks-concurrently">Ejecutando Tareas Concurrentemente</a></li>
+<li><a class="reference internal" href="#shielding-from-cancellation">Protección contra Cancelación</a></li>
+<li><a class="reference internal" href="#timeouts">Tiempo agotado</a></li>
+<li><a class="reference internal" href="#waiting-primitives">Esperando Primitivas</a></li>
+<li><a class="reference internal" href="#running-in-threads">Ejecutando en Hilos</a></li>
+<li><a class="reference internal" href="#scheduling-from-other-threads">Planificación Desde Otros Hilos</a></li>
+<li><a class="reference internal" href="#introspection">Introspección</a></li>
+<li><a class="reference internal" href="#task-object">Objeto Task</a></li>
+<li><a class="reference internal" href="#generator-based-coroutines">Corrutinas basadas en generadores</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="asyncio.html"
+                        title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="asyncio-stream.html"
+                        title="próximo capítulo">Streams</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/asyncio-task.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="asyncio-stream.html" title="Streams"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="asyncio.html" title="asyncio — E/S Asíncrona"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="ipc.html" >Comunicación en redes y entre procesos</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="asyncio.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code> — E/S Asíncrona</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Corrutinas y Tareas</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

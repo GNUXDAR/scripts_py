@@ -1,0 +1,712 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>CÓMO (HOWTO) Unicode &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="HOWTO - Cómo obtener recursos de Internet con el paquete urllib" href="urllib2.html" />
+    <link rel="prev" title="HOW TO - Ordenar" href="sorting.html" />
+    <link rel="canonical" href="https://docs.python.org/3/howto/unicode.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CÓMO (<em>HOWTO</em>) Unicode</a><ul>
+<li><a class="reference internal" href="#introduction-to-unicode">Introducción a Unicode</a><ul>
+<li><a class="reference internal" href="#definitions">Definiciones</a></li>
+<li><a class="reference internal" href="#encodings">Codificaciones</a></li>
+<li><a class="reference internal" href="#references">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-s-unicode-support">Soporte Unicode de Python</a><ul>
+<li><a class="reference internal" href="#the-string-type">El tipo cadena</a></li>
+<li><a class="reference internal" href="#converting-to-bytes">Convirtiendo a Bytes</a></li>
+<li><a class="reference internal" href="#unicode-literals-in-python-source-code">Literales Unicode en código fuente Python</a></li>
+<li><a class="reference internal" href="#unicode-properties">Propiedades Unicode</a></li>
+<li><a class="reference internal" href="#comparing-strings">Comparando cadenas</a></li>
+<li><a class="reference internal" href="#unicode-regular-expressions">Expresiones Regulares Unicode</a></li>
+<li><a class="reference internal" href="#id2">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reading-and-writing-unicode-data">Leyendo y escribiendo datos Unicode</a><ul>
+<li><a class="reference internal" href="#unicode-filenames">Nombres de archivos Unicode</a></li>
+<li><a class="reference internal" href="#tips-for-writing-unicode-aware-programs">Consejos para escribir programas compatibles con Unicode</a><ul>
+<li><a class="reference internal" href="#converting-between-file-encodings">Conversión entre codificaciones de archivo</a></li>
+<li><a class="reference internal" href="#files-in-an-unknown-encoding">Archivos en una codificación desconocida</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#acknowledgements">Agradecimientos</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="sorting.html"
+                        title="capítulo anterior">HOW TO - Ordenar</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="urllib2.html"
+                        title="próximo capítulo">HOWTO - Cómo obtener recursos de Internet con el paquete urllib</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/unicode.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="urllib2.html" title="HOWTO - Cómo obtener recursos de Internet con el paquete urllib"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="HOW TO - Ordenar"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">CÓMO (<em>HOWTO</em>) Unicode</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="unicode-howto">
+<span id="id1"></span><h1>CÓMO (<em>HOWTO</em>) Unicode<a class="headerlink" href="#unicode-howto" title="Enlazar permanentemente con este título">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Lanzamiento</dt>
+<dd class="field-odd"><p>1.12</p>
+</dd>
+</dl>
+<p>Este CÓMO (<em>HOWTO</em>) debate el soporte de Python para la especificación Unicode para representar datos textuales, y explica varios problemas que comúnmente encuentra la gente cuando tratan de trabajar con Unicode.</p>
+<section id="introduction-to-unicode">
+<h2>Introducción a Unicode<a class="headerlink" href="#introduction-to-unicode" title="Enlazar permanentemente con este título">¶</a></h2>
+<section id="definitions">
+<h3>Definiciones<a class="headerlink" href="#definitions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Los programas de hoy necesitan poder manejar una amplia variedad de caracteres. Las aplicaciones son a menudo internacionalizadas para mostrar mensajes y resultados en una variedad de idiomas seleccionables por el usuario; Es posible que el mismo programa necesite generar un mensaje de error en inglés, francés, japonés, hebreo o ruso. El contenido web se puede escribir en cualquiera de estos idiomas y también puede incluir una variedad de símbolos <em>emoji</em>. El tipo cadena de Python utiliza el estándar Unicode para representar caracteres, lo que permite a los programas de Python trabajar con todos estos caracteres posibles diferentes.</p>
+<p>Unicode (<a class="reference external" href="https://www.unicode.org/">https://www.unicode.org/</a>) es una especificación que apunta a listar cada carácter usado por lenguajes humanos y darle a cada carácter su propio código único. La especificación Unicode es continuamente revisada y actualizada para añadir nuevos lenguajes y símbolos.</p>
+<p>Un <strong>carácter</strong> es el componente mas pequeño posible de un texto.  “A”, “B”, “C”, etc., son todos diferentes caracteres. También lo son <em>“È”</em> e <em>“Í”</em>. Los caracteres varían dependiendo del lenguaje o del contexto en el que estás hablando. Por ejemplo, Existe un carácter para el «Número Uno Romano»,  “I”, que es distinto de la letra “I” mayúscula. Estos usualmente lucen igual, pero son dos caracteres diferentes que tienen distintos significados.</p>
+<p>El estándar Unicode describe cómo se representan los caracteres mediante <strong>puntos de código</strong>. Un valor de punto de código es un número entero en el rango de 0 a 0x10FFFF (aproximadamente 1.1 millones de valores, el <a class="reference external" href="https://www.unicode.org/versions/latest/#Summary">número real asignado</a> es menor que eso). En el estándar y en este documento, un punto de código se escribe usando la notación <code class="docutils literal notranslate"><span class="pre">U+265E</span></code> para significar el carácter con valor <code class="docutils literal notranslate"><span class="pre">0x265e</span></code> (9,822 en decimal).</p>
+<p>El estándar Unicode contiene muchas tablas que enumeran caracteres y sus puntos de código correspondientes:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0061    &#39;a&#39;; LATIN SMALL LETTER A
+0062    &#39;b&#39;; LATIN SMALL LETTER B
+0063    &#39;c&#39;; LATIN SMALL LETTER C
+...
+007B    &#39;{&#39;; LEFT CURLY BRACKET
+...
+2167    &#39;Ⅷ&#39;; ROMAN NUMERAL EIGHT
+2168    &#39;Ⅸ&#39;; ROMAN NUMERAL NINE
+...
+265E    &#39;♞&#39;; BLACK CHESS KNIGHT
+265F    &#39;♟&#39;; BLACK CHESS PAWN
+...
+1F600   &#39;😀&#39;; GRINNING FACE
+1F609   &#39;😉&#39;; WINKING FACE
+...
+</pre></div>
+</div>
+<p>Estrictamente, estas definiciones implican que no tiene sentido decir “este es el carácter <code class="docutils literal notranslate"><span class="pre">U+265E</span></code>. <code class="docutils literal notranslate"><span class="pre">U+265E</span></code> es un punto de código, que representa algún carácter en particular; en este caso, representa el carácter “CABALLERO AJEDREZ NEGRO”, “♞”. En contextos informales, esta distinción entre puntos de código y caracteres a veces se olvidará.</p>
+<p>Un carácter es representado en una pantalla o en papel por un conjunto de elementos gráficos llamado <strong>glifo</strong>. El glifo para una A mayúscula, por ejemplo, es dos trazos diagonales y uno horizontal, aunque los detalles exactos van a depender de la fuente utilizada. La mayoría del código de Python no necesita preocuparse por los glifos; averiguar el glifo correcto para mostrar es generalmente el trabajo de un kit de herramientas GUI o el renderizador de fuentes de una terminal.</p>
+</section>
+<section id="encodings">
+<h3>Codificaciones<a class="headerlink" href="#encodings" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Para resumir la sección anterior: Una cadena Unicode es una secuencia de código de posiciones que son números desde 0 hasta <code class="docutils literal notranslate"><span class="pre">0x10FFFF</span></code> (1114111 decimal). Esta secuencia de código de posiciones necesita ser representada en memoria como un conjunto de <strong>unidades de código</strong>,  y las <strong>unidades de código</strong> son mapeadas a bytes de 8 bits. Las reglas para traducir una cadena Unicode a una secuencia de bytes son llamadas <strong>Codificación de carácter</strong>, o sólo una <strong>codificación</strong>.</p>
+<p>La primera codificación en que podrías pensar es usar enteros de 32 bits como unidad de código, y luego usar la representación de la CPU de enteros de 32 bits. En esta representación, la cadena «Python» podría verse así:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   P           y           t           h           o           n
+0x50 00 00 00 79 00 00 00 74 00 00 00 68 00 00 00 6f 00 00 00 6e 00 00 00
+   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+</pre></div>
+</div>
+<p>Esta representación es sencilla pero utilizarla presenta una serie de problemas.</p>
+<ol class="arabic simple">
+<li><p>No es portable; diferentes procesadores ordenan los bytes de manera diferente.</p></li>
+<li><p>Es un desperdicio de espacio. En la mayoría de los textos, la mayoría de los códigos de posición son menos de 127, o menos de 255, por lo que una gran cantidad de espacio está ocupado por bytes <code class="docutils literal notranslate"><span class="pre">0x00</span></code>. La cadena anterior toma 24 bytes en comparación con los 6 bytes necesarios para una representación ASCII. El aumento en el uso de RAM no importa demasiado (las computadoras de escritorio tienen <em>gigabytes</em> de RAM, y las cadenas no suelen ser tan grandes), pero expandir nuestro uso del disco y el ancho de banda de la red en un factor de 4 es intolerable.</p></li>
+<li><p>No es compatible con funciones existentes en C como <code class="docutils literal notranslate"><span class="pre">strlen()</span></code>, para eso se necesitaría una nueva familia de funciones de cadenas.</p></li>
+</ol>
+<p>Por lo tanto esta codificación no es muy utilizada, y la gente prefiere elegir codificaciones que son mas eficientes y convenientes, como UTF-8.</p>
+<p>UTF-8 es una de las codificaciones mas utilizadas, y Python generalmente la usa de forma predeterminada. UTF significa <em>«Unicode Transformation Format»</em>, y el «8» significa que se utilizan valores de 8 bits en la codificación. (También hay codificaciones UTF-16 y UTF-32, pero son menos frecuentes que UTF-8.) UTF-8 usa las siguientes reglas:</p>
+<ol class="arabic simple">
+<li><p>Si el código de posición is &lt; 128, es representado por el valor de byte correspondiente.</p></li>
+<li><p>Si el código de posición es &gt;= 128, se transforma en una secuencia de dos, tres, o cuatro bytes, donde cada byte de la secuencia está entre 128 y 255.</p></li>
+</ol>
+<p>UTF-8 tiene varias propiedades convenientes:</p>
+<ol class="arabic simple">
+<li><p>Puede manejar cualquier punto de código Unicode.</p></li>
+<li><p>Una cadena Unicode se convierte en una secuencia de bytes que contiene cero bytes incrustados solo donde representan el carácter nulo (U+0000). Esto significa que las cadenas UTF-8 pueden ser procesadas por funciones C como <code class="docutils literal notranslate"><span class="pre">strcpy()</span></code> y enviadas a través de protocolos que no pueden manejar cero bytes para nada más que marcadores de fin de cadena de caracteres.</p></li>
+<li><p>Una cadena de texto ASCII es también texto UTF-8.</p></li>
+<li><p>UTF-8 es bastante compacto; La mayoría de los caracteres comúnmente usados pueden ser representados con uno o dos bytes.</p></li>
+<li><p>Si los bytes están corruptos o perdidos, es posible determinar el comienzo del próximo código de posición y re-sincronizar. También es poco probable que datos aleatorios de 8 bit se vean como UTF-8 válido.</p></li>
+<li><p>UTF-8 es una codificación orientada a bytes. La codificación especifica que cada carácter está representado por una secuencia específica de uno o más bytes. Esto evita los problemas de ordenamiento de bytes que pueden ocurrir con codificaciones orientadas a números enteros y palabras, como UTF-16 y UTF-32, donde la secuencia de bytes varía según el hardware en el que se codificó la cadena.</p></li>
+</ol>
+</section>
+<section id="references">
+<h3>Referencias<a class="headerlink" href="#references" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El <a class="reference external" href="https://www.unicode.org">sitio del Consorcio Unicode</a> tiene gráficos de caracteres, un glosario y versiones en PDF de la especificación Unicode. Esté preparado para una lectura difícil. <a class="reference external" href="https://www.unicode.org/history/">Una cronología</a> del origen y desarrollo de Unicode también está disponible en el sitio.</p>
+<p>En el canal de <em>Youtube</em> <em>Computerphile</em>, <em>Tom Scott</em> <cite>discute brevemente la historia de Unicode y UTF-8 &lt;https://www.youtube.com/watch?v=MijmeoH9LT4&gt;</cite> (9 minutos 36 segundos).</p>
+<p>To help understand the standard, Jukka Korpela has written <a class="reference external" href="https://jkorpela.fi/unicode/guide.html">an introductory
+guide</a> to reading the
+Unicode character tables.</p>
+<p>Otro <a class="reference external" href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/">buen articulo introductorio</a> fue escrito por <em>Joel Spolsky</em>. Si esta introducción no aclara las cosas para usted, debería tratar leyendo este articulo alternativo antes de continuar.</p>
+<p>Artículos de <em>Wikipedia</em> son a menudo útiles. Mire los artículos para «<a class="reference external" href="https://es.wikipedia.org/wiki/Codificaci%C3%B3n_de_caracteres">codificación de caracteres</a>» y <a class="reference external" href="https://es.wikipedia.org/wiki/UTF-8">UTF-8</a>, por ejemplo.</p>
+</section>
+</section>
+<section id="python-s-unicode-support">
+<h2>Soporte Unicode de Python<a class="headerlink" href="#python-s-unicode-support" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Ahora que ya ha aprendido los rudimentos de Unicode, podemos mirar las características de Unicode de Python.</p>
+<section id="the-string-type">
+<h3>El tipo cadena<a class="headerlink" href="#the-string-type" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Desde Python 3.0, el tipo <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> del lenguaje contiene caracteres Unicode, lo que significa que cualquier cadena creada usando <code class="docutils literal notranslate"><span class="pre">&quot;unicode</span> <span class="pre">rocks!&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">'unicode</span> <span class="pre">rocks!'</span></code>, o la sintaxis de cadena entre comillas triples es almacenado como Unicode.</p>
+<p>La codificación predeterminada para el código fuente de Python es UTF-8, por lo que simplemente puede incluir un carácter Unicode en un literal de cadena de caracteres:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/tmp/input.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="o">...</span>
+<span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+    <span class="c1"># &#39;File not found&#39; error message.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fichier non trouvé&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Nota al margen: Python 3 también soporta el uso de caracteres Unicode en identificadores:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">répertoire</span> <span class="o">=</span> <span class="s2">&quot;/tmp/records.log&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">répertoire</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;test</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Si no puede ingresar un carácter en particular en su editor o desea mantener el código fuente solo ASCII por alguna razón, también puede usar secuencias de escape en cadenas de caracteres literales. (Dependiendo de su sistema, es posible que vea el glifo delta de mayúsculas en lugar de un escape u):</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;</span><span class="se">\N{GREEK CAPITAL LETTER DELTA}</span><span class="s2">&quot;</span>  <span class="c1"># Using the character name</span>
+<span class="go">&#39;\u0394&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;</span><span class="se">\u0394</span><span class="s2">&quot;</span>                          <span class="c1"># Using a 16-bit hex value</span>
+<span class="go">&#39;\u0394&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;</span><span class="se">\U00000394</span><span class="s2">&quot;</span>                      <span class="c1"># Using a 32-bit hex value</span>
+<span class="go">&#39;\u0394&#39;</span>
+</pre></div>
+</div>
+<p>Además, uno puede crear una cadena usando el método <a class="reference internal" href="../library/stdtypes.html#bytes.decode" title="bytes.decode"><code class="xref py py-func docutils literal notranslate"><span class="pre">decode()</span></code></a> de la clase <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>. Este método recibe una <em>codificación</em> como argumento, como <code class="docutils literal notranslate"><span class="pre">UTF-8</span></code>, y opcionalmente un argumento <em>errores</em>.</p>
+<p>El argumento <em>errores</em> especifica la respuesta cuando la cadena ingresada no puede ser convertida de acuerdo a las reglas de codificación. Los posibles valores para este argumento son <code class="docutils literal notranslate"><span class="pre">'strict'</span></code> (levanta una excepción <a class="reference internal" href="../library/exceptions.html#UnicodeDecodeError" title="UnicodeDecodeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnicodeDecodeError</span></code></a>), <code class="docutils literal notranslate"><span class="pre">'replace'</span></code> (use <code class="docutils literal notranslate"><span class="pre">U+FFFD'',</span> <span class="pre">``CARACTER</span> <span class="pre">DE</span> <span class="pre">REEMPLAZO}</span> <span class="pre">``),</span> <span class="pre">``'ignore'</span></code> (solo deje el carácter fuera del resultado Unicode), o <code class="docutils literal notranslate"><span class="pre">'backslahsreplace'</span></code> (inserta una secuencia de escape <code class="docutils literal notranslate"><span class="pre">\xNN</span></code>). Los siguientes ejemplos muestran las diferencias</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80</span><span class="s1">abc&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;strict&quot;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">UnicodeDecodeError</span>: <span class="n">&#39;utf-8&#39; codec can&#39;t decode byte 0x80 in position 0:</span>
+<span class="go">  invalid start byte</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80</span><span class="s1">abc&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+<span class="go">&#39;\ufffdabc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80</span><span class="s1">abc&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;backslashreplace&quot;</span><span class="p">)</span>
+<span class="go">&#39;\\x80abc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80</span><span class="s1">abc&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+<span class="go">&#39;abc&#39;</span>
+</pre></div>
+</div>
+<p>Las codificaciones son especificadas como cadenas que contienen el nombre de la codificación. Python viene con cerca de 100 codificaciones diferentes; consulta la referencia de la biblioteca de Python en <a class="reference internal" href="../library/codecs.html#standard-encodings"><span class="std std-ref">Codificaciones estándar</span></a> para una lista. Algunas codificaciones tienen múltiples nombres; por ejemplo, <code class="docutils literal notranslate"><span class="pre">'latin-1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'iso_8859_1'</span></code> y <code class="docutils literal notranslate"><span class="pre">'8859</span></code>” son sinónimos para la misma codificación.</p>
+<p>Las cadenas de un solo carácter pueden ser creadas también con la función incorporada <a class="reference internal" href="../library/functions.html#chr" title="chr"><code class="xref py py-func docutils literal notranslate"><span class="pre">chr()</span></code></a>, que toma un entero y retorna una cadena Unicode de longitud 1 que contiene el correspondiente código de posición. La operación inversa es la función incorporada <a class="reference internal" href="../library/functions.html#ord" title="ord"><code class="xref py py-func docutils literal notranslate"><span class="pre">ord()</span></code></a> que toma una cadena Unicode de un carácter y retorna el código de posición:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">chr</span><span class="p">(</span><span class="mi">57344</span><span class="p">)</span>
+<span class="go">&#39;\ue000&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\ue000</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="go">57344</span>
+</pre></div>
+</div>
+</section>
+<section id="converting-to-bytes">
+<h3>Convirtiendo a Bytes<a class="headerlink" href="#converting-to-bytes" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>El método opuesto a <a class="reference internal" href="../library/stdtypes.html#bytes.decode" title="bytes.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bytes.decode()</span></code></a> es <a class="reference internal" href="../library/stdtypes.html#str.encode" title="str.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.encode()</span></code></a>, que retorna una representación de <a class="reference internal" href="../library/stdtypes.html#bytes" title="bytes"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> de la cadena Unicode, codificada en la codificación solicitada.</p>
+<p>El parámetro <em>errores</em> es el mismo que el parámetro del método <a class="reference internal" href="../library/stdtypes.html#bytes.decode" title="bytes.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode()</span></code></a> pero soporta algunos manejadores mas.</p>
+<p>El siguiente ejemplo muestra los diferentes resultados:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">40960</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;abcd&#39;</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">1972</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="go">b&#39;\xea\x80\x80abcd\xde\xb4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="gr">UnicodeEncodeError</span>: <span class="n">&#39;ascii&#39; codec can&#39;t encode character &#39;\ua000&#39; in</span>
+<span class="go">  position 0: ordinal not in range(128)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="go">b&#39;abcd&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;?abcd?&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;&amp;#40960;abcd&amp;#1972;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;backslashreplace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;\\ua000abcd\\u07b4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;namereplace&#39;</span><span class="p">)</span>
+<span class="go">b&#39;\\N{YI SYLLABLE IT}abcd\\u07b4&#39;</span>
+</pre></div>
+</div>
+<p>Las rutinas de bajo nivel para registrar y acceder a las codificaciones disponibles se encuentran en el módulo <a class="reference internal" href="../library/codecs.html#module-codecs" title="codecs: Encode and decode data and streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code></a>. La implementación de nuevas codificaciones también requiere comprender el módulo <a class="reference internal" href="../library/codecs.html#module-codecs" title="codecs: Encode and decode data and streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code></a>. Sin embargo, las funciones de codificación y decodificación retornadas por este módulo generalmente son de nivel más bajo de lo que es cómodo, y escribir nuevas codificaciones es una tarea especializada, por lo que el módulo no se cubrirá en este CÓMO.</p>
+</section>
+<section id="unicode-literals-in-python-source-code">
+<h3>Literales Unicode en código fuente Python<a class="headerlink" href="#unicode-literals-in-python-source-code" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>En el código fuente de Python, se pueden escribir puntos de código Unicode específicos utilizando la secuencia de escape <code class="docutils literal notranslate"><span class="pre">\u</span></code>, que es seguida por cuatro dígitos hexadecimales que dan el punto de código. La secuencia de escape <code class="docutils literal notranslate"><span class="pre">\U</span></code> es similar, pero espera ocho dígitos hexadecimales, no cuatro:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;a</span><span class="se">\xac\u1234\u20ac\U00008000</span><span class="s2">&quot;</span>
+<span class="gp">... </span><span class="c1">#     ^^^^ two-digit hex escape</span>
+<span class="gp">... </span><span class="c1">#         ^^^^^^ four-digit Unicode escape</span>
+<span class="gp">... </span><span class="c1">#                     ^^^^^^^^^^ eight-digit Unicode escape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+<span class="go">[97, 172, 4660, 8364, 32768]</span>
+</pre></div>
+</div>
+<p>El uso de secuencias de escape para puntos de código superiores a 127 está bien en pequeñas dosis, pero se convierte en una molestia si está utilizando muchos caracteres acentuados, como lo haría en un programa con mensajes en francés o algún otro lenguaje que utilice acento. También puede ensamblar cadenas usando la función incorporada <a class="reference internal" href="../library/functions.html#chr" title="chr"><code class="xref py py-func docutils literal notranslate"><span class="pre">chr()</span></code></a>, pero esto es aún más tedioso.</p>
+<p>Idealmente, desearía poder escribir literales en la codificación natural de su idioma. Luego, puede editar el código fuente de Python con su editor favorito, que mostrará los caracteres acentuados de forma natural y tendrá los caracteres correctos utilizados en tiempo de ejecución.</p>
+<p>Python soporta la escritura de código fuente en UTF-8 de forma predeterminada, pero puede usar casi cualquier codificación si declara la codificación que está utilizando. Esto se hace mediante la inclusión de un comentario especial en la primera o segunda línea del archivo fuente:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: latin-1 -*-</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="s1">&#39;abcdé&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>La sintaxis está inspirada en la notación de Emacs para especificar variables locales a un archivo. Emacs admite muchas variables diferentes, pero Python solo admite <em>“coding”</em>. Los símbolos <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">*</span> <span class="pre">-</span></code> indican a Emacs que el comentario es especial; no tienen importancia para Python pero son una convención. Python busca <code class="docutils literal notranslate"><span class="pre">coding:</span> <span class="pre">name</span></code> o <code class="docutils literal notranslate"><span class="pre">coding=name</span></code> en el comentario.</p>
+<p>Si no incluye dicho comentario, la codificación predeterminada utilizada será UTF-8 como ya se mencionó. Ver también <span class="target" id="index-2"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0263"><strong>PEP 263</strong></a> para más información.</p>
+</section>
+<section id="unicode-properties">
+<h3>Propiedades Unicode<a class="headerlink" href="#unicode-properties" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La especificación Unicode incluye una base de datos de información sobre puntos de código. Para cada punto de código definido, la información incluye el nombre del carácter, su categoría, el valor numérico si corresponde (para caracteres que representan conceptos numéricos como los números romanos, fracciones como un tercio y cuatro quintos, etc.). También hay propiedades relacionadas con la visualización, como cómo usar el punto de código en texto bidireccional.</p>
+<p>El siguiente programa muestra información sobre varios caracteres e imprime el valor numérico de un carácter en particular:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">233</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mh">0x0bf2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">3972</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">6000</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">13231</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">u</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%04x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">unicodedata</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+
+<span class="c1"># Get numeric value of second character</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unicodedata</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Cuando se ejecuta, este imprime:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0 00e9 Ll LATIN SMALL LETTER E WITH ACUTE
+1 0bf2 No TAMIL NUMBER ONE THOUSAND
+2 0f84 Mn TIBETAN MARK HALANTA
+3 1770 Lo TAGBANWA LETTER SA
+4 33af So SQUARE RAD OVER S SQUARED
+1000.0
+</pre></div>
+</div>
+<p>Los códigos de categoría son abreviaturas que describen la naturaleza del personaje. Estos se agrupan en categorías como «Letra», «Número», «Puntuación» o «Símbolo», que a su vez se dividen en subcategorías. Para tomar los códigos de la salida anterior, <code class="docutils literal notranslate"><span class="pre">'Ll'</span></code> significa “Letra, minúscula “, <code class="docutils literal notranslate"><span class="pre">'No'</span></code> significa «Número, otro», <code class="docutils literal notranslate"><span class="pre">'Mn'</span></code> es «Marca, sin espacios» , y <code class="docutils literal notranslate"><span class="pre">'So'</span></code> es «Símbolo, otro». Consulte <a class="reference external" href="https://www.unicode.org/reports/tr44/#General_Category_Values">la sección Valores de categoría generales de la documentación de la base de datos de caracteres Unicode</a> para obtener una lista de códigos de categoría.</p>
+</section>
+<section id="comparing-strings">
+<h3>Comparando cadenas<a class="headerlink" href="#comparing-strings" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Unicode agrega algunas complicaciones a la comparación de cadenas, porque el mismo conjunto de caracteres puede representarse mediante diferentes secuencias de puntos de código. Por ejemplo, una letra como “ê” puede representarse como un único punto de código U+00EA, o como U+0065 U+0302, que es el punto de código para “e” seguido de un punto de código para “COMBINING CIRCUMFLEX ACCENT” . Estos producirán la misma salida cuando se impriman, pero uno es una cadena de longitud 1 y el otro es de longitud 2.</p>
+<p>Una herramienta para una comparación que no distingue entre mayúsculas y minúsculas es el método <a class="reference internal" href="../library/stdtypes.html#str.casefold" title="str.casefold"><code class="xref py py-meth docutils literal notranslate"><span class="pre">casefold()</span></code></a> que convierte una cadena en una forma que no distingue entre mayúsculas y minúsculas siguiendo un algoritmo descrito por el estándar Unicode. Este algoritmo tiene un manejo especial para caracteres como la letra Alemana “ß” (punto de código U+00DF), que se convierte en el par de letras minúsculas “ss”.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">street</span> <span class="o">=</span> <span class="s1">&#39;Gürzenichstraße&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">street</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span>
+<span class="go">&#39;gürzenichstrasse&#39;</span>
+</pre></div>
+</div>
+<p>Una segunda herramienta es la función <a class="reference internal" href="../library/unicodedata.html#unicodedata.normalize" title="unicodedata.normalize"><code class="xref py py-func docutils literal notranslate"><span class="pre">normalize()</span></code></a> del módulo <a class="reference internal" href="../library/unicodedata.html#module-unicodedata" title="unicodedata: Access the Unicode Database."><code class="xref py py-mod docutils literal notranslate"><span class="pre">unicodedata</span></code></a> que convierte las cadenas en una de varias formas normales, donde las letras seguidas de un carácter de combinación se reemplazan con caracteres individuales. <code class="xref py py-func docutils literal notranslate"><span class="pre">normalize()</span></code> puede usarse para realizar comparaciones de cadenas que no informarán falsamente la desigualdad si dos cadenas usan caracteres combinados de manera diferente:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="k">def</span> <span class="nf">compare_strs</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">NFD</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">&#39;NFD&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">NFD</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span> <span class="o">==</span> <span class="n">NFD</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+
+<span class="n">single_char</span> <span class="o">=</span> <span class="s1">&#39;ê&#39;</span>
+<span class="n">multiple_chars</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\N{LATIN SMALL LETTER E}\N{COMBINING CIRCUMFLEX ACCENT}</span><span class="s1">&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;length of first string=&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">single_char</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;length of second string=&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">multiple_chars</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">compare_strs</span><span class="p">(</span><span class="n">single_char</span><span class="p">,</span> <span class="n">multiple_chars</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Cuando se ejecuta, esto genera:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python3 compare-strs.py
+<span class="go">length of first string= 1</span>
+<span class="go">length of second string= 2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>El primer argumento para la función <a class="reference internal" href="../library/unicodedata.html#unicodedata.normalize" title="unicodedata.normalize"><code class="xref py py-func docutils literal notranslate"><span class="pre">normalize()</span></code></a> es una cadena que proporciona la forma de normalización deseada, que puede ser una de “NFC”, “NFKC”, “NFD” y “NFKD”.</p>
+<p>El estándar Unicode también especifica cómo hacer comparaciones sin mayúsculas y minúsculas:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="k">def</span> <span class="nf">compare_caseless</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">NFD</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">&#39;NFD&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">NFD</span><span class="p">(</span><span class="n">NFD</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span> <span class="o">==</span> <span class="n">NFD</span><span class="p">(</span><span class="n">NFD</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
+
+<span class="c1"># Example usage</span>
+<span class="n">single_char</span> <span class="o">=</span> <span class="s1">&#39;ê&#39;</span>
+<span class="n">multiple_chars</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\N{LATIN CAPITAL LETTER E}\N{COMBINING CIRCUMFLEX ACCENT}</span><span class="s1">&#39;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">compare_caseless</span><span class="p">(</span><span class="n">single_char</span><span class="p">,</span> <span class="n">multiple_chars</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Esto imprimirá <code class="docutils literal notranslate"><span class="pre">Verdadero</span></code>. (¿Por qué se invoca dos veces <code class="xref py py-func docutils literal notranslate"><span class="pre">NFD()</span></code>? Debido a que hay algunos caracteres que hacen que <code class="xref py py-meth docutils literal notranslate"><span class="pre">casefold()</span></code> retorne una cadena no normalizada, por lo que el resultado debe normalizarse nuevamente. Consulte la sección 3.13 del Estándar Unicode para una discusión y un ejemplo.)</p>
+</section>
+<section id="unicode-regular-expressions">
+<h3>Expresiones Regulares Unicode<a class="headerlink" href="#unicode-regular-expressions" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Las expresiones regulares soportadas por el módulo <a class="reference internal" href="../library/re.html#module-re" title="re: Regular expression operations."><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> se pueden proporcionar como bytes o cadenas. Algunas de las secuencias de caracteres especiales como <code class="docutils literal notranslate"><span class="pre">\d</span></code> y <code class="docutils literal notranslate"><span class="pre">\w</span></code> tienen diferentes significados dependiendo de si el patrón se suministra como bytes o una cadena. Por ejemplo, <code class="docutils literal notranslate"><span class="pre">\d</span></code> coincidirá con los caracteres <code class="docutils literal notranslate"><span class="pre">[0-9]</span></code> en bytes, pero en las cadenas coincidirá con cualquier carácter que esté en la categoría <code class="docutils literal notranslate"><span class="pre">'Nd'</span></code>.</p>
+<p>La cadena en este ejemplo tiene el número 57 escrito en números tailandeses y árabes:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">)</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;Over </span><span class="se">\u0e55\u0e57</span><span class="s2"> 57 flavours&quot;</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()))</span>
+</pre></div>
+</div>
+<p>Cuando se ejecuta, <code class="docutils literal notranslate"><span class="pre">\d+</span></code> coincidirá con los números tailandeses y los imprimirá. Si proporciona el indicador <a class="reference internal" href="../library/re.html#re.ASCII" title="re.ASCII"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.ASCII</span></code></a> a <a class="reference internal" href="../library/re.html#re.compile" title="re.compile"><code class="xref py py-func docutils literal notranslate"><span class="pre">compile()</span></code></a>, <code class="docutils literal notranslate"><span class="pre">\d+</span></code> coincidirá con la subcadena «57» en su lugar.</p>
+<p>Del mismo modo, <code class="docutils literal notranslate"><span class="pre">\w</span></code> coincide con una amplia variedad de caracteres Unicode pero solo <code class="docutils literal notranslate"><span class="pre">[a-zA-Z0-9_]</span></code> en bytes o si <a class="reference internal" href="../library/re.html#re.ASCII" title="re.ASCII"><code class="xref py py-const docutils literal notranslate"><span class="pre">re.ASCII</span></code></a> se suministra, y <code class="docutils literal notranslate"><span class="pre">\s</span></code> coincidirá con los caracteres de espacio en blanco Unicode o <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">\t\n\r\f\v]</span></code>.</p>
+</section>
+<section id="id2">
+<h3>Referencias<a class="headerlink" href="#id2" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Algunas buenas discusiones alternativas sobre el soporte Unicode de Python son:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://python-notes.curiousefficiency.org/en/latest/python3/text_file_processing.html">Processing Text Files in Python 3</a>, by Nick Coghlan.</p></li>
+<li><p><a class="reference external" href="https://nedbatchelder.com/text/unipain.html">Pragmatic Unicode</a>, una presentación de <em>Ned Batchelder</em> en PyCon 2012.</p></li>
+</ul>
+<p>El tipo <a class="reference internal" href="../library/stdtypes.html#str" title="str"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> se describe en la referencia de la biblioteca de Python en <a class="reference internal" href="../library/stdtypes.html#textseq"><span class="std std-ref">Cadenas de caracteres — str</span></a>.</p>
+<p>La documentación para el módulo <a class="reference internal" href="../library/unicodedata.html#module-unicodedata" title="unicodedata: Access the Unicode Database."><code class="xref py py-mod docutils literal notranslate"><span class="pre">unicodedata</span></code></a>.</p>
+<p>La documentación para el módulo <a class="reference internal" href="../library/codecs.html#module-codecs" title="codecs: Encode and decode data and streams."><code class="xref py py-mod docutils literal notranslate"><span class="pre">codecs</span></code></a>.</p>
+<p><em>Marc-André Lemburg</em> hizo una presentación titulada «Python and Unicode» (diapositivas en PDF) &lt;<a class="reference external" href="https://downloads.egenix.com/python/Unicode-EPC2002-Talk.pdf">https://downloads.egenix.com/python/Unicode-EPC2002-Talk.pdf</a>&gt;`_ en EuroPython 2002. Las diapositivas son una excelente descripción general del diseño de las características Unicode de Python 2 (donde el tipo de cadena Unicode se llama <code class="docutils literal notranslate"><span class="pre">unicode</span></code> y los literales comienzan con <code class="docutils literal notranslate"><span class="pre">u</span></code>).</p>
+</section>
+</section>
+<section id="reading-and-writing-unicode-data">
+<h2>Leyendo y escribiendo datos Unicode<a class="headerlink" href="#reading-and-writing-unicode-data" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Una vez que haya escrito un código que funcione con datos Unicode, el siguiente problema es la entrada/salida. ¿Cómo obtiene cadenas Unicode en su programa y cómo convierte Unicode en una forma adecuada para almacenamiento o transmisión?</p>
+<p>Es posible que no necesite hacer nada dependiendo de sus fuentes de entrada y destinos de salida; debe verificar si las bibliotecas utilizadas en su aplicación son compatibles con Unicode de forma nativa. Los analizadores XML a menudo retornan datos Unicode, por ejemplo. Muchas bases de datos relacionales también admiten columnas con valores Unicode y pueden retornar valores Unicode de una consulta SQL.</p>
+<p>Los datos Unicode generalmente se convierten a una codificación particular antes de escribirse en el disco o enviarse a través de un socket. Es posible hacer todo el trabajo usted mismo: abra un archivo, lea un objeto de bytes de 8 bits y convierta los bytes con <code class="docutils literal notranslate"><span class="pre">bytes.decode(codificación)</span></code>. Sin embargo, no se recomienda el enfoque manual.</p>
+<p>Un problema es la naturaleza de múltiples bytes de las codificaciones; Un carácter Unicode puede ser representado por varios bytes. Si desea leer el archivo en fragmentos de tamaño arbitrario (por ejemplo, 1024 o 4096 bytes), debe escribir un código de manejo de errores para detectar el caso en el que solo una parte de los bytes que codifican un solo carácter Unicode se leen al final de Un trozo. Una solución sería leer todo el archivo en la memoria y luego realizar la decodificación, pero eso le impide trabajar con archivos que son extremadamente grandes; si necesita leer un archivo de 2 GB, necesita 2 GB de RAM. (Más, realmente, ya que por al menos un momento necesitarías tener tanto la cadena codificada como su versión Unicode en la memoria).</p>
+<p>La solución sería utilizar la interfaz de decodificación de bajo nivel para detectar el caso de secuencias de codificación parcial. El trabajo de implementar esto ya se ha realizado para usted: la función incorporada <a class="reference internal" href="../library/functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> puede retornar un objeto similar a un archivo que asume que el contenido del archivo está en una codificación especificada y acepta parámetros Unicode para métodos como <a class="reference internal" href="../library/io.html#io.TextIOBase.read" title="io.TextIOBase.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code></a> y <a class="reference internal" href="../library/io.html#io.TextIOBase.write" title="io.TextIOBase.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>. Esto funciona a través de los parámetros <em>enconding</em> y <em>errors</em> de <a class="reference internal" href="../library/functions.html#open" title="open"><code class="xref py py-func docutils literal notranslate"><span class="pre">open()</span></code></a> que se interpretan como los de <a class="reference internal" href="../library/stdtypes.html#str.encode" title="str.encode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.encode()</span></code></a> y <a class="reference internal" href="../library/stdtypes.html#bytes.decode" title="bytes.decode"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bytes.decode()</span></code></a>.</p>
+<p>Por lo tanto, leer Unicode de un archivo es simple:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;unicode.txt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>También es posible abrir archivos en modo de actualización, lo que permite leer y escribir:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\u4500</span><span class="s1"> blah blah blah</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()[:</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>El carácter Unicode <code class="docutils literal notranslate"><span class="pre">U+FEFF</span></code> se usa como marca de orden de bytes (BOM), y a menudo se escribe como el primer carácter de un archivo para ayudar a la auto detección del orden de bytes del archivo. Algunas codificaciones, como UTF-16, esperan que haya una BOM al comienzo de un archivo; cuando se utiliza dicha codificación, la BOM se escribirá automáticamente como el primer carácter y se descartará en silencio cuando se lea el archivo. Existen variantes de estas codificaciones, como “utf-16-le” y “utf-16-be” para codificaciones “little-endian” y “big-endian”, que especifican un orden de bytes particular y no omiten la BOM.</p>
+<p>En algunas áreas, también es convencional usar una «BOM» al comienzo de los archivos codificados UTF-8; el nombre es engañoso ya que UTF-8 no depende del orden de bytes. La marca simplemente anuncia que el archivo está codificado en UTF-8. Para leer dichos archivos, use el códec “utf-8-sig” para omitir automáticamente la marca si está presente.</p>
+<section id="unicode-filenames">
+<h3>Nombres de archivos Unicode<a class="headerlink" href="#unicode-filenames" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>La mayoría de los sistemas operativos de uso común en la actualidad admiten nombres de archivo que contienen caracteres Unicode arbitrarios. Por lo general, esto se implementa convirtiendo la cadena Unicode en una codificación que varía según el sistema. Hoy Python está convergiendo en el uso de UTF-8: Python en MacOS ha usado UTF-8 para varias versiones, y Python 3.6 también ha cambiado a usar UTF-8 en Windows. En los sistemas Unix, solo habrá un <a class="reference internal" href="../glossary.html#term-filesystem-encoding-and-error-handler"><span class="xref std std-term">filesystem encoding</span></a>. si ha configurado las variables de entorno <code class="docutils literal notranslate"><span class="pre">LANG</span></code> o <code class="docutils literal notranslate"><span class="pre">LC_CTYPE</span></code>; si no lo ha hecho, la codificación predeterminada es nuevamente UTF-8.</p>
+<p>La función <a class="reference internal" href="../library/sys.html#sys.getfilesystemencoding" title="sys.getfilesystemencoding"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.getfilesystemencoding()</span></code></a> retorna la codificación para usar en su sistema actual, en caso de que desee realizar la codificación manualmente, pero no hay muchas razones para molestarse. Al abrir un archivo para leer o escribir, generalmente puede proporcionar la cadena Unicode como nombre de archivo, y se convertirá automáticamente a la codificación correcta para usted:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;filename</span><span class="se">\u4500</span><span class="s1">abc&#39;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;blah</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Las funciones en el módulo <a class="reference internal" href="../library/os.html#module-os" title="os: Miscellaneous operating system interfaces."><code class="xref py py-mod docutils literal notranslate"><span class="pre">os</span></code></a> como <a class="reference internal" href="../library/os.html#os.stat" title="os.stat"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.stat()</span></code></a> también aceptarán nombres de archivo Unicode.</p>
+<p>La función <a class="reference internal" href="../library/os.html#os.listdir" title="os.listdir"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.listdir()</span></code></a> retorna nombres de archivo, lo que plantea un problema: ¿debería devolver la versión Unicode de los nombres de archivo o debería devolver bytes que contienen las versiones codificadas? <a class="reference internal" href="../library/os.html#os.listdir" title="os.listdir"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.listdir()</span></code></a> puede hacer ambas cosas, dependiendo de si proporcionó la ruta del directorio como bytes o una cadena Unicode. Si pasa una cadena Unicode como ruta, los nombres de archivo se decodificarán utilizando la codificación del sistema de archivos y se devolverá una lista de cadenas Unicode, mientras que pasar una ruta de bytes devolverá los nombres de archivo como bytes. Por ejemplo, suponiendo que el <a class="reference internal" href="../glossary.html#term-filesystem-encoding-and-error-handler"><span class="xref std std-term">filesystem encoding</span></a> predeterminado es UTF-8, al ejecutar el siguiente programa:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="s1">&#39;filename</span><span class="se">\u4500</span><span class="s1">abc&#39;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>producirá la siguiente salida:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python listdir-test.py
+<span class="go">[b&#39;filename\xe4\x94\x80abc&#39;, ...]</span>
+<span class="go">[&#39;filename\u4500abc&#39;, ...]</span>
+</pre></div>
+</div>
+<p>La primera lista contiene nombres de archivos codificados con UTF-8, y la segunda lista contiene las versiones Unicode.</p>
+<p>Tenga en cuenta que en la mayoría de las ocasiones, debe seguir usando Unicode con estas API. Las API de bytes solo deben usarse en sistemas donde pueden estar presentes nombres de archivo no codificables; eso es prácticamente solo sistemas Unix ahora.</p>
+</section>
+<section id="tips-for-writing-unicode-aware-programs">
+<h3>Consejos para escribir programas compatibles con Unicode<a class="headerlink" href="#tips-for-writing-unicode-aware-programs" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Esta sección proporciona algunas sugerencias sobre cómo escribir software que maneje Unicode.</p>
+<p>El consejo más importante es:</p>
+<blockquote>
+<div><p>El software solo debería funcionar con cadenas Unicode internamente, decodificando los datos de entrada lo antes posible y codificando la salida solo al final.</p>
+</div></blockquote>
+<p>Si intenta escribir funciones de procesamiento que acepten cadenas Unicode y de bytes, encontrará que su programa es vulnerable a errores dondequiera que combine los dos tipos diferentes de cadenas. No hay codificación o decodificación automática: si hace, por ejemplo: <code class="docutils literal notranslate"><span class="pre">str+bytes</span></code>, un <a class="reference internal" href="../library/exceptions.html#TypeError" title="TypeError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> se generará.</p>
+<p>Cuando se usan datos que provienen de un navegador web u otra fuente no confiable, una técnica común es verificar si hay caracteres ilegales en una cadena antes de usar la cadena en una línea de comando generada o almacenarla en una base de datos. Si está haciendo esto, tenga cuidado de verificar la cadena decodificada, no los datos de bytes codificados; Algunas codificaciones pueden tener propiedades interesantes, como no ser biyectivo o no ser totalmente compatible con ASCII. Esto es especialmente cierto si los datos de entrada también especifican la codificación, ya que el atacante puede elegir una forma inteligente de ocultar el texto malicioso en el flujo de bytes codificado.</p>
+<section id="converting-between-file-encodings">
+<h4>Conversión entre codificaciones de archivo<a class="headerlink" href="#converting-between-file-encodings" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>La clase <a class="reference internal" href="../library/codecs.html#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a> puede convertir de forma transparente entre codificaciones, tomar una secuencia que retorna datos en la codificación 1 y comportarse como una secuencia que retorna datos en la codificación 2.</p>
+<p>Por ejemplo, si tiene un archivo de entrada <em>f</em> que está en Latin-1, puede envolverlo con <a class="reference internal" href="../library/codecs.html#codecs.StreamRecoder" title="codecs.StreamRecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamRecoder</span></code></a> para retornar bytes codificados en UTF-8:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_f</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">StreamRecoder</span><span class="p">(</span><span class="n">f</span><span class="p">,</span>
+    <span class="c1"># en/decoder: used by read() to encode its results and</span>
+    <span class="c1"># by write() to decode its input.</span>
+    <span class="n">codecs</span><span class="o">.</span><span class="n">getencoder</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getdecoder</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+
+    <span class="c1"># reader/writer: used to read and write to the stream.</span>
+    <span class="n">codecs</span><span class="o">.</span><span class="n">getreader</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">),</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getwriter</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="files-in-an-unknown-encoding">
+<h4>Archivos en una codificación desconocida<a class="headerlink" href="#files-in-an-unknown-encoding" title="Enlazar permanentemente con este título">¶</a></h4>
+<p>¿Qué puede hacer si necesita hacer un cambio en un archivo, pero no conoce la codificación del archivo? Si sabe que la codificación es compatible con ASCII y solo desea examinar o modificar las partes ASCII, puede abrir el archivo con el manejador de errores <code class="docutils literal notranslate"><span class="pre">surrogateescape</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogateescape&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="c1"># make changes to the string &#39;data&#39;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.new&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+          <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogateescape&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>El manejador de errores <code class="docutils literal notranslate"><span class="pre">surrogateescape</span></code> decodificará los bytes que no sean ASCII como puntos de código en un rango especial que va desde U+DC80 a U+DCFF. Estos puntos de código volverán a convertirse en los mismos bytes cuando se use el controlador de error <code class="docutils literal notranslate"><span class="pre">subrogateescape</span></code> para codificar los datos y volver a escribirlos.</p>
+</section>
+</section>
+<section id="id3">
+<h3>Referencias<a class="headerlink" href="#id3" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>One section of <a class="reference external" href="https://pyvideo.org/video/289/pycon-2010--mastering-python-3-i-o">Mastering Python 3 Input/Output</a>,
+a PyCon 2010 talk by David Beazley, discusses text processing and binary data handling.</p>
+<p>El <a class="reference external" href="https://downloads.egenix.com/python/LSM2005-Developing-Unicode-aware-applications-in-Python.pdf">PDF slides for Marc-André Lemburg’s presentation «Writing Unicode-aware Applications in Python»</a> discute cuestiones de codificaciones de caracteres, así como también cómo internacionalizar y localizar una aplicación. Estas diapositivas cubren solo Python 2.x.</p>
+<p><a class="reference external" href="https://pyvideo.org/video/1768/the-guts-of-unicode-in-python">The Guts of Unicode in Python</a>
+is a PyCon 2013 talk by Benjamin Peterson that discusses the internal Unicode
+representation in Python 3.3.</p>
+</section>
+</section>
+<section id="acknowledgements">
+<h2>Agradecimientos<a class="headerlink" href="#acknowledgements" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>El borrador inicial de este documento fue escrito por <em>Andrew Kuchling</em>. Desde entonces ha sido revisado por <em>Alexander Belopolsky, Georg Brandl, Andrew Kuchling y Ezio Melotti</em>.</p>
+<p>293/5000
+Gracias a las siguientes personas que notaron errores u ofrecieron sugerencias sobre este artículo: <em>Éric Araujo, Nicholas Bastin, Nick Coghlan, Marius Gedminas, Kent Johnson, Ken Krugler, Marc-André Lemburg, Martin von Löwis, Terry J. Reedy, Serhiy Storchaka , Eryk Sun, Chad Whitacre, Graham Wideman</em>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CÓMO (<em>HOWTO</em>) Unicode</a><ul>
+<li><a class="reference internal" href="#introduction-to-unicode">Introducción a Unicode</a><ul>
+<li><a class="reference internal" href="#definitions">Definiciones</a></li>
+<li><a class="reference internal" href="#encodings">Codificaciones</a></li>
+<li><a class="reference internal" href="#references">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-s-unicode-support">Soporte Unicode de Python</a><ul>
+<li><a class="reference internal" href="#the-string-type">El tipo cadena</a></li>
+<li><a class="reference internal" href="#converting-to-bytes">Convirtiendo a Bytes</a></li>
+<li><a class="reference internal" href="#unicode-literals-in-python-source-code">Literales Unicode en código fuente Python</a></li>
+<li><a class="reference internal" href="#unicode-properties">Propiedades Unicode</a></li>
+<li><a class="reference internal" href="#comparing-strings">Comparando cadenas</a></li>
+<li><a class="reference internal" href="#unicode-regular-expressions">Expresiones Regulares Unicode</a></li>
+<li><a class="reference internal" href="#id2">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reading-and-writing-unicode-data">Leyendo y escribiendo datos Unicode</a><ul>
+<li><a class="reference internal" href="#unicode-filenames">Nombres de archivos Unicode</a></li>
+<li><a class="reference internal" href="#tips-for-writing-unicode-aware-programs">Consejos para escribir programas compatibles con Unicode</a><ul>
+<li><a class="reference internal" href="#converting-between-file-encodings">Conversión entre codificaciones de archivo</a></li>
+<li><a class="reference internal" href="#files-in-an-unknown-encoding">Archivos en una codificación desconocida</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">Referencias</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#acknowledgements">Agradecimientos</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="sorting.html"
+                        title="capítulo anterior">HOW TO - Ordenar</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="urllib2.html"
+                        title="próximo capítulo">HOWTO - Cómo obtener recursos de Internet con el paquete urllib</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/howto/unicode.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="urllib2.html" title="HOWTO - Cómo obtener recursos de Internet con el paquete urllib"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="HOW TO - Ordenar"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Comos (<em>HOWTOs</em>) de Python</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">CÓMO (<em>HOWTO</em>) Unicode</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

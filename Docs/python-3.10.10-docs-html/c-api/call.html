@@ -1,0 +1,616 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Protocolo de llamada &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="Protocolo de números" href="number.html" />
+    <link rel="prev" title="Protocolo de objeto" href="object.html" />
+    <link rel="canonical" href="https://docs.python.org/3/c-api/call.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Protocolo de llamada</a><ul>
+<li><a class="reference internal" href="#the-tp-call-protocol">El protocolo <em>tp_call</em></a></li>
+<li><a class="reference internal" href="#the-vectorcall-protocol">El protocolo vectorcall</a><ul>
+<li><a class="reference internal" href="#recursion-control">Control de recursión</a></li>
+<li><a class="reference internal" href="#vectorcall-support-api">API de soporte para vectorcall</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#object-calling-api">API para invocar objetos</a></li>
+<li><a class="reference internal" href="#call-support-api">API de soporte de llamadas</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="object.html"
+                        title="capítulo anterior">Protocolo de objeto</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="number.html"
+                        title="próximo capítulo">Protocolo de números</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/call.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="number.html" title="Protocolo de números"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="object.html" title="Protocolo de objeto"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="abstract.html" accesskey="U">Capa de objetos abstractos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Protocolo de llamada</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="call-protocol">
+<span id="call"></span><h1>Protocolo de llamada<a class="headerlink" href="#call-protocol" title="Enlazar permanentemente con este título">¶</a></h1>
+<p>CPython admite dos protocolos de llamada diferentes: <em>tp_call</em> y vectorcall.</p>
+<section id="the-tp-call-protocol">
+<h2>El protocolo <em>tp_call</em><a class="headerlink" href="#the-tp-call-protocol" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Las instancias de clases que establecen <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_call" title="PyTypeObject.tp_call"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_call</span></code></a> son invocables. La firma del slot es:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="nf">tp_call</span><span class="p">(</span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">callable</span><span class="p">,</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">kwargs</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Se realiza una llamada usando una tupla para los argumentos posicionales y un dict para los argumentos de palabras clave, de manera similar a <code class="docutils literal notranslate"><span class="pre">callable(*args,</span> <span class="pre">**kwargs)</span></code> en el código Python. <em>args</em> debe ser no NULL (use una tupla vacía si no hay argumentos) pero <em>kwargs</em> puede ser <em>NULL</em> si no hay argumentos de palabra clave.</p>
+<p>Esta convención no solo es utilizada por <em>tp_call</em>: <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_new" title="PyTypeObject.tp_new"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_new</span></code></a> y <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_init" title="PyTypeObject.tp_init"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_init</span></code></a> también pasan argumentos de esta manera.</p>
+<p>To call an object, use <a class="reference internal" href="#c.PyObject_Call" title="PyObject_Call"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Call()</span></code></a> or another
+<a class="reference internal" href="#capi-call"><span class="std std-ref">call API</span></a>.</p>
+</section>
+<section id="the-vectorcall-protocol">
+<span id="vectorcall"></span><h2>El protocolo vectorcall<a class="headerlink" href="#the-vectorcall-protocol" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+<p>El protocolo vectorcall se introdujo en <span class="target" id="index-2"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0590"><strong>PEP 590</strong></a> como un protocolo adicional para hacer que las llamadas sean más eficientes.</p>
+<p>Como regla general, CPython preferirá el vectorcall para llamadas internas si el invocable lo admite. Sin embargo, esta no es una regla estricta. Además, algunas extensiones de terceros usan <em>tp_call</em> directamente (en lugar de usar <a class="reference internal" href="#c.PyObject_Call" title="PyObject_Call"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Call()</span></code></a>). Por lo tanto, una clase que admita vectorcall también debe implementar <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_call" title="PyTypeObject.tp_call"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_call</span></code></a>. Además, el invocable debe comportarse de la misma manera independientemente del protocolo que se utilice. La forma recomendada de lograr esto es configurando <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_call" title="PyTypeObject.tp_call"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_call</span></code></a> en <a class="reference internal" href="#c.PyVectorcall_Call" title="PyVectorcall_Call"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyVectorcall_Call()</span></code></a>. Vale la pena repetirlo:</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Una clase que admita vectorcall <strong>debe</strong> también implementar <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_call" title="PyTypeObject.tp_call"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_call</span></code></a> con la misma semántica.</p>
+</div>
+<p>Una clase no debería implementar vectorcall si eso fuera más lento que <em>tp_call</em>. Por ejemplo, si el destinatario de la llamada necesita convertir los argumentos a una tupla args y un dict kwargs de todos modos, entonces no tiene sentido implementar vectorcall.</p>
+<p>Las clases pueden implementar el protocolo vectorcall habilitando el indicador <a class="reference internal" href="typeobj.html#Py_TPFLAGS_HAVE_VECTORCALL" title="Py_TPFLAGS_HAVE_VECTORCALL"><code class="xref py py-const docutils literal notranslate"><span class="pre">Py_TPFLAGS_HAVE_VECTORCALL</span></code></a> y la configuración <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_vectorcall_offset" title="PyTypeObject.tp_vectorcall_offset"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_vectorcall_offset</span></code></a> al desplazamiento dentro de la estructura del objeto donde aparece un <em>vectorcallfunc</em>. Este es un puntero a una función con la siguiente firma:</p>
+<dl class="c type">
+<dt id="c.vectorcallfunc">
+<em class="property">typedef </em><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *(*<code class="sig-name descname">vectorcallfunc</code>)<span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *callable, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em class="property">const</em> *args, size_t nargsf, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *kwnames<span class="sig-paren">)</span><a class="headerlink" href="#c.vectorcallfunc" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd></dd></dl>
+
+<ul class="simple">
+<li><p><em>callable</em> es el objeto siendo invocado.</p></li>
+<li><dl class="simple">
+<dt><em>args</em> es un arreglo en C que consta de los argumentos posicionales seguidos por el</dt><dd><p>valores de los argumentos de la palabra clave. Puede ser <em>NULL</em> si no hay argumentos.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><em>nargsf</em> es el número de argumentos posicionales más posiblemente el</dt><dd><p>flag <code class="xref py py-const docutils literal notranslate"><span class="pre">PY_VECTORCALL_ARGUMENTS_OFFSET</span></code>. Para obtener el número real de argumentos posicionales de <em>nargsf</em>, use <a class="reference internal" href="#c.PyVectorcall_NARGS" title="PyVectorcall_NARGS"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyVectorcall_NARGS()</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><em>kwnames</em> es una tupla que contiene los nombres de los argumentos de la palabra clave;</dt><dd><p>en otras palabras, las claves del diccionario kwargs. Estos nombres deben ser cadenas (instancias de <code class="docutils literal notranslate"><span class="pre">str</span></code> o una subclase) y deben ser únicos. Si no hay argumentos de palabras clave, entonces <em>kwnames</em> puede ser <em>NULL</em>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="c macro">
+<dt id="c.PY_VECTORCALL_ARGUMENTS_OFFSET">
+<code class="sig-name descname">PY_VECTORCALL_ARGUMENTS_OFFSET</code><a class="headerlink" href="#c.PY_VECTORCALL_ARGUMENTS_OFFSET" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si este flag se establece en un argumento vectorcall <em>nargsf</em>, el destinatario de la llamada puede cambiar temporalmente <code class="docutils literal notranslate"><span class="pre">args[-1]</span></code>. En otras palabras, <em>args</em> apunta al argumento 1 (no 0) en el vector asignado. El destinatario de la llamada debe restaurar el valor de <code class="docutils literal notranslate"><span class="pre">args[-1]</span></code> antes de regresar.</p>
+<p>Para <a class="reference internal" href="#c.PyObject_VectorcallMethod" title="PyObject_VectorcallMethod"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_VectorcallMethod()</span></code></a>, este flag significa en cambio que <code class="docutils literal notranslate"><span class="pre">args[0]</span></code> puede cambiarse.</p>
+<p>Siempre que puedan hacerlo de forma económica (sin asignación adicional), se anima a las personas que llaman a utilizar <code class="xref py py-const docutils literal notranslate"><span class="pre">PY_VECTORCALL_ARGUMENTS_OFFSET</span></code>. Si lo hace, permitirá que las personas que llaman, como los métodos enlazados, realicen sus llamadas posteriores (que incluyen un argumento <em>self</em> antepuesto) de manera muy eficiente.</p>
+</dd></dl>
+
+<p>Para llamar a un objeto que implementa vectorcall, use una función <a class="reference internal" href="#capi-call"><span class="std std-ref">call API</span></a> como con cualquier otro invocable. <a class="reference internal" href="#c.PyObject_Vectorcall" title="PyObject_Vectorcall"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Vectorcall()</span></code></a> normalmente será más eficiente.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>En CPython 3.8, la API de vectorcall y las funciones relacionadas estaban disponibles provisionalmente bajo nombres con un guión bajo inicial: <code class="docutils literal notranslate"><span class="pre">_PyObject_Vectorcall</span></code>, <code class="docutils literal notranslate"><span class="pre">_Py_TPFLAGS_HAVE_VECTORCALL</span></code>, <code class="docutils literal notranslate"><span class="pre">_PyObject_VectorcallMethod</span></code>, <code class="docutils literal notranslate"><span class="pre">_PyVectorcall_Function</span></code>, <code class="docutils literal notranslate"><span class="pre">_PyObject_CallMethodNoArgs</span></code>, <code class="docutils literal notranslate"><span class="pre">_PyObject_CallMethodOneArg</span></code>. Además, <code class="docutils literal notranslate"><span class="pre">PyObject_VectorcallDict</span></code> estaba disponible como <code class="docutils literal notranslate"><span class="pre">_PyObject_FastCallDict</span></code>. Los nombres antiguos todavía se definen como alias de los nuevos nombres no subrayados.</p>
+</div>
+<section id="recursion-control">
+<h3>Control de recursión<a class="headerlink" href="#recursion-control" title="Enlazar permanentemente con este título">¶</a></h3>
+<p>Cuando se usa <em>tp_call</em>, los destinatarios no necesitan preocuparse por <a class="reference internal" href="exceptions.html#recursion"><span class="std std-ref">recursividad</span></a>: CPython usa <a class="reference internal" href="exceptions.html#c.Py_EnterRecursiveCall" title="Py_EnterRecursiveCall"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_EnterRecursiveCall()</span></code></a> y <a class="reference internal" href="exceptions.html#c.Py_LeaveRecursiveCall" title="Py_LeaveRecursiveCall"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_LeaveRecursiveCall()</span></code></a> para llamadas realizadas usando <em>tp_call</em>.</p>
+<p>Por eficiencia, este no es el caso de las llamadas realizadas mediante vectorcall: el destinatario de la llamada debe utilizar <em>Py_EnterRecursiveCall</em> y <em>Py_LeaveRecursiveCall</em> si es necesario.</p>
+</section>
+<section id="vectorcall-support-api">
+<h3>API de soporte para vectorcall<a class="headerlink" href="#vectorcall-support-api" title="Enlazar permanentemente con este título">¶</a></h3>
+<dl class="c function">
+<dt id="c.PyVectorcall_NARGS">
+<a class="reference internal" href="intro.html#c.Py_ssize_t" title="Py_ssize_t">Py_ssize_t</a> <code class="sig-name descname">PyVectorcall_NARGS</code><span class="sig-paren">(</span>size_t <em>nargsf</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyVectorcall_NARGS" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Dado un argumento vectorcall <em>nargsf</em>, retorna el número real de argumentos. Actualmente equivalente a:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">Py_ssize_t</span><span class="p">)(</span><span class="n">nargsf</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">~</span><span class="n">PY_VECTORCALL_ARGUMENTS_OFFSET</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Sin embargo, la función <code class="docutils literal notranslate"><span class="pre">PyVectorcall_NARGS</span></code> debe usarse para permitir futuras extensiones.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyVectorcall_Function">
+<a class="reference internal" href="#c.vectorcallfunc" title="vectorcallfunc">vectorcallfunc</a> <code class="sig-name descname">PyVectorcall_Function</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyVectorcall_Function" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Si <em>op</em> no admite el protocolo vectorcall (ya sea porque el tipo no lo hace o porque la instancia específica no lo hace), retorna <em>NULL</em>. De lo contrario, retorna el puntero de la función vectorcall almacenado en <em>op</em>. Esta función nunca lanza una excepción.</p>
+<p>Esto es principalmente útil para verificar si <em>op</em> admite vectorcall, lo cual se puede hacer marcando <code class="docutils literal notranslate"><span class="pre">PyVectorcall_Function(op)</span> <span class="pre">!=</span> <span class="pre">NULL</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyVectorcall_Call">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyVectorcall_Call</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>tuple</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>dict</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyVectorcall_Call" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a la <a class="reference internal" href="#c.vectorcallfunc" title="vectorcallfunc"><code class="xref c c-type docutils literal notranslate"><span class="pre">vectorcallfunc</span></code></a> de <em>callable</em> con argumentos posicionales y de palabras clave dados en una tupla y dict, respectivamente.</p>
+<p>Esta es una función especializada, destinada a colocarse en el slot <a class="reference internal" href="typeobj.html#c.PyTypeObject.tp_call" title="PyTypeObject.tp_call"><code class="xref c c-member docutils literal notranslate"><span class="pre">tp_call</span></code></a> o usarse en una implementación de <code class="docutils literal notranslate"><span class="pre">tp_call</span></code>. No comprueba el flag <a class="reference internal" href="typeobj.html#Py_TPFLAGS_HAVE_VECTORCALL" title="Py_TPFLAGS_HAVE_VECTORCALL"><code class="xref py py-const docutils literal notranslate"><span class="pre">Py_TPFLAGS_HAVE_VECTORCALL</span></code></a> y no vuelve a <code class="docutils literal notranslate"><span class="pre">tp_call</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.8.</span></p>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="object-calling-api">
+<span id="capi-call"></span><h2>API para invocar objetos<a class="headerlink" href="#object-calling-api" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Hay varias funciones disponibles para llamar a un objeto Python. Cada una convierte sus argumentos a una convención respaldada por el objeto llamado, ya sea <em>tp_call</em> o vectorcall. Para realizar la menor conversión posible, elija la que mejor se adapte al formato de datos que tiene disponible.</p>
+<p>La siguiente tabla resume las funciones disponibles; consulte la documentación individual para obtener más detalles.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 19%" />
+<col style="width: 21%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Función</p></th>
+<th class="head"><p>invocable</p></th>
+<th class="head"><p>args</p></th>
+<th class="head"><p>kwargs</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_Call" title="PyObject_Call"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Call()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>tupla</p></td>
+<td><p>dict/<code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_CallNoArgs" title="PyObject_CallNoArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallNoArgs()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_CallOneArg" title="PyObject_CallOneArg"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallOneArg()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>1 objeto</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_CallObject" title="PyObject_CallObject"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallObject()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>tuple/<code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_CallFunction" title="PyObject_CallFunction"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallFunction()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>formato</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_CallMethod" title="PyObject_CallMethod"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallMethod()</span></code></a></p></td>
+<td><p>obj + <code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
+<td><p>formato</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_CallFunctionObjArgs" title="PyObject_CallFunctionObjArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallFunctionObjArgs()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>variadica</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_CallMethodObjArgs" title="PyObject_CallMethodObjArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallMethodObjArgs()</span></code></a></p></td>
+<td><p>obj + nombre</p></td>
+<td><p>variadica</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_CallMethodNoArgs" title="PyObject_CallMethodNoArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallMethodNoArgs()</span></code></a></p></td>
+<td><p>obj + nombre</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_CallMethodOneArg" title="PyObject_CallMethodOneArg"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallMethodOneArg()</span></code></a></p></td>
+<td><p>obj + nombre</p></td>
+<td><p>1 objeto</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_Vectorcall" title="PyObject_Vectorcall"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Vectorcall()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>vectorcall</p></td>
+<td><p>vectorcall</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#c.PyObject_VectorcallDict" title="PyObject_VectorcallDict"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_VectorcallDict()</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PyObject</span> <span class="pre">*</span></code></p></td>
+<td><p>vectorcall</p></td>
+<td><p>dict/<code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#c.PyObject_VectorcallMethod" title="PyObject_VectorcallMethod"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_VectorcallMethod()</span></code></a></p></td>
+<td><p>arg + nombre</p></td>
+<td><p>vectorcall</p></td>
+<td><p>vectorcall</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="c function">
+<dt id="c.PyObject_Call">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_Call</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Call" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Llama a un objeto de Python invocable <em>callable</em>, con argumentos dados por la tupla <em>args</em>, y argumentos con nombre dados por el diccionario <em>kwargs</em>.</p>
+<p><em>args</em> no debe ser <em>NULL</em>; use una tupla vacía si no se necesitan argumentos. Si no se necesitan argumentos con nombre, <em>kwargs</em> puede ser <em>NULL</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<p>Este es el equivalente de la expresión de Python: <code class="docutils literal notranslate"><span class="pre">callable(*args,</span> <span class="pre">**kwargs)</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallNoArgs">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallNoArgs</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallNoArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a> since version 3.10.</em><p>Llama a un objeto de Python invocable <em>callable</em> sin ningún argumento. Es la forma más eficiente de llamar a un objeto Python invocable sin ningún argumento.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallOneArg">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallOneArg</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallOneArg" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a un objeto de Python invocable <em>callable</em> con exactamente 1 argumento posicional <em>arg</em> y sin argumentos de palabra clave.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallObject">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallObject</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallObject" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Llama a un objeto de Python invocable <em>callable</em>, con argumentos dados por la tupla <em>args</em>. Si no se necesitan argumentos, entonces <em>args</em> puede ser <em>NULL</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<p>Este es el equivalente de la expresión de Python: <code class="docutils literal notranslate"><span class="pre">callable(*args)</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallFunction">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallFunction</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <em class="property">const</em> char *<em>format</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallFunction" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Llama a un objeto de Python invocable <em>callable</em>, con un número variable de argumentos C. Los argumentos de C se describen usando una cadena de caracteres de formato de estilo <a class="reference internal" href="arg.html#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a>. El formato puede ser <em>NULL</em>, lo que indica que no se proporcionan argumentos.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<p>Este es el equivalente de la expresión de Python: <code class="docutils literal notranslate"><span class="pre">callable(*args)</span></code>.</p>
+<p>Note that if you only pass <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code> args,
+<a class="reference internal" href="#c.PyObject_CallFunctionObjArgs" title="PyObject_CallFunctionObjArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallFunctionObjArgs()</span></code></a> is a faster alternative.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>El tipo de <em>format</em> se cambió desde <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">*</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallMethod">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallMethod</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>obj</em>, <em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallMethod" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Llama al método llamado <em>name</em> del objeto <em>obj</em> con un número variable de argumentos en C. Los argumentos de C se describen mediante una cadena de formato <a class="reference internal" href="arg.html#c.Py_BuildValue" title="Py_BuildValue"><code class="xref c c-func docutils literal notranslate"><span class="pre">Py_BuildValue()</span></code></a> que debería producir una tupla.</p>
+<p>El formato puede ser <em>NULL</em>, lo que indica que no se proporcionan argumentos.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<p>Este es el equivalente de la expresión de Python: <code class="docutils literal notranslate"><span class="pre">obj.name(arg1,</span> <span class="pre">arg2,</span> <span class="pre">...)</span></code>.</p>
+<p>Note that if you only pass <code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code> args,
+<a class="reference internal" href="#c.PyObject_CallMethodObjArgs" title="PyObject_CallMethodObjArgs"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_CallMethodObjArgs()</span></code></a> is a faster alternative.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.4: </span>Los tipos de <em>name</em> y <em>format</em> se cambiaron desde <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">*</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallFunctionObjArgs">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallFunctionObjArgs</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallFunctionObjArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Call a callable Python object <em>callable</em>, with a variable number of
+<code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code> arguments.  The arguments are provided as a variable number
+of parameters followed by <em>NULL</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<p>Este es el equivalente de la expresión de Python: <code class="docutils literal notranslate"><span class="pre">callable(arg1,</span> <span class="pre">arg2,</span> <span class="pre">...)</span></code>.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallMethodObjArgs">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallMethodObjArgs</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>obj</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>name</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallMethodObjArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="refcount">Return value: New reference.</em><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Call a method of the Python object <em>obj</em>, where the name of the method is given as a
+Python string object in <em>name</em>.  It is called with a variable number of
+<code class="xref c c-expr docutils literal notranslate"><a class="reference internal" href="structures.html#c.PyObject" title="PyObject"><span class="pre">PyObject</span></a><span class="pre">*</span></code> arguments.  The arguments are provided as a variable number
+of parameters followed by <em>NULL</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallMethodNoArgs">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallMethodNoArgs</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>obj</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallMethodNoArgs" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a un método del objeto de Python <em>obj</em> sin argumentos, donde el nombre del método se da como un objeto de cadena de caracteres de Python en <em>name</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_CallMethodOneArg">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_CallMethodOneArg</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>obj</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>name</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_CallMethodOneArg" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llame a un método del objeto de Python <em>obj</em> con un único argumento posicional <em>arg</em>, donde el nombre del método se proporciona como un objeto de cadena de caracteres de Python en <em>name</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_Vectorcall">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_Vectorcall</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em class="property">const</em> *<em>args</em>, size_t <em>nargsf</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kwnames</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_Vectorcall" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a un objeto de Python invocable <em>callable</em>. Los argumentos son los mismos que para <a class="reference internal" href="#c.vectorcallfunc" title="vectorcallfunc"><code class="xref c c-type docutils literal notranslate"><span class="pre">vectorcallfunc</span></code></a>. Si <em>callable</em> admite <a class="reference internal" href="#vectorcall">vectorcall</a>, esto llama directamente a la función vectorcall almacenada en <em>callable</em>.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_VectorcallDict">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_VectorcallDict</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>callable</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em class="property">const</em> *<em>args</em>, size_t <em>nargsf</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kwdict</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_VectorcallDict" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llamada <em>invocable</em> con argumentos posicionales pasados exactamente como en el protocolo <a class="reference internal" href="#vectorcall">vectorcall</a>, pero con argumentos de palabras clave pasados como un diccionario <em>kwdict</em>. El arreglo <em>args</em> contiene solo los argumentos posicionales.</p>
+<p>Independientemente del protocolo que se utilice internamente, es necesario realizar una conversión de argumentos. Por lo tanto, esta función solo debe usarse si la persona que llama ya tiene un diccionario listo para usar para los argumentos de palabras clave, pero no una tupla para los argumentos posicionales.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt id="c.PyObject_VectorcallMethod">
+<a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<code class="sig-name descname">PyObject_VectorcallMethod</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>name</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em class="property">const</em> *<em>args</em>, size_t <em>nargsf</em>, <a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>kwnames</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyObject_VectorcallMethod" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><p>Llama a un método usando la convención de llamada vectorcall. El nombre del método se proporciona como una cadena de Python <em>name</em>. El objeto cuyo método se llama es <em>args[0]</em>, y el arreglo <em>args</em> que comienza en <em>args [1]</em> representa los argumentos de la llamada. Debe haber al menos un argumento posicional. <em>nargsf</em> es el número de argumentos posicionales que incluyen <em>args [0]</em>, más <code class="xref py py-const docutils literal notranslate"><span class="pre">PY_VECTORCALL_ARGUMENTS_OFFSET</span></code> si el valor de <code class="docutils literal notranslate"><span class="pre">args[0]</span></code> puede cambiarse temporalmente. Los argumentos de palabras clave se pueden pasar como en <a class="reference internal" href="#c.PyObject_Vectorcall" title="PyObject_Vectorcall"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyObject_Vectorcall()</span></code></a>.</p>
+<p>Si el objeto tiene la característica <a class="reference internal" href="typeobj.html#Py_TPFLAGS_METHOD_DESCRIPTOR" title="Py_TPFLAGS_METHOD_DESCRIPTOR"><code class="xref py py-const docutils literal notranslate"><span class="pre">Py_TPFLAGS_METHOD_DESCRIPTOR</span></code></a>, esto llamará al objeto de método independiente con el vector <em>args</em> completo como argumentos.</p>
+<p>Retorna el resultado de la llamada en caso de éxito o lanza una excepción y retorna <em>NULL</em> en caso de error.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.9.</span></p>
+</div>
+</dd></dl>
+
+</section>
+<section id="call-support-api">
+<h2>API de soporte de llamadas<a class="headerlink" href="#call-support-api" title="Enlazar permanentemente con este título">¶</a></h2>
+<dl class="c function">
+<dt id="c.PyCallable_Check">
+int <code class="sig-name descname">PyCallable_Check</code><span class="sig-paren">(</span><a class="reference internal" href="structures.html#c.PyObject" title="PyObject">PyObject</a> *<em>o</em><span class="sig-paren">)</span><a class="headerlink" href="#c.PyCallable_Check" title="Enlazar permanentemente con esta definición">¶</a><br /></dt>
+<dd><em class="stableabi"> Part of the <a class="reference internal" href="stable.html#stable"><span class="std std-ref">Stable ABI</span></a>.</em><p>Determina si el objeto <em>o</em> es invocable. Retorna <code class="docutils literal notranslate"><span class="pre">1</span></code> si el objeto es invocable y <code class="docutils literal notranslate"><span class="pre">0</span></code> en caso contrario. Esta función siempre finaliza con éxito.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Protocolo de llamada</a><ul>
+<li><a class="reference internal" href="#the-tp-call-protocol">El protocolo <em>tp_call</em></a></li>
+<li><a class="reference internal" href="#the-vectorcall-protocol">El protocolo vectorcall</a><ul>
+<li><a class="reference internal" href="#recursion-control">Control de recursión</a></li>
+<li><a class="reference internal" href="#vectorcall-support-api">API de soporte para vectorcall</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#object-calling-api">API para invocar objetos</a></li>
+<li><a class="reference internal" href="#call-support-api">API de soporte de llamadas</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="object.html"
+                        title="capítulo anterior">Protocolo de objeto</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="number.html"
+                        title="próximo capítulo">Protocolo de números</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/c-api/call.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="number.html" title="Protocolo de números"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="object.html" title="Protocolo de objeto"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Manual de referencia de la API en C de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="abstract.html" >Capa de objetos abstractos</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Protocolo de llamada</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,534 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>asyncore — controlador de socket asincrónico &#8212; documentación de Python - 3.10.10</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pydoctheme.css?2022.1" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    
+    <script src="../_static/sidebar.js"></script>
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Buscar en documentación de Python - 3.10.10"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="Sobre este documento" href="../about.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="audioop — Manipula datos de audio sin procesar" href="audioop.html" />
+    <link rel="prev" title="asynchat — Gestor de comandos/respuestas en sockets asíncronos" href="asynchat.html" />
+    <link rel="canonical" href="https://docs.python.org/3/library/asyncore.html" />
+    
+      
+    
+
+    
+    <style>
+      @media only screen {
+        table.full-width-table {
+            width: 100%;
+        }
+      }
+    </style>
+<link rel="shortcut icon" type="image/png" href="../_static/py.svg" />
+            <script type="text/javascript" src="../_static/copybutton.js"></script>
+            <script type="text/javascript" src="../_static/menu.js"></script> 
+
+  </head>
+<body>
+<div class="mobile-nav">
+    <input type="checkbox" id="menuToggler" class="toggler__input" aria-controls="navigation"
+           aria-pressed="false" aria-expanded="false" role="button" aria-label="Menu" />
+    <label for="menuToggler" class="toggler__label">
+        <span></span>
+    </label>
+    <nav class="nav-content" role="navigation">
+         <a href="https://www.python.org/" class="nav-logo">
+             <img src="../_static/py.svg" alt="Logo"/>
+         </a>
+        <div class="version_switcher_placeholder"></div>
+        <form role="search" class="search" action="../search.html" method="get">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="search-icon">
+                <path fill-rule="nonzero"
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#444"></path>
+            </svg>
+            <input type="text" name="q" aria-label="Búsqueda rápida"/>
+            <input type="submit" value="Ir"/>
+        </form>
+    </nav>
+    <div class="menu-wrapper">
+        <nav class="menu" role="navigation" aria-label="main navigation">
+            <div class="language_switcher_placeholder"></div>
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code> — controlador de socket asincrónico</a><ul>
+<li><a class="reference internal" href="#asyncore-example-basic-http-client">Ejemplo asyncore de cliente HTTP básico</a></li>
+<li><a class="reference internal" href="#asyncore-example-basic-echo-server">Ejemplo asyncore de servidor de eco básico</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="asynchat.html"
+                        title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asynchat</span></code> — Gestor de comandos/respuestas en <em>sockets</em> asíncronos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="audioop.html"
+                        title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audioop</span></code> — Manipula datos de audio sin procesar</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/asyncore.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </nav>
+    </div>
+</div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="audioop.html" title="audioop — Manipula datos de audio sin procesar"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="asynchat.html" title="asynchat — Gestor de comandos/respuestas en sockets asíncronos"
+             accesskey="P">anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="superseded.html" accesskey="U">Módulos Reemplazados</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code> — controlador de socket asincrónico</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>    
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-asyncore">
+<span id="asyncore-asynchronous-socket-handler"></span><h1><a class="reference internal" href="#module-asyncore" title="asyncore: A base class for developing asynchronous socket handling services. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code></a> — controlador de socket asincrónico<a class="headerlink" href="#module-asyncore" title="Enlazar permanentemente con este título">¶</a></h1>
+<p><strong>Código fuente:</strong> <a class="reference external" href="https://github.com/python/cpython/tree/3.10/Lib/asyncore.py">Lib/asyncore.py</a></p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.6: </span><a class="reference internal" href="#module-asyncore" title="asyncore: A base class for developing asynchronous socket handling services. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code></a> will be removed in Python 3.12
+(see <span class="target" id="index-0"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0594#asyncore"><strong>PEP 594</strong></a> for details).
+Please use <a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a> instead.</p>
+</div>
+<hr class="docutils" />
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Este módulo solo existe para compatibilidad con versiones anteriores.  Para el nuevo código recomendamos usar <a class="reference internal" href="asyncio.html#module-asyncio" title="asyncio: Asynchronous I/O."><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a>.</p>
+</div>
+<p>Este módulo proporciona la infraestructura básica para escribir servicio de socket asincrónicos, clientes y servidores.</p>
+<p>Sólo hay dos maneras de que un programa en un solo procesador haga «más de una cosa a la vez». La programación multiproceso es la forma más sencilla y popular de hacerlo, pero hay otra técnica muy diferente, que le permite tener casi todas las ventajas de multiproceso, sin usar realmente varios subprocesos.  Es realmente sólo práctico si su programa está en gran parte limitado por el I/O.  Si el programa está limitado por el procesador, los subprocesos programados preventivos son probablemente lo que realmente necesita.  Sin embargo, los servidores de red rara vez están limitado al procesador.</p>
+<p>Si su sistema operativo es compatible con la llamada del sistema <code class="xref c c-func docutils literal notranslate"><span class="pre">select()</span></code> en su biblioteca de I/O (y casi todos lo son), puede usarla para hacer malabares con varios canales de comunicación a la vez; haciendo otro trabajo mientras su I/O está teniendo lugar en el «fondo».  Aunque esta estrategia puede parecer extraña y compleja, especialmente al principio, es en muchos sentidos más fácil de entender y controlar que la programación multiproceso.  El módulo <a class="reference internal" href="#module-asyncore" title="asyncore: A base class for developing asynchronous socket handling services. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code></a> resuelve muchos de los problemas difíciles para usted, haciendo que la tarea de construir sofisticados servidores de red de alto rendimiento y clientes sea fácil.  Para aplicaciones y protocolos «conversacionales», el módulo complementario <a class="reference internal" href="asynchat.html#module-asynchat" title="asynchat: Support for asynchronous command/response protocols. (obsoleto)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asynchat</span></code></a> es invaluable.</p>
+<p>La idea básica detrás de ambos módulos es crear uno o más <em>canales</em> de red, instancias de clase <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">asyncore.dispatcher</span></code></a> y <a class="reference internal" href="asynchat.html#asynchat.async_chat" title="asynchat.async_chat"><code class="xref py py-class docutils literal notranslate"><span class="pre">asynchat.async_chat</span></code></a>.  La creación de los canales los agrega a un mapa global, utilizado por la función <a class="reference internal" href="#asyncore.loop" title="asyncore.loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code></a> si no lo proporciona con su propio <em>map</em>.</p>
+<p>Una vez creados los canales iniciales, llamar a la función <a class="reference internal" href="#asyncore.loop" title="asyncore.loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code></a> activa el servicio de canal, que continúa hasta que se cierra el último canal (incluido el que se ha agregado al mapa durante el servicio asincrónico).</p>
+<dl class="py function">
+<dt id="asyncore.loop">
+<code class="sig-prename descclassname">asyncore.</code><code class="sig-name descname">loop</code><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param">timeout</em><span class="optional">[</span>, <em class="sig-param">use_poll</em><span class="optional">[</span>, <em class="sig-param">map</em><span class="optional">[</span>, <em class="sig-param">count</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.loop" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Ingresa un bucle de sondeo que termina después de que se hayan cerrado los pases de conteo o todos los canales abiertos.  Todos los argumentos son opcionales.  El parámetro <em>count</em> tiene como valor predeterminado <code class="docutils literal notranslate"><span class="pre">None</span></code>, lo que da como resultado que el bucle termine solo cuando se hayan cerrado todos los canales.  El argumento <em>timeout</em> establece el parámetro de tiempo de espera para la llamada adecuada a <a class="reference internal" href="select.html#select.select" title="select.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> o <a class="reference internal" href="select.html#select.poll" title="select.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a>, medida en segundos; el valor predeterminado es 30 segundos.  El parámetro <em>use_poll</em>, si es true, indica que <a class="reference internal" href="select.html#select.poll" title="select.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> debe utilizarse en lugar de <a class="reference internal" href="select.html#select.select" title="select.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> (el valor predeterminado es <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p>
+<p>El parámetro <em>map</em> es un diccionario cuyos elementos son los canales a observar. A medida que se cierran los canales, se eliminan del mapa.  Si se omite <em>map</em>, se utiliza un mapa global. Los canales (instancias de <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">asyncore.dispatcher</span></code></a>, <a class="reference internal" href="asynchat.html#asynchat.async_chat" title="asynchat.async_chat"><code class="xref py py-class docutils literal notranslate"><span class="pre">asynchat.async_chat</span></code></a> y subclases de los mismos) se pueden mezclar libremente en el mapa.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="asyncore.dispatcher">
+<em class="property">class </em><code class="sig-prename descclassname">asyncore.</code><code class="sig-name descname">dispatcher</code><a class="headerlink" href="#asyncore.dispatcher" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>La clase <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">dispatcher</span></code></a> es un contenedor fino alrededor de un objeto de socket de bajo nivel. Para hacerlo más útil, tiene algunos métodos para el control de eventos que se llaman desde el bucle asincrónico.   De lo contrario, se puede tratar como un objeto de socket normal sin bloqueo.</p>
+<p>La activación de eventos de bajo nivel en determinados momentos o en determinados estados de conexión indica al bucle asincrónico que se han producido ciertos eventos de nivel superior.  Por ejemplo, si hemos pedido un socket para conectarse a otro host, sabemos que la conexión se ha realizado cuando el socket se vuelve <em>grabable</em> por primera vez (en este punto sabe que puede escribir a él con la expectativa de éxito).  Los eventos de nivel superior implícitos son:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Evento</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">handle_connect()</span></code></p></td>
+<td><p>Implícito en el primer proceso de lectura o escritura</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">handle_close()</span></code></p></td>
+<td><p>Implícito en un evento de lectura sin datos disponibles</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">handle_accepted()</span></code></p></td>
+<td><p>Implícito en un evento de lectura en un socket de escucha</p></td>
+</tr>
+</tbody>
+</table>
+<p>Durante el procesamiento asincrónico, se utilizan los métodos <a class="reference internal" href="#asyncore.dispatcher.readable" title="asyncore.dispatcher.readable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">readable()</span></code></a> y <a class="reference internal" href="#asyncore.dispatcher.writable" title="asyncore.dispatcher.writable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">writable()</span></code></a> de cada canal asignado para determinar si el socket del canal deberían ser agregados a la lista de canales <code class="xref c c-func docutils literal notranslate"><span class="pre">seleccionados</span></code> o <code class="xref c c-func docutils literal notranslate"><span class="pre">encuestados</span></code> para eventos de lectura y escritura.</p>
+<p>Por lo tanto, el conjunto de eventos de canal es mayor que los eventos básicos del socket.  El conjunto completo de métodos que se pueden invalidar en la subclase es el siguiente:</p>
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_read">
+<code class="sig-name descname">handle_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_read" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el bucle asincrónico detecta que una llamada <code class="xref py py-meth docutils literal notranslate"><span class="pre">read()</span></code> en el socket del canal tendrá éxito.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_write">
+<code class="sig-name descname">handle_write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_write" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el bucle asincrónico detecta que se puede escribir un socket grabable.  A menudo, este método implementará el almacenamiento en búfer necesario para el rendimiento.  Por ejemplo:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">handle_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="n">sent</span><span class="p">:]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_expt">
+<code class="sig-name descname">handle_expt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_expt" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando hay datos fuera de banda (OOB) para una conexión de socket.  Esto casi nunca sucederá, ya que OOB es tenuemente compatible y rara vez se utiliza.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_connect">
+<code class="sig-name descname">handle_connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_connect" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el socket del abridor activo realmente hace una conexión.  Puede enviar un banner de «bienvenido» o iniciar una negociación de protocolo con el punto de conexión remoto, por ejemplo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_close">
+<code class="sig-name descname">handle_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando el socket está cerrado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_error">
+<code class="sig-name descname">handle_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_error" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cuando se genera una excepción y no se controla de otro modo.  La versión predeterminada imprime un <em>traceback</em> condensado.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_accept">
+<code class="sig-name descname">handle_accept</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_accept" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama en los canales de escucha (abridores pasivos) cuando se puede establecer una conexión con un nuevo punto de conexión remoto que ha emitido una llamada <a class="reference internal" href="#asyncore.dispatcher.connect" title="asyncore.dispatcher.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> para el punto de conexión local. En desuso en la versión 3.2; use <a class="reference internal" href="#asyncore.dispatcher.handle_accepted" title="asyncore.dispatcher.handle_accepted"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_accepted()</span></code></a> en su lugar.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Obsoleto desde la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.handle_accepted">
+<code class="sig-name descname">handle_accepted</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sock</span></em>, <em class="sig-param"><span class="n">addr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.handle_accepted" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama en los canales de escucha (abridores pasivos) cuando se ha establecido una conexión con un nuevo punto de conexión remoto que ha emitido una llamada <a class="reference internal" href="#asyncore.dispatcher.connect" title="asyncore.dispatcher.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> para el punto de conexión local.  <em>sock</em> es un objeto de socket <em>new</em> utilizable para enviar y recibir datos en la conexión, y <em>addr</em> es la dirección enlazada al socket en el otro extremo de la conexión.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Nuevo en la versión 3.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.readable">
+<code class="sig-name descname">readable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.readable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama en cada momento alrededor del bucle asincrónico para determinar si se debe agregar el socket de un canal a la lista en la que se pueden producir eventos de lectura.  El método predeterminado simplemente retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>, lo que indica que, de forma predeterminada, todos los canales estarán interesados en eventos de lectura.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.writable">
+<code class="sig-name descname">writable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.writable" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Se llama cada vez alrededor del bucle asincrónico para determinar si se debe agregar el socket de un canal a la lista en la que se pueden producir eventos de escritura.  El método predeterminado simplemente retorna <code class="docutils literal notranslate"><span class="pre">True</span></code>, lo que indica que, de forma predeterminada, todos los canales estarán interesados en eventos de escritura.</p>
+</dd></dl>
+
+<p>Además, cada canal delega o extiende muchos de los métodos de socket. La mayoría de estos son casi idénticos a sus socios de socket.</p>
+<dl class="py method">
+<dt id="asyncore.dispatcher.create_socket">
+<code class="sig-name descname">create_socket</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">family</span><span class="o">=</span><span class="default_value">socket.AF_INET</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">socket.SOCK_STREAM</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.create_socket" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esto es idéntico a la creación de un socket normal y usará las mismas opciones para la creación.  Consulte la documentación <a class="reference internal" href="socket.html#module-socket" title="socket: Low-level networking interface."><code class="xref py py-mod docutils literal notranslate"><span class="pre">socket</span></code></a> para obtener información sobre la creación de sockets.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Distinto en la versión 3.3: </span>Los argumentos <em>family</em> y <em>type</em> se pueden omitir.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.connect" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Al igual que con el objeto de socket normal, <em>address</em> es una tupla con el primer elemento al que se va a conectar el host y el segundo el número de puerto.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.send" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Envía <em>data</em> al punto final remoto del socket.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.recv">
+<code class="sig-name descname">recv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">buffer_size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.recv" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Lee como máximo los bytes <em>buffer_size</em> desde el punto final remoto del socket.  Un objeto bytes vacío implica que el canal se ha cerrado desde el otro extremo.</p>
+<p>Tenga en cuenta que <a class="reference internal" href="#asyncore.dispatcher.recv" title="asyncore.dispatcher.recv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recv()</span></code></a> puede lanzar <a class="reference internal" href="exceptions.html#BlockingIOError" title="BlockingIOError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BlockingIOError</span></code></a>, aunque <a class="reference internal" href="select.html#select.select" title="select.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select.select()</span></code></a> o <a class="reference internal" href="select.html#select.poll" title="select.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">select.poll()</span></code></a> ha informado del socket listo para la lectura.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backlog</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.listen" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Escucha las conexiones realizadas al socket.  El argumento <em>backlog</em> especifica el número máximo de conexiones en cola y debe ser al menos 1; el valor máximo depende del sistema (normalmente 5).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.bind" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Enlaza el socket a <em>address</em>.  El socket no debe estar enlazado ya.  (El formato de <em>address</em> depende de la familia de direcciones — consulte la documentación <a class="reference internal" href="socket.html#module-socket" title="socket: Low-level networking interface."><code class="xref py py-mod docutils literal notranslate"><span class="pre">socket</span></code></a> para obtener más información.)  Para marcar el socket como <em>reutilizable</em> (estableciendo la opción <code class="xref py py-const docutils literal notranslate"><span class="pre">SO_REUSEADDR</span></code>), llame al método <code class="xref py py-meth docutils literal notranslate"><span class="pre">set_reuse_addr()</span></code> del objeto <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">dispatcher</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.accept">
+<code class="sig-name descname">accept</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.accept" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Acepta una conexión.  El socket debe estar enlazado a una dirección y escuchar las conexiones.  El valor retornado puede ser <code class="docutils literal notranslate"><span class="pre">None</span></code> o un par <code class="docutils literal notranslate"><span class="pre">(conn,</span> <span class="pre">address)</span></code> donde <em>conn</em> es un objeto de socket <em>new</em> utilizable para enviar y recibir datos en la conexión, y <em>address</em> es la dirección enlazada al socket en el otro extremo de la conexión. Cuando se retorna <code class="docutils literal notranslate"><span class="pre">None</span></code> significa que la conexión no se llevó a cabo, en cuyo caso el servidor debe ignorar este evento y seguir escuchando otras conexiones entrantes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asyncore.dispatcher.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#asyncore.dispatcher.close" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Cierra el socket.  Se producirá un error en todas las operaciones futuras en el objeto de socket. El punto final remoto no recibirá más datos (después de vaciar los datos en cola).  Los sockets se cierran automáticamente cuando se recogen como elementos no utilizados.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asyncore.dispatcher_with_send">
+<em class="property">class </em><code class="sig-prename descclassname">asyncore.</code><code class="sig-name descname">dispatcher_with_send</code><a class="headerlink" href="#asyncore.dispatcher_with_send" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Una subclase <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">dispatcher</span></code></a> que agrega capacidad de salida almacenada en búfer simple, útil para clientes simples. Para un uso más sofisticado, utilice <a class="reference internal" href="asynchat.html#asynchat.async_chat" title="asynchat.async_chat"><code class="xref py py-class docutils literal notranslate"><span class="pre">asynchat.async_chat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="asyncore.file_dispatcher">
+<em class="property">class </em><code class="sig-prename descclassname">asyncore.</code><code class="sig-name descname">file_dispatcher</code><a class="headerlink" href="#asyncore.file_dispatcher" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un file_dispatcher toma un descriptor de archivo o <a class="reference internal" href="../glossary.html#term-file-object"><span class="xref std std-term">file object</span></a> junto con un argumento de mapa opcional y lo ajusta para su uso con las funciones <code class="xref c c-func docutils literal notranslate"><span class="pre">poll()</span></code> o <code class="xref c c-func docutils literal notranslate"><span class="pre">loop()</span></code>.  Si se proporciona un objeto de archivo o cualquier cosa con un método <code class="xref c c-func docutils literal notranslate"><span class="pre">fileno()</span></code>, ese método se llamará y se pasará al constructor <a class="reference internal" href="#asyncore.file_wrapper" title="asyncore.file_wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">file_wrapper</span></code></a>.</p>
+<p class="availability"><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="asyncore.file_wrapper">
+<em class="property">class </em><code class="sig-prename descclassname">asyncore.</code><code class="sig-name descname">file_wrapper</code><a class="headerlink" href="#asyncore.file_wrapper" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Un file_wrapper toma un descriptor de archivo entero y llama a <a class="reference internal" href="os.html#os.dup" title="os.dup"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.dup()</span></code></a> para duplicar el identificador de modo que el identificador original se pueda cerrar independientemente del file_wrapper. Esta clase implementa métodos suficientes emulando un socket para su uso por la clase <a class="reference internal" href="#asyncore.file_dispatcher" title="asyncore.file_dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">file_dispatcher</span></code></a>.</p>
+<p class="availability"><a class="reference internal" href="intro.html#availability"><span class="std std-ref">Disponibilidad</span></a>: Unix.</p>
+</dd></dl>
+
+<section id="asyncore-example-basic-http-client">
+<span id="asyncore-example-1"></span><h2>Ejemplo asyncore de cliente HTTP básico<a class="headerlink" href="#asyncore-example-basic-http-client" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Aquí hay una llamada básica al cliente HTTP que usa la clase <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">dispatcher</span></code></a> para implementar su controlador de socket:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncore</span>
+
+<span class="k">class</span> <span class="nc">HTTPClient</span><span class="p">(</span><span class="n">asyncore</span><span class="o">.</span><span class="n">dispatcher</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">asyncore</span><span class="o">.</span><span class="n">dispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_socket</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;GET </span><span class="si">%s</span><span class="s1"> HTTP/1.0</span><span class="se">\r\n</span><span class="s1">Host: </span><span class="si">%s</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">host</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">handle_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">handle_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">writable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="n">sent</span><span class="p">:]</span>
+
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="s1">&#39;www.python.org&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="n">asyncore</span><span class="o">.</span><span class="n">loop</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="asyncore-example-basic-echo-server">
+<span id="asyncore-example-2"></span><h2>Ejemplo asyncore de servidor de eco básico<a class="headerlink" href="#asyncore-example-basic-echo-server" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Aquí hay un servidor de eco básico que utiliza la clase <a class="reference internal" href="#asyncore.dispatcher" title="asyncore.dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">dispatcher</span></code></a> para aceptar conexiones y distribuye las conexiones entrantes a un controlador:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncore</span>
+
+<span class="k">class</span> <span class="nc">EchoHandler</span><span class="p">(</span><span class="n">asyncore</span><span class="o">.</span><span class="n">dispatcher_with_send</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">handle_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">EchoServer</span><span class="p">(</span><span class="n">asyncore</span><span class="o">.</span><span class="n">dispatcher</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="n">asyncore</span><span class="o">.</span><span class="n">dispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_socket</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_reuse_addr</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_accepted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sock</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Incoming connection from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">EchoHandler</span><span class="p">(</span><span class="n">sock</span><span class="p">)</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">EchoServer</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
+<span class="n">asyncore</span><span class="o">.</span><span class="n">loop</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Tabla de contenido</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code> — controlador de socket asincrónico</a><ul>
+<li><a class="reference internal" href="#asyncore-example-basic-http-client">Ejemplo asyncore de cliente HTTP básico</a></li>
+<li><a class="reference internal" href="#asyncore-example-basic-echo-server">Ejemplo asyncore de servidor de eco básico</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Tema anterior</h4>
+  <p class="topless"><a href="asynchat.html"
+                        title="capítulo anterior"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asynchat</span></code> — Gestor de comandos/respuestas en <em>sockets</em> asíncronos</a></p>
+  <h4>Próximo tema</h4>
+  <p class="topless"><a href="audioop.html"
+                        title="próximo capítulo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audioop</span></code> — Manipula datos de audio sin procesar</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="../bugs.html">Reporta un Bug</a></li>
+      <li>
+        <a href="https://github.com/python/cpython/blob/3.10/Doc/library/asyncore.rst"
+            rel="nofollow">Ver Fuente
+        </a>
+      </li>
+    </ul>
+  </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Índice general"
+             >índice</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="audioop.html" title="audioop — Manipula datos de audio sin procesar"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="asynchat.html" title="asynchat — Gestor de comandos/respuestas en sockets asíncronos"
+             >anterior</a> |</li>
+
+          <li><img src="../_static/py.svg" alt="python logo" style="vertical-align: middle; margin-top: -1px"/></li>
+          <li><a href="https://www.python.org/">Python</a> &#187;</li>
+          <li class="switchers">
+            <div class="language_switcher_placeholder"></div>
+            <div class="version_switcher_placeholder"></div>
+          </li>
+          <li>
+              
+          </li>
+    <li id="cpython-language-and-version">
+      <a href="../index.html">3.10.10 Documentation</a> &#187;
+    </li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >La Biblioteca Estándar de Python</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="superseded.html" >Módulos Reemplazados</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncore</span></code> — controlador de socket asincrónico</a></li>
+                <li class="right">
+                    
+
+    <div class="inline-search" role="search">
+        <form class="inline-search" action="../search.html" method="get">
+          <input placeholder="Búsqueda rápida" aria-label="Búsqueda rápida" type="text" name="q" />
+          <input type="submit" value="Ir" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+    </div>
+                     |
+                </li>
+            
+      </ul>
+    </div>  
+    <div class="footer">
+    &copy; <a href="../copyright.html">Copyright</a> 2001-2023, Python Software Foundation.
+    <br />
+    This page is licensed under the Python Software Foundation License Version 2.
+    <br />
+    Examples, recipes, and other code in the documentation are additionally licensed under the Zero Clause BSD License.
+    <br />
+    See <a href="/license.html">History and License</a> for more information.<br />
+    <br />
+
+    La Python Software Foundation es una organización sin fines de lucro.
+<a href="https://www.python.org/psf/donations/">Por favor, haga una donación.</a>
+<br />
+    <br />
+
+    Última actualización el mar 27, 2023.
+    <a href="/bugs.html">Found a bug</a>?
+    <br />
+
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+
+  </body>
+</html>
