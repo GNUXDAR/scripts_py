@@ -116,5 +116,47 @@ try:
 except:
     print(f'No se ha encontrado el archivo {fichero}')
 
-# codigo de caracteres en fichero
+# CODIGO DE CARACTERES DE FICHEROS
+# definimos una función que cargue todos los párrafos y seleccione uno 
+def parrafo(numerodeparrafo):
+    #primero cargamos el fichero
+    archivo = 'pythonMoocProblems-master/moocSemana7/Ejercicio7.1/quijote.txt'
+    fichero = open(archivo)
+    #lo leemos
+    texto = fichero.read()
+    #y seleccionamos el párrafo indicado en el parámetro 
+    parrafos = texto.split('\n')
+    while '' in parrafos: 
+        parrafos.remove('')    
+    parrafoseleccionado=parrafos[numerodeparrafo]
+   
+    #recordar cerrar el fichero si no se ha abierto con un with
+    fichero.close()    
+    print(parrafoseleccionado)
+
+parrafo(8)
+
+#en el caso de que el fichero se abra en un Os con otra codificacion como ANSI de windows
+#es preferible pasarle la codificacion
+def parrafo(numerodeparrafo):
+    #primero cargamos el fichero
+    archivo = 'pythonMoocProblems-master/moocSemana7/Ejercicio7.1/quijote.txt'
+    # fichero = open(archivo, "r", encoding="utf-8")
+    fichero = open(archivo, "r", encoding="ansi")
+    #fichero = open('quijoteansi.txt', "r", encoding="ansi")
+    # fichero = open('quijoteansi.txt', "r", encoding="utf-8")
+    
+    #lo leemos
+    texto = fichero.read()
+    #y seleccionamos el párrafo indicado en el parámetro 
+    parrafos = texto.split('\n')
+    while '' in parrafos: 
+        parrafos.remove('')    
+    
+    parrafoseleccionado=parrafos[numerodeparrafo]
+     
+    #acordaos de cerrar el fichero si no lo habéis abierto con un with
+    fichero.close()    
+    print(parrafoseleccionado)
+parrafo(8)
 
