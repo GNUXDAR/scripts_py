@@ -42,7 +42,7 @@ refran.replace('no', 'si')      #remplazar todo del primer parametro por el segu
 refran.find('Roque')            #busca una palabra o un caracter e indica en que posicion esta
 refran.find('roque')            #-1 si no la encuentra, distingue mayuscula de minuscula
 refran.lower().find('roque')    #pasar a minuscula y buscar la palabra o letra
-refran.strip()                  #elimina los espacios del princio y del final
+refran.strip()                  #elimina los espacios del princio y del final y los saltos de lineas
 refran.split()                  #crea uan lista con cada elemento de la cadena de texto
 refran.split('no')              #parte la cadena en las veces que exista esa palabra o letra, quitando la palabra o letra que se pase por parametro
 refran.isupper()                #para determinar si una letra está en mayúscula
