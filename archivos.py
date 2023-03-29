@@ -160,3 +160,41 @@ def parrafo(numerodeparrafo):
     print(parrafoseleccionado)
 parrafo(8)
 
+#Ejercicio 5: La función **primerafrase(numerodeparrafo)** deberá abrir el archivo y devolver el contenido de la primera frase del párrafo indicado 
+# (siendo 0 el primer párrafo). La primera frase estará definida por los caracteres que se encuentran en el párrafo hasta llegar al primer símbolo de puntuación 
+# (cualquiera del grupo ,.:;).
+# no complete este ejercicio :(
+
+def primerafrase(parrafo):
+    #primero cargamos el fichero
+    archivo = 'pythonMoocProblems-master/moocSemana7/Ejercicio7.1/quijote.txt'
+    fichero = open(archivo)
+    #lo leemos
+    texto = fichero.read()
+    #y seleccionamos el párrafo indicado en el parámetro 
+    parrafos = texto.split('\n')
+    #eliminamos los párrafos vacios tras el split 
+    while '' in parrafos: 
+        parrafos.remove('')    
+    parrafoseleccionado=parrafos[parrafo]
+    #vamos a buscar donde acabaría la primera frase buscamos los delimitadores que nos han pedido 
+    #y añadimos sus posiciones a una lista
+    delimitadores =[]
+    delimitadores.append(parrafoseleccionado.find(','))
+    delimitadores.append(parrafoseleccionado.find('.'))
+    delimitadores.append(parrafoseleccionado.find(':'))
+    delimitadores.append(parrafoseleccionado.find(';'))
+    #quitamos los -1 que son delimitadores no encontrados y nos puede dar lugar a errores
+    while -1 in delimitadores: 
+        delimitadores.remove(-1)
+    #y obtenemos el primero que aparece con el comando min (el menor es el primero)
+    finfrase = min(delimitadores)
+    
+    #nuestra frase sera pues
+    frase = parrafoseleccionado[:finfrase]
+    print(frase)
+    #acordaros de cerrar el fichero si no lo habeis abierto con un with
+    fichero.close()    
+    return(frase)
+
+primerafrase(1)
