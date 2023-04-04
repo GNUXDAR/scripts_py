@@ -1,8 +1,10 @@
 # cadenas de textos
 help(str)
 refran = "el perro de san roque no tiene rabo "
-refran = refran + 'porque ramon rodriguez se lo ha robado'
+refran = refran + 'porque ramon rodriguez se lo ha robado'  #concatenacion
 print(refran)
+print(refran*2) #lo repite * cuantas veces se le indique
+
 
 ## la \ nos ayuda a organizarnos
 refran = "el perro de san roque no tiene rabo "\
@@ -38,15 +40,27 @@ print(refran.upper())
 refran.lower()                  #todas a minusculas
 refran.upper()                  #todas a mayusculas
 refran.capitalize()             #la primera letra de la cadena en mayuscula
+str.title(refran)               # poner el principio de cada palabra en mayuscula
+refran.title()                  # lo mismo que en lo anterior
 refran.replace('no', 'si')      #remplazar todo del primer parametro por el segundo
 refran.find('Roque')            #busca una palabra o un caracter e indica en que posicion esta
 refran.find('roque')            #-1 si no la encuentra, distingue mayuscula de minuscula
+print("rabo" in refran)         #busca si existe
+print("rabo" not in refran)     #busca si no existe
 refran.lower().find('roque')    #pasar a minuscula y buscar la palabra o letra
 refran.strip()                  #elimina los espacios del princio y del final y los saltos de lineas
+refran.rstrip()                 # elimina los espacios de la derecha
+refran.lstrip()                 # elimina los espacios de la izquierda
 refran.split()                  #crea uan lista con cada elemento de la cadena de texto
 refran.split('no')              #parte la cadena en las veces que exista esa palabra o letra, quitando la palabra o letra que se pase por parametro
 refran.isupper()                #para determinar si una letra está en mayúscula
 refran.islower()                #para determinar si una letra está en minuscula
+
+## Ejemplo de uso de formatear cadenas
+cadena = " esto es una cadena con espacios "
+print(cadena)
+print(cadena.capitalize())
+print(cadena.strip().capitalize())
 
 ## Ejemplo: de isupper y islower
 def cambiaMayus(cadena):
@@ -78,10 +92,10 @@ print(ord(letra))   #ASCII
 print(chr(43))      #convierte de codigo a caracter
 
 ## convertir caracter a ascii y vicebersa
-letra = input(" ")  #caracter
+letra = input("convertir caracter a ascii ")  #caracter
 print(ord(letra))
 print("\nrevertir")
-revertir = input("")        #ASCII
+revertir = input("convertir ascii a caracter")        #ASCII
 revertir = int(revertir)
 print(chr(revertir))      #convierte de codigo a caracter
 
@@ -104,6 +118,5 @@ cadenaDeCodificada=''
 for letra in cadenaCodificada:
     cadenaDeCodificada=cadenaDeCodificada+chr(ord(letra)-desplazamiento)
 
-print(cadena)
 print(cadenaCodificada)
 print(cadenaDeCodificada)
