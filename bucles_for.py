@@ -5,9 +5,41 @@
 # ---- bucle(for/while) ----
 # ---- finalizacion ----
 
-## contar una lista con FOR
+# MOSTRAR LISTA
+# range()
+for numero in range(5):
+    print(numero)
+
+lista = list(range(1, 4))
+print(lista)
+
+
+for numero in range(5):
+    print(numero)
+
+## con string
+for numero in range(5):
+    print(numero, numero * "python ")
+
+## for else
+buscar = 2
+for numero in range(5):
+    print(numero)
+    if numero == buscar:
+        print("encontrado", buscar)
+        break
+else:
+    print(f"Lo siento, pero no se encontro el numero {buscar}")
+
+## iterar un string
+cadena = " esto es una cadena CON espacios "
+for letra in cadena:
+    print(letra)
+
+## CONTAR UNA LISTA CON FOR
 lista = [9, 13, 2, 7, 124, -5]
 print (len(lista))
+
 ## como se haria sin la funcion len?
 canList = 0
 for elemento in lista:
@@ -16,7 +48,7 @@ for elemento in lista:
 print(f'El resultado final es {canList}')
 print('----------------------------')
 
-## sumar los valores de una lista
+## EJERCICIO: sumar los valores de una lista
 lista = [9, 13, 2, 7, 124, -5]
 print (sum(lista))
 ## como se haria sin la funcion sum
@@ -27,7 +59,7 @@ for elemento in lista:
 print (suma)
 print('----------------------------')
 
-## calcular la media de los valores de una lista
+## EJERCICIO: calcular la media de los valores de una lista
 lista = [9, 13, 2, 7, 124, -5]
 print(sum(lista)/len(lista))
 ## como se haria sin la funcion sum ni len
@@ -41,7 +73,7 @@ for elemento in lista:
     print(f'el resultado parcial de la suma es {suma}')
 print(suma/cuenta)
 
-## verificar si existe un elemento en una lista
+## EJERCICIO: verificar si existe un elemento en una lista
 lista = [9, 13, 2, 7, 124, -5, 7]
 print(7 in lista)
 ## como se haria sin la funcion in
@@ -55,7 +87,7 @@ for elemento in lista:
         cuenta += 1
 print(existe, cuenta)
 
-## como identificar el mayor y menor elemento de una lista
+## EJERCICIO: como identificar el mayor y menor elemento de una lista
 lista = [9, 13, 2, 7, 124, -5, 7]
 print(max(lista))
 print(min(lista))
