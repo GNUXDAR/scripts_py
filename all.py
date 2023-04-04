@@ -81,11 +81,11 @@ print(lista)
 for numero in range(5):
     print(numero)
 
-# con string
+## con string
 for numero in range(5):
     print(numero, numero * "python ")
 
-# for else
+## for else
 buscar = 2
 for numero in range(5):
     print(numero)
@@ -95,12 +95,31 @@ for numero in range(5):
 else:
     print(f"Lo siento, pero no se encontro el numero {buscar}")
 
-# iterar un string
+## iterar un string
 cadena = " esto es una cadena CON espacios "
 for letra in cadena:
     print(letra)
-    
+
+
 # BUCLES
+## while
+numero = 1
+while numero < 100:
+    print(numero)
+    numero *= 2
+
+comando = ""
+while comando.lower() != "salir":
+    comando = input("$ ")
+    print(comando)
+
+# while infinito
+while True:
+    comando = input("$ ")
+    print(comando)
+    if comando.lower() == "exit":
+        break
+
 # contar una lista
 lista = [9, 13, 2, 7, 124, -5]
 print (len(lista))
