@@ -26,3 +26,9 @@ else:
     print("Ve a otro lado")
 
 print("Listo")
+
+
+# ternario
+edad_cinefilo = int(input("Ingrese su edad cinefilo: "))
+mensaje = "Puede ver la pelicula" if edad_cinefilo > 18 else "no puedes entrar"
+print(mensaje)
