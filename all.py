@@ -1,5 +1,51 @@
 # mostrar mensaje por pantalla
-print ("Hola Mundo");
+print ("Hola Mundo")
+
+
+# numeros
+numero = 5      # entero -> integer
+decimal = 1.2   # float
+
+suma = 10 + 8
+resta = 18 - 8
+multiplicar = 16*2
+dividir = 10 / 2
+divicion_sin_decimal = 1 // 3
+modulo = 1 % 3
+potencia = 2 ** 3
+
+# otra notacion
+# numero += 5
+# numero -= 3
+# numero *= 5
+# numero /= 2
+numero //= 2
+
+
+print(dividir)
+print(divicion_sin_decimal)
+print(modulo)
+print(potencia)
+print(f"numero  {numero}")
+
+# Funciones matematicas
+# round()  #Devuelve el número redondeado a la precisión de los dígitos después del punto decimal. Si se omite ndigits o es None, devuelve el entero más cercano a su entrada.
+print(round(1.3))
+print(round(1.5))
+print(round(1.7))
+# abs() Devuelve el valor absoluto de un número. El argumento puede ser un número entero, un número de coma flotante o un objeto que implemente __abs__(). Si el argumento es un número complejo, se devuelve su magnitud.
+print(abs(-44))
+print(abs(44))
+
+# Comparadores logicos
+print(1 < 2)
+print(1 > 2)
+print(1 <= 2)
+print(1 >= 2)
+print(1 == 2)
+print(2 == "2")
+print(1 != 2)
+print(1 != "2")
 
 # capturar valores por pantalla (input) y mostrar
 nombre = input('escribe tu nombre ')
@@ -198,6 +244,15 @@ refran.split()                  #crea uan lista con cada elemento de la cadena d
 refran.split('no')              #parte la cadena en las veces que exista esa palabra o letra, quitando la palabra o letra que se pase por parametro
 refran.isupper()                #para determinar si una letra está en mayúscula
 refran.islower()                #para determinar si una letra está en minuscula
+
+test = "1--2--3--4--5"
+# split() puede seleccionar la posición en una cadena desde el frente para dividir.
+print(test.split("--", 2))
+# rsplit() puede seleccionar la posición en una cadena desde atrás para dividir.
+print(test.rsplit("--", 2))
+# salida
+['1', '2', '3--4--5']  # split()
+['1--2--3', '4', '5']  # rsplit()
 
 # Ejemplo de uso de formatear cadenas
 cadena = " esto es una cadena con espacios "
