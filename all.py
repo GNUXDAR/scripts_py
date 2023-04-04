@@ -2,7 +2,7 @@
 print ("Hola Mundo")
 
 
-# numeros
+# NUMEROS
 numero = 5      # entero -> integer
 decimal = 1.2   # float
 
@@ -28,7 +28,7 @@ print(modulo)
 print(potencia)
 print(f"numero  {numero}")
 
-# Funciones matematicas
+# FUNCIONES MATEMATICAS
 # round()  #Devuelve el número redondeado a la precisión de los dígitos después del punto decimal. Si se omite ndigits o es None, devuelve el entero más cercano a su entrada.
 print(round(1.3))
 print(round(1.5))
@@ -37,7 +37,7 @@ print(round(1.7))
 print(abs(-44))
 print(abs(44))
 
-# Comparadores logicos
+# COMPARADORES LOGICOS
 print(1 < 2)
 print(1 > 2)
 print(1 <= 2)
@@ -51,7 +51,7 @@ print(1 != "2")
 nombre = input('escribe tu nombre ')
 print(nombre)
 
-# como saber si un anio es bisiesto
+# EJERCICIO: como saber si un anio es bisiesto
 print ("Digite el año:")
 anio = int(input()) #convertir en entero
 
@@ -61,7 +61,7 @@ if (anio % 4 == 0 and anio % 100 != 0) or anio % 400 == 0:
 else:
     print ("Año NO bisiesto")
 
-# mostrar si el numero ingresao es pas o impar
+# EJERCICIO: mostrar si el numero ingresao es par o impar
 num = input('Introduce un número:')
 numInt = int(num)
 if (numInt%2==0):
@@ -69,16 +69,43 @@ if (numInt%2==0):
 else:
     print('El numero es impar')
 
-# mostrar una lista
-lista = list(range(1,4))
+# MOSTRAR LISTA
+# range()
+for numero in range(5):
+    print(numero)
+
+lista = list(range(1, 4))
 print(lista)
 
+
+for numero in range(5):
+    print(numero)
+
+# con string
+for numero in range(5):
+    print(numero, numero * "python ")
+
+# for else
+buscar = 2
+for numero in range(5):
+    print(numero)
+    if numero == buscar:
+        print("encontrado", buscar)
+        break
+else:
+    print(f"Lo siento, pero no se encontro el numero {buscar}")
+
+# iterar un string
+cadena = " esto es una cadena CON espacios "
+for letra in cadena:
+    print(letra)
+    
 # BUCLES
 # contar una lista
 lista = [9, 13, 2, 7, 124, -5]
 print (len(lista))
 
-## como se haria sin la funcion len?
+## EJERCICIO: como se haria sin la funcion len?
 canList = 0
 for elemento in lista:
     canList += 1
@@ -86,7 +113,7 @@ for elemento in lista:
 print(f'El resultado final es {canList}')
 print('----------------------------')
 
-## sumar los valores de una lista
+## EJERCICIO: sumar los valores de una lista
 lista = [9, 13, 2, 7, 124, -5]
 print (sum(lista))
 ## como se haria sin la funcion sum
@@ -183,12 +210,12 @@ print(math.cos(math.pi))  #coseno de pi
 miTexto = "el perro de san roque no tiene rabo"
 help(str)
 str.title(miTexto)  #poner el principio de cada palabra en mayuscula
-mitexto.title()     # lo mismo que en lo anterior
-mitexto.replace('san','mr')  #replazar palabras
-mitexto.replace('san','mr').title()
+miTexto.title()     # lo mismo que en lo anterior
+miTexto.replace('san','mr')  #replazar palabras
+miTexto.replace('san','mr').title()
 
 
-# cadenas de textos
+# CADENAS DE TEXTOS
 refran = "el perro de san roque no tiene rabo "
 refran = refran + 'porque ramon rodriguez se lo ha robado'
 print(refran)
@@ -224,7 +251,7 @@ print(refran[21:])  # desde la posicion 21 hasta el final de la cadena
 print(refran[:-10]) # desde el principio hasta -10 posisciones del final
 print(refran[-10:]) # los 10 ultimos caracteres
 
-# Funciones mas usadas con cadenas de caracteres
+# FUNCIONES MAS USADAS CON CADENAS DE CARACTERES
 print(refran.upper())
 refran.lower()                  #todas a minusculas
 refran.upper()                  #todas a mayusculas
@@ -254,16 +281,69 @@ print(test.rsplit("--", 2))
 ['1', '2', '3--4--5']  # split()
 ['1--2--3', '4', '5']  # rsplit()
 
-# Ejemplo de uso de formatear cadenas
+# FORMATEANDO CADENAS
 cadena = " esto es una cadena con espacios "
 print(cadena)
 print(cadena.capitalize())
 print(cadena.strip().capitalize())
 
-# Extraer trosos de una cadena
-
-
-## ejercicios:
+## EJERCICIOS:
 ### como podemos extraer la palabra "casa" de la siguiente cadena: "Tengo una casa roja" guardada en la variable frase?
 frase = "Tengo una casa roja"
 print(frase[frase.find('casa'):frase.find('casa')+len('casa')])
+
+# CONDICIONALES
+## if
+EDAD = 18
+edad_votante = int(input("Ingrese su edad: "))
+if edad_votante < EDAD:
+    print("No tiene edad para Votar")
+if edad_votante >= EDAD:
+    print("Felicidades Puede votar")
+
+
+## else
+edad_votante = int(input("Ingrese su edad: "))
+if edad_votante < EDAD:
+    print("No tiene edad para Votar")
+else:
+    print("Felicidades Puede votar")
+
+## elif
+### es importante que en caso de enteros, se debe evaluar de mayor a menor
+edad_cinefilo = int(input("Ingrese su edad cinefilo: "))
+if edad_cinefilo > 54:
+    print("Puede ver la pelicula con descuento")
+elif edad_cinefilo > 17:
+    print("Puedes ver la pelicula")
+else:
+    print("No puedes entrar")
+    print("Ve a otro lado")
+
+print("Listo")
+
+
+## ternario
+edad_cinefilo = int(input("Ingrese su edad cinefilo: "))
+mensaje = "Puede ver la pelicula" if edad_cinefilo > 18 else "no puedes entrar"
+print(mensaje)
+
+# OPERADORES LOGICOS
+# and, or, not
+gas = False
+encendido = True
+edad = 18
+
+if gas and encendido and edad > 17:
+    print("Puedes avanzar")
+
+if gas or encendido:
+    print("Puedes avanzar ve")
+
+if not gas and (encendido and edad > 17):
+    print("No Puedes avanzar sin gas")
+
+# tambien se puede hacer de la siguiente manera
+edad = 25
+if 15 <= edad <= 65:
+    print("puede entrar a la piscina")
