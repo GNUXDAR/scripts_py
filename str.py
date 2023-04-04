@@ -56,6 +56,13 @@ refran.split('no')              #parte la cadena en las veces que exista esa pal
 refran.isupper()                #para determinar si una letra está en mayúscula
 refran.islower()                #para determinar si una letra está en minuscula
 
+test = "1--2--3--4--5"
+print(test.split("--", 2))      # split() puede seleccionar la posición en una cadena desde el frente para dividir.
+print(test.rsplit("--", 2))     # rsplit() puede seleccionar la posición en una cadena desde atrás para dividir.
+## salida
+['1', '2', '3--4--5']  # split()
+['1--2--3', '4', '5']  # rsplit()
+
 ## Ejemplo de uso de formatear cadenas
 cadena = " esto es una cadena con espacios "
 print(cadena)
