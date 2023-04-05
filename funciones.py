@@ -20,6 +20,10 @@ def suma(num1, num2):
     return total
 
 
+valor_de_suma = suma(5, 5)
+print(valor_de_suma)
+
+
 # funciones desde objetos
 miTexto = "el perro de san roque no tiene rabo"
 help(str)
