@@ -200,9 +200,54 @@ mifuncionParam(5, 5)
 
 
 # funcion con return
-# def suma(num1, num2):
-#     total = num1 + num2
-#     return total
+def suma(num1, num2):
+    total = num1 + num2
+    return total
+
+
+valor_de_suma = suma(5, 5)
+print(valor_de_suma)
+
+# parametros opcionales
+def imprime_cliente(nombre="Arturo", apellido="Cabrera"):
+    print(f"El nombre del cliente es {nombre} {apellido}")
+
+
+imprime_cliente("Adrian", "Guillermo")
+
+# argumentos nombrados
+def imprime_user(nombre="Arturo", apellido="Cabrera"):
+    print(f"El nombre del cliente es {nombre} {apellido}")
+
+
+imprime_user(apellido="Guerrero", nombre="Brunilde")
+
+# xargs es poder pasarle N argumentos a la funcion
+def suma(*numeros):
+    result = 0
+    for numero in numeros:
+        result += numero
+    print(result)
+
+
+suma(2, 5)
+suma(3, 4, 3)
+
+# kwargs
+## es obligatorio el nombre del parametro cuando se trabaje con kwargs
+def get_product(**datos):
+    print(datos)
+
+
+get_product(id="id", name="shoes", sku="nike001")
+
+## acceder a los parametros en la funcion
+def get_product(**datos):
+    print(datos["id"], datos["name"])
+
+
+get_product(id="01", name="shoes", sku="nike001")
+
 
 # modulos
 # cada uno de los archivos .py que generamos en python se denominan modulos, y son considerados contenedores para organizar nuestro codigo
