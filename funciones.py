@@ -1,21 +1,24 @@
 # funciones en python
 def mifuncion():
-    print(f'---- FUNCIONES ----')
+    """ imprime un string """
+    print('---- FUNCIONES ----')
     print(f'vamos a sumar dos numeros 5 + 5: {5+5}')
 
 
 mifuncion()
 
 # funciones con parametros
-def mifuncionParam(num1, num2):
-    print(f'---- FUNCIONES CON PARAMETROS ----')
+def mifuncion_param(num1, num2):
+    """ funcion con dos parametros """
+    print('---- FUNCIONES CON PARAMETROS ----')
     print(f'el resultado de la suma de sus dos numeros es {num1+num2}')
 
 
-mifuncionParam(5, 5)
+mifuncion_param(5, 5)
 
 # funcion con return
 def suma(num1, num2):
+    """ funcion con return """
     total = num1 + num2
     return total
 
@@ -34,6 +37,7 @@ mitexto.replace('san', 'mr').title()
 
 # parametros opcionales
 def imprime_cliente(nombre="Arturo", apellido="Cabrera"):
+    """ funcio con parametros opcionales """
     print(f"El nombre del cliente es {nombre} {apellido}")
 
 
@@ -41,6 +45,7 @@ imprime_cliente("Adrian", "Guillermo")
 
 # argumentos nombrados
 def imprime_user(nombre="Arturo", apellido="Cabrera"):
+    """ funcion con argumentos nombrados"""
     print(f"El nombre del cliente es {nombre} {apellido}")
 
 

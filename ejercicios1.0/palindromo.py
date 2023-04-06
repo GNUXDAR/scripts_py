@@ -1,10 +1,12 @@
 # Un palíndromo, también llamado palíndroma o palindroma, es una palabra o frase que se lee igual en un sentido que en otro.
 # Ejemplos: Reconocer,Somos o no somos, Isaac no ronca asi, Sé verlas al revés, Amo la paloma, Anita lava la tina, Luz azul, Yo hago yoga hoy, Ana lava lana
 def delete_space(text):
+    """ eliminar los espacios de la cadena"""
     new_text = text.lower().replace(" ", "")
     return new_text
 
 def reverse(text):
+    """ revertir la cadena"""
     reverse_text = ""
     for l in text:
         reverse_text = l + reverse_text # la clave es poner al iterador "l" antes: {l + reverse_text} en vez de {reverse_text + l}
@@ -12,6 +14,7 @@ def reverse(text):
 
 
 def es_palindromo(text):
+    """ mostrar si es True o False la cadena """
     text = delete_space(text)
     reverse_text = reverse(text)
     
