@@ -53,3 +53,4 @@ numeros = [10, 23, 50, 5, 12, 30]
 # numeros.sort(reverse=True)  # ordena la lista de forma descendente
 numeros2 = sorted(numeros)  # crea una copia nueva lista
 numeros2 = sorted(numeros, reverse=True)  # tambien podemos ordenarla alreves de la misma manera que antes
+lambda  #fucnciones anonimas
