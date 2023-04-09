@@ -34,6 +34,8 @@ mascotas = ["zeus", "titan", "sky", "titan"]
 print(mascotas.index("titan"))          # index() muestra el indice del elemento en la lista; list.py
 
 # agregando y eliminando elementos de una lista
+lista = [9, 13, 2, 7, 124, -5]
+print(sum(lista))
 mascotas = ["zeus", "titan", "sky", "titan"]
 # Inserte un nuevo elemento con valor x en la matriz antes de la posición i. Los valores negativos se tratan como relativos al final de la matriz.
 mascotas.insert(2, "downie")
