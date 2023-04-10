@@ -8,6 +8,14 @@ from os import path
 from notifypy import Notify
 
 
+def convertTime(seconds):
+
+    minutes, seconds = divmod(seconds, 60)
+
+    hours, minutes = divmod(minutes, 60)
+
+    return "%d:%02d:%02d" % (hours, minutes, seconds)
+
 def battery_low():
     # porcentaje de batería por debajo del cual se considera que la batería está baja
     LOW_BATTERY_THRESHOLD = 20
@@ -16,7 +24,10 @@ def battery_low():
 
     while True:
         battery = psutil.sensors_battery()
-        if battery.percent < LOW_BATTERY_THRESHOLD:  # and not battery.power_plugged:
+        CONNECTED = battery.power_plugged
+        IS_CONNECTED = "Connected" if CONNECTED == True else "Disconnected"
+        if battery.percent < LOW_BATTERY_THRESHOLD and not CONNECTED:
+            print(time.sleep(SLEEP_INTERVAL))
             notification = Notify()
             notification.title = "Battery Low!"
             notification.message = "it's time to connect the machine!!!"
@@ -29,6 +40,11 @@ def battery_low():
             notification.audio = path.join(direccion, audio)
 
             notification.send()
+
+        print(psutil.sensors_battery())
+        print("Battery Percent: ", battery.percent)
+        print("Connected to charger: ", IS_CONNECTED)
+        print("Battery remaining: ", convertTime(battery.secsleft), "\n")
         time.sleep(SLEEP_INTERVAL)
 
 
