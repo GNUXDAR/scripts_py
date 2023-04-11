@@ -1,6 +1,11 @@
 # mostrar mensaje por pantalla
 print ("Hola Mundo")
 
+# variables y una lista de palabras reservada que python declara
+help('keywords')
+
+# cadenas de textos
+help(str)
 
 # NUMEROS
     numero = 5      # entero -> integer
@@ -319,7 +324,7 @@ print(f'el elemento menor es {menor}')
     # invertir una cadena
     print(refran[::-1])
 
-    # Saltando caracteres al cortar
+    # Saltando caracteres al cortar Oo
     # Es posible omitir caracteres durante el corte pasando el argumento de paso al método de corte.
     language = 'Python'
     pto = language[0:6:2]
@@ -355,6 +360,100 @@ print(f'el elemento menor es {menor}')
     # salida
     ['1', '2', '3--4--5']  # split()
     ['1--2--3', '4', '5']  # rsplit()
+
+    # count() contando caracteres en eun string
+    # count(): devuelve ocurrencias de subcadena en cadena, cuenta(subcadena, inicio=.., final=..).
+    # El inicio es una indexación inicial para contar y el final es el último índice para contar.
+    refran = '''el perro de san roque no tiene rabo 
+            porque ramon rodriguez se lo ha robado, 
+            esto es un refran tipico de España. ole toro'''
+    print(refran.count('de'))
+    print(refran.count('de', 8, 20))
+
+    # endswith(): comprueba si una cadena termina con un final específico
+    challenge = 'programming with python'
+    print(challenge.endswith('on'))   # True
+    print(challenge.endswith('tion'))  # False
+
+    # expandtabs(): reemplaza el carácter de tabulación con espacios, el tamaño de tabulación predeterminado es 8. Toma el argumento de tamaño de tabulación
+    challenge = 'i\tam\tlearning\tpython'
+    print(challenge.expandtabs())           # 'i       am      learning        python'
+    print(challenge.expandtabs(10))          # 'i         am        learning  python'
+
+    # index (): devuelve el índice más bajo de una subcadena, los argumentos adicionales indican el índice inicial y final
+    # (predeterminado 0 y longitud de cadena - 1). Si no se encuentra la subcadena, genera un valueError.
+    challenge = 'i am learning python'
+    sub_string = 'da'
+    print(challenge.index(sub_string))  # 7
+    print(challenge.index(sub_string, 4))  # error
+
+    # rindex(): Devuelve el índice más alto de una subcadena, los argumentos adicionales indican el índice inicial y final (predeterminado 0 y longitud de la cadena - 1)
+    challenge = 'i am learning python'
+    sub_string = 'da'
+    print(challenge.rindex(sub_string))  # 8
+    print(challenge.rindex(sub_string, 9))  # error
+
+    # isalnum(): comprueba el carácter alfanumérico
+    challenge = 'ThirtyDaysPython'
+    print(challenge.isalnum())  # True
+
+    challenge = '30DaysPython'
+    print(challenge.isalnum())  # True
+
+    challenge = 'i am learning python'
+    print(challenge.isalnum())  # False, space is not an alphanumeric character
+
+    challenge = 'i am learning python 2019'
+    print(challenge.isalnum())  # False
+
+    # isalpha(): Comprueba si todos los elementos de la cadena son caracteres alfabéticos (a-z y A-Z)
+    challenge = 'i am learning python'
+    print(challenge.isalpha())  # False, space is once again excluded
+    challenge = 'ThirtyDaysPython'
+    print(challenge.isalpha())  # True
+    num = '123'
+    print(num.isalpha())      # False
+
+    # isdecimal(): comprueba si todos los caracteres de una cadena son decimales (0-9)
+    challenge = 'i am learning python'
+    print(challenge.isdecimal())  # False
+    challenge = '123'
+    print(challenge.isdecimal())  # True
+    challenge = '\u00B2'
+    print(challenge.isdecimal())   # False
+    challenge = '12 3'
+    print(challenge.isdecimal())  # False, espacio no permitido
+
+    # isdigit(): comprueba si todos los caracteres de una cadena son números(0-9 y algunos otros caracteres Unicode para números)
+    challenge = 'Thirty'
+    print(challenge.isdigit())  # False
+    challenge = '30'
+    print(challenge.isdigit())   # True
+    challenge = '\u00B2'
+    print(challenge.isdigit())   # True
+
+    # isnumeric(): comprueba si todos los caracteres de una cadena son números o están relacionados con números (al igual que isdigit(), solo acepta más símbolos, como ½)
+    num = '10'
+    print(num.isnumeric())  # True
+    num = '\u00BD'  # ½
+    print(num.isnumeric())  # True
+    num = '10.5'
+    print(num.isnumeric())  # False
+
+    # isidentifier(): busca un identificador válido; verifica si una cadena es un nombre de variable válido
+    challenge = '30DaysOfPython'
+    print(challenge.isidentifier())  # False, because it starts with a number
+    challenge = 'thirty_days_of_python'
+    print(challenge.isidentifier())  # True
+
+    # join(): Devuelve una cadena concatenada
+    web_tech = ['HTML', 'CSS', 'JavaScript', 'React']
+    result = ' '.join(web_tech)
+    print(result)  # 'HTML CSS JavaScript React'
+    web_tech = ['HTML', 'CSS', 'JavaScript', 'React']
+    result = '# '.join(web_tech)
+    print(result)  # 'HTML# CSS# JavaScript# React'
+
 
     # Formato de cadena de estilo antiguo (% operador)
     # En Python hay muchas formas de formatear cadenas.
