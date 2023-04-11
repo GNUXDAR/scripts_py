@@ -316,6 +316,16 @@ print(f'el elemento menor es {menor}')
     print(refran[:-10]) # desde el principio hasta -10 posisciones del final
     print(refran[-10:]) # los 10 ultimos caracteres
 
+    # invertir una cadena
+    print(refran[::-1])
+
+    # Saltando caracteres al cortar
+    # Es posible omitir caracteres durante el corte pasando el argumento de paso al método de corte.
+    language = 'Python'
+    pto = language[0:6:2]
+    print(pto)  # Pto
+
+
 # FUNCIONES MAS USADAS CON CADENAS DE CARACTERES
     print(refran.upper())
     refran.lower()                  #todas a minusculas
@@ -345,6 +355,109 @@ print(f'el elemento menor es {menor}')
     # salida
     ['1', '2', '3--4--5']  # split()
     ['1--2--3', '4', '5']  # rsplit()
+
+    # Formato de cadena de estilo antiguo (% operador)
+    # En Python hay muchas formas de formatear cadenas.
+    # En esta sección, cubriremos algunos de ellos. El operador "%"
+    # se utiliza para formatear un conjunto de variables encerradas en una "tupla" (una lista de tamaño fijo),
+    # junto con una cadena de formato, que contiene texto normal junto con "especificadores de argumento",
+    # símbolos especiales como "%s" , "%d", "%f", "%.número de dígitosf".
+
+    # %s - Cadena(o cualquier objeto con una representación de cadena, como números)
+    # %d - Enteros
+    # %f - Números de punto flotante
+    # "%.number of digitsf" - Números de punto flotante con precisión fija
+
+    # Strings only
+    first_name = 'Arturo'
+    last_name = 'Cabrera'
+    language = 'Python'
+    formated_string = 'I am %s %s. I am learning %s' % (
+        first_name, last_name, language)
+    print(formated_string)
+
+    # Strings  and numbers
+    radius = 10
+    pi = 3.14
+    area = pi * radius ** 2
+    formated_string = 'The area of circle with a radius %d is %.3f.' % (
+        radius, area)
+    print(formated_string)
+
+    python_libraries = ['Django', 'Flask', 'NumPy', 'Matplotlib', 'Pandas']
+    formated_string = 'The following are python libraries:%s' % (python_libraries)
+    print(formated_string)
+
+    # Nuevo formato de cadena de estilo (str.format)
+    # esta version se introdujo en la version 3
+    first_name = 'Arturo'
+    last_name = 'Cabrera'
+    language = 'Python'
+    formated_string = 'I am {} {}. I am learning {}'.format(
+        first_name, last_name, language)
+    print(formated_string)
+    a = 4
+    b = 3
+
+    print('{} + {} = {}'.format(a, b, a + b))
+    print('{} - {} = {}'.format(a, b, a - b))
+    print('{} * {} = {}'.format(a, b, a * b))
+    # limits it to two digits after decimal
+    print('{} / {} = {:.2f}'.format(a, b, a / b))
+    print('{} % {} = {}'.format(a, b, a % b))
+    print('{} // {} = {}'.format(a, b, a // b))
+    print('{} ** {} = {}'.format(a, b, a ** b))
+
+    # Strings  and numbers
+    radius = 10
+    pi = 3.14
+    area = pi * radius ** 2
+    formated_string = 'The area of a circle with a radius {} is {:.2f}.'.format(
+        radius, area)  # 2 digits after decimal
+    print(formated_string)
+
+    # Interpolación de cadenas / f-Strings (Python 3.6+)
+    a = 4
+    b = 3
+    print(f'{a} + {b} = {a +b}')
+    print(f'{a} - {b} = {a - b}')
+    print(f'{a} * {b} = {a * b}')
+    print(f'{a} / {b} = {a / b:.2f}')
+    print(f'{a} % {b} = {a % b}')
+    print(f'{a} // {b} = {a // b}')
+    print(f'{a} ** {b} = {a ** b}')
+
+    # Cadenas de Python como secuencias de caracteres
+    # Las cadenas de Python son secuencias de caracteres y
+    # comparten sus métodos básicos de acceso con otras secuencias
+    # de objetos ordenadas de Python: listas y tuplas.
+    # La forma más sencilla de extraer caracteres individuales de cadenas (y miembros individuales de cualquier secuencia)
+    # es descomprimirlos en las variables correspondientes.
+    language = 'Python'
+    a, b, c, d, e, f = language  # unpacking sequence characters into variables
+    print(a)  # P
+    print(b)  # y
+    print(c)  # t
+    print(d)  # h
+    print(e)  # o
+    print(f)  # n
+
+    # Acceso a caracteres en cadenas por índice
+    language = 'Python'
+    first_letter = language[0]
+    print(first_letter)  # P
+    second_letter = language[1]
+    print(second_letter)  # y
+    last_index = len(language) - 1
+    last_letter = language[last_index]
+    print(last_letter)  # n
+
+    # Si queremos comenzar desde el extremo derecho, podemos usar la indexación negativa. -1 es el último índice.
+    language = 'Python'
+    last_letter = language[-1]
+    print(last_letter)  # n
+    second_last = language[-2]
+    print(second_last)  # o
 
 # FORMATEANDO CADENAS
     cadena = " esto es una cadena con espacios "
