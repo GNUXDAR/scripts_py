@@ -102,6 +102,15 @@ del mascotas[1]                 # parecido al anterior, pero influye directament
 mascotas.clear()                # como su nombre lo indica, limpia por completo la lista
 print(mascotas)
 
+# join(): Devuelve una cadena concatenada
+web_tech = ['HTML', 'CSS', 'JavaScript', 'React']
+result = ' '.join(web_tech)
+print(result)  # 'HTML CSS JavaScript React'
+web_tech = ['HTML', 'CSS', 'JavaScript', 'React']
+result = '# '.join(web_tech)
+print(result)  # 'HTML# CSS# JavaScript# React'
+
+
 # ordenando listas
 numeros = [10, 23, 50, 5, 12, 30]
 # numeros.sort()  # ordena la lista
