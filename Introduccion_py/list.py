@@ -31,6 +31,11 @@ print(matriz)
 alfanumericos = numeros + letras
 print(alfanumericos)
 
+front_end = ['HTML', 'CSS', 'JS', 'React', 'Redux']
+back_end = ['Node', 'Express', 'MongoDB', 'PHP']
+technologies = front_end + back_end
+print(technologies)
+
 ## range y list
 lista = list(range(1,4))
 print(lista)
@@ -136,9 +141,9 @@ print(result)  # 'HTML# CSS# JavaScript# React'
 
 # ordenando listas
 numeros = [10, 23, 50, 5, 12, 30]
-# numeros.sort()  # ordena la lista
+# numeros.sort()  # ordena la lista original
 # numeros.sort(reverse=True)  # ordena la lista de forma descendente
-numeros2 = sorted(numeros)  # crea una copia nueva lista
+numeros2 = sorted(numeros)  # crea una copia nueva lista ordenada (la mejor opcion)
 numeros2 = sorted(numeros, reverse=True)  # tambien podemos ordenarla alreves de la misma manera que antes
 print(numeros)
 print(numeros2)
