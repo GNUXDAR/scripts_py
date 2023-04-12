@@ -1,4 +1,5 @@
 # LISTAS
+# Lista: es una colección ordenada y cambiable (modificable). Permite miembros duplicados.
 numeros = [1, 2, 3, 4, 5,]
 print(numeros)          # imprime la lista completa
 print(numeros[1])       # imprime lo que esta en esa pocion que le pasemos
@@ -10,11 +11,19 @@ print(letras)
 palabras = ["algo", "esta", "interesante", "oculto", "universidad"]
 print(palabras)
 
+web_techs = ['HTML', 'CSS', 'JS', 'React', 'Redux',
+             'Node', 'MongDB', 'Python']  # list of web technologies
+print('Web technologies:', web_techs)   # Web technologies: ['HTML', 'CSS', 'JS', 'React', 'Redux', 'Node', 'MongDB', 'Python']
+print('Number of Web technologies:', len(web_techs)) # 8
+latex_index = len(web_techs) - 1
+print(web_techs[latex_index])  # Python
+
+
 ## lista de booleans
 booleans = [True, False, True, False]
 print(booleans)
 
-## lista de listaspalabras
+## lista de listas
 matriz = [[1, 1], [1, 0]]
 print(matriz)
  
@@ -38,6 +47,8 @@ print(users)
 print(users[1:])    # desde la posicion 1 hasta el ultimo
 # con negativos (-) va desde el ultimo al primero de la lista, -1, -3, -N
 print(users[-1])
+# imprimir todos los elemento
+print(users[-4:])
 # imprime los pares, comeinza desde el inicio y va a (dos) despues: ['gnuxdar', 'newbie']
 print(users[::2])
 # immprime desde la posicion 1 (el segundo) y luego a cada dos:
@@ -54,17 +65,29 @@ numeros = [1, 2, 3]
 # primero = numeros[0]
 # segundo = numeros[1]
 # tercero = numeros[2]
-# print(primero, segundo, tercero)
+# print(primero, segundo, tercero)  # 1 2 3
 
 primero, segundo, tercero = numeros
 # aca se le asigna dinamicamente a cada variable un valor de una posicion
-print(primero, segundo, tercero)
+print(primero, segundo, tercero)    # 1 2 3 
 print(segundo)                      # podemos acceder al valor de la variable
 
 numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 # despues de declarar una variable despues de *otros, esta reseva el valor de N variables que se asignen, cada variable es un valor de la lista
 primero, *otros, ultimo = numeros
-print(primero, ultimo, otros)
+print(primero, ultimo, otros)   # 1 9 [2, 3, 4, 5, 6, 7, 8]
+
+# otro ejemplo
+countries = ['Germany', 'France', 'Belgium', 'Sweden',
+             'Denmark', 'Finland', 'Norway', 'Iceland', 'España']
+gr, fr, bg, sw, *scandic, es = countries
+print(gr)   # Germany
+print(fr)   # France
+print(bg)   # Belgium
+print(sw)   # Sweden
+print(scandic)  # ['Denmark', 'Finland', 'Norway', 'Iceland']
+print(es)   # España
+
 
 # iterar listas
 mascotas = ["zeus", "thitan", "sky"]
@@ -157,3 +180,11 @@ print(names)
 names = [user[0] for user in users]
 # names = [name[0] for name in names]   # imprimir la primera letra de cada item
 print(names)
+
+
+# Comprobación de un elemento si es miembro de una lista mediante el operador in. Vea el ejemplo a continuación.
+fruits = ['banana', 'orange', 'mango', 'lemon']
+does_exist = 'banana' in fruits
+print(does_exist)  # True
+does_exist = 'lime' in fruits
+print(does_exist)  # False
