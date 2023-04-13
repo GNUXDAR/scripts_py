@@ -1,3 +1,5 @@
+[Recursos Web](Docs/links.md) | [Recursos PDF](Docs/PDF/pdfs.md)
+
 Jupyter Notebook, una aplicación web de código abierto, 
 le permite crear y compartir un código interactivo, 
 visualizaciones y otros recursos en la web.
