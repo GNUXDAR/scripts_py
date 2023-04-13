@@ -130,6 +130,16 @@ del mascotas[1]                 # parecido al anterior, pero influye directament
 mascotas.clear()                # como su nombre lo indica, limpia por completo la lista
 print(mascotas)
 
+# como eliminar varios elementos de una lista
+users = ['master prod', 'julian', 'billied', 'forming', 'gabriel77', 'mastergamer',
+         'michel', 'mary', 'sandro', 'alexis', 'erick', 'samugamer', 'gogueta', 'hugo']
+to_remove = ['julian', 'billied', 'gabriel77',
+             'mastergamer', 'michel', 'erick', 'samugamer', 'gogueta', 'hugo']
+print(users)
+for user in to_remove:
+    users.remove(user)
+print(users)
+
 # join(): Devuelve una cadena concatenada
 web_tech = ['HTML', 'CSS', 'JavaScript', 'React']
 result = ' '.join(web_tech)
