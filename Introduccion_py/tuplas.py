@@ -56,3 +56,6 @@ print(tecnologies[0:])  # todosl los items
 # No es posible eliminar un solo elemento en una tupla, pero es posible eliminar la tupla en sí usando del.
 del tecnologies
 print(tecnologies)
+
+# contando elementos de una tupla
+print(tecnologies.count('Python'))  # 1
