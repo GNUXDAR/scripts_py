@@ -1,3 +1,7 @@
+# La vida está llena de rutinas. En programación también hacemos muchas tareas repetitivas. 
+# Para manejar tareas repetitivas, los lenguajes de programación usan bucles. 
+# El lenguaje de programación Python también proporciona los siguientes tipos de dos bucles: for, while
+
 # resolviendo problemas con bucles
 
 # flujo iterativo
@@ -106,3 +110,33 @@ for elemento in lista:
             menor = elemento
 print(f' el elemento mayor es {mayor}')
 print(f'el elemento menor es {menor}')
+
+# for con una tupla
+numbers = (0, 1, 2, 3, 4, 5)
+for number in numbers:
+    print(number)
+
+# for con diccionario
+person = {
+    'first_name': 'Arturo',
+    'last_name': 'Cabrera',
+    'age': 404,
+    'country': 'Venezuela',
+    'is_marred': True,
+    'skills': ['PHP', 'Laravel', 'React', 'Flask', 'Python'],
+    'address': {
+        'street': 'Space street',
+        'zipcode': '01010101'
+    }
+}
+for key in person:
+    print(key)
+
+for key, value in person.items():
+    print(key, value)  # 
+
+# for con set
+it_companies = {'Facebook', 'Google', 'Microsoft',
+                'Apple', 'IBM', 'Oracle', 'Amazon', 'AC Tecnology'}
+for company in it_companies:
+    print(company)
