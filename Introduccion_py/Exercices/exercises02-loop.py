@@ -96,5 +96,11 @@ print(result_impares)
 # 10. Esta es una lista de frutas, ['plátano', 'naranja', 'mango', 'limón'] invierta el orden usando bucle.
 frutas = ['plátano', 'naranja', 'mango', 'limón']
 frutas_revertidas = frutas[::-1]
-
 print(frutas_revertidas)  # salida: ['limón', 'mango', 'naranja', 'plátano']
+
+fruits = ['plátano', 'naranja', 'mango', 'limón']
+new_fruits = list()
+size = len(fruits)
+for i in fruits:
+    new_fruits.insert(0, i)
+print(new_fruits)
