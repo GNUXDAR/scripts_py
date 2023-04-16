@@ -140,3 +140,17 @@ it_companies = {'Facebook', 'Google', 'Microsoft',
                 'Apple', 'IBM', 'Oracle', 'Amazon', 'AC Tecnology'}
 for company in it_companies:
     print(company)
+
+# iterar de 10 a 0 usando el bucle for
+# El parámetro en la función range(10, -1, -1) indica los valores que se van a generar en la secuencia. En este caso, los parámetros son:
+
+# El valor inicial es 10.
+# El valor final es - 1, pero como la función range excluye el valor final, la secuencia llegará hasta el número anterior a - 1, es decir, 0.
+# El valor del "paso" es - 1, lo que significa que la secuencia irá restando 1 en cada iteración.
+# Entonces, range(10, -1, -1) genera los números del 10 al 0, en orden descendente.
+for i in range(10, -1, -1):
+    print(i)
+
+# sumando, desde el 10 hasta el 20, de 2 en 2
+for i in range(10, 20, +2):
+    print(i)
