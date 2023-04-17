@@ -1,3 +1,7 @@
+# Una función es un bloque reutilizable de código o declaraciones de programación diseñadas para realizar una determinada tarea. 
+# Para definir o declarar una función, Python proporciona la palabra clave def. 
+# La siguiente es la sintaxis para definir una función. El bloque de función de código se ejecuta solo si se llama o invoca la función
+
 # funciones en python
 def mifuncion():
     """ imprime un string """
@@ -22,9 +26,17 @@ def suma(num1, num2):
     total = num1 + num2
     return total
 
-
 valor_de_suma = suma(5, 5)
 print(valor_de_suma)
+
+
+def imprime_cliente(nombre="Arturo", apellido="Cabrera"):
+    """ funcio con parametros opcionales """
+    customer = f"El nombre del cliente es {nombre} {apellido}"
+    return customer
+
+print(imprime_cliente("Adrian", "Guillermo"))   # El nombre del cliente es Adrian Guillermo
+print(imprime_cliente())                        # El nombre del cliente es Arturo Cabrera
 
 
 # funciones desde objetos
@@ -35,7 +47,7 @@ mitexto.title()     # lo mismo que en lo anterior
 mitexto.replace('san', 'mr')  # replazar palabras
 mitexto.replace('san', 'mr').title()
 
-# parametros opcionales
+# parametros por defecto
 def imprime_cliente(nombre="Arturo", apellido="Cabrera"):
     """ funcio con parametros opcionales """
     print(f"El nombre del cliente es {nombre} {apellido}")
