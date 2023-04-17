@@ -100,7 +100,6 @@ print(frutas_revertidas)  # salida: ['limón', 'mango', 'naranja', 'plátano']
 
 fruits = ['plátano', 'naranja', 'mango', 'limón']
 new_fruits = list()
-size = len(fruits)
 for i in fruits:
     new_fruits.insert(0, i)
 print(new_fruits)
