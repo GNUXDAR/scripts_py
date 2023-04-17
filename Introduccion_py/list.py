@@ -1,4 +1,13 @@
 # LISTAS
+# podemos crear listas de dos maneras
+
+# Uso de la función incorporada de lista
+# syntax
+lst = list()
+
+# usando corchetes
+lst = []
+
 # Lista: es una colección ordenada y cambiable (modificable). Permite miembros duplicados.
 numeros = [1, 2, 3, 4, 5,]
 print(numeros)          # imprime la lista completa
