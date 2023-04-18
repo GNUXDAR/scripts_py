@@ -14,7 +14,7 @@ def convertTime(seconds):
 
     hours, minutes = divmod(minutes, 60)
 
-    return "%d:%02d:%02d" % (hours, minutes, seconds)
+    return '%d:%02d:%02d' % (hours, minutes, seconds)
 
 def battery_low():
     # porcentaje de batería por debajo del cual se considera que la batería está baja
@@ -25,16 +25,17 @@ def battery_low():
     while True:
         battery = psutil.sensors_battery()
         CONNECTED = battery.power_plugged
-        IS_CONNECTED = "Connected" if CONNECTED == True else "Disconnected"
+        ACTUALLY_TIME = time.strftime('%H:%M:%S')
+        IS_CONNECTED = 'Connected' if CONNECTED == True else 'Disconnected'
         if battery.percent < LOW_BATTERY_THRESHOLD and not CONNECTED:
             print(time.sleep(SLEEP_INTERVAL))
             notification = Notify()
-            notification.title = "Battery Low!"
+            notification.title = 'Battery Low!'
             notification.message = "it's time to connect the machine!!!"
-            # notification.icon = "/home/gnuxdar/scripts_py/img/ACTECNOLOGY.png" #con rutas absolutas
-            # notification.audio = "/home/gnuxdar/scripts_py/sound/3014.wav"
-            icono = "../img/ACTECNOLOGY.png"
-            audio = "../sound/3014.wav"
+            # notification.icon = '/home/gnuxdar/scripts_py/img/ACTECNOLOGY.png' #con rutas absolutas
+            # notification.audio = '/home/gnuxdar/scripts_py/sound/3014.wav'
+            icono = '../img/ACTECNOLOGY.png'
+            audio = '../sound/3014.wav'
             direccion = path.abspath(path.dirname(__file__))
             notification.icon = path.join(direccion, icono)
             notification.audio = path.join(direccion, audio)
@@ -42,9 +43,10 @@ def battery_low():
             notification.send()
 
         print(psutil.sensors_battery())
-        print("Battery Percent: ", battery.percent)
-        print("Connected to charger: ", IS_CONNECTED)
-        print("Battery remaining: ", convertTime(battery.secsleft), "\n")
+        print('Time NOW: ', ACTUALLY_TIME)
+        print('Battery Percent: ', battery.percent)
+        print('Connected to charger: ', IS_CONNECTED)
+        print('Battery remaining: ', convertTime(battery.secsleft), '\n')
         time.sleep(SLEEP_INTERVAL)
 
 
