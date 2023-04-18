@@ -19,7 +19,7 @@ user = {
 # El diccionario anterior muestra que un valor puede ser cualquier tipo de datos: cadena, booleano, lista, tupla, conjunto o un diccionario.
 
 print(user)
-print(user['name'])
+print(user['first_name'])
 
 # agregar
 user['age'] = 33    # llave: valor "que no existen"
