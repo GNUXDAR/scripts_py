@@ -138,6 +138,17 @@ help(string)
 print(string.ascii_letters) # abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 print(string.digits)        # 0123456789
 print(string.punctuation)   # !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+# DATA
+# __all__ = ['ascii_letters', 'ascii_lowercase', 'ascii_uppercase', 'cap...
+#            ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+#            ascii_lowercase = 'abcdefghijklmnopqrstuvwxyz'
+#            ascii_uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+#            digits = '0123456789'
+#            hexdigits = '0123456789abcdefABCDEF'
+#            octdigits = '01234567'
+#            printable = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU...
+#            punctuation = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+#            whitespace = ' \t\n\r\x0b\x0c'
 
 # MODULO RANDOM 
 # A estas alturas ya está familiarizado con la importación de módulos. 
