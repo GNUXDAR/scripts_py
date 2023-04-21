@@ -186,7 +186,58 @@ users = [
 users.sort(key=lambda el:el[1], reverse=True) # reverse=True es opcional
 print(users)
 
-# listas de comprension
+# LISTA DE COMPRENSION
+# La comprensión de listas en Python es una forma compacta de crear una lista a partir de una secuencia. 
+# Es una forma corta de crear una nueva lista. La comprensión de listas es considerablemente más rápida que procesar una lista usando el bucle for .
+
+# syntax
+[i for i in iterable if expression]
+
+# Por ejemplo, si desea cambiar una cadena a una lista de caracteres. Puedes usar un par de métodos. Veamos algunos de ellos:
+# One way
+language = 'Python'
+lst = list(language)  # changing the string to list
+print(type(lst))     # list
+print(lst)           # ['P', 'y', 't', 'h', 'o', 'n']
+
+# Second way: list comprehension
+lst = [i for i in language]
+print(type(lst))  # list
+print(lst)       # ['P', 'y', 't', 'h', 'o', 'n']
+
+# Por ejemplo, si desea generar una lista de números
+# Generando numeros
+numbers = [i for i in range(11)]  # to generate numbers from 0 to 10
+print(numbers)                    # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Es posible hacer operaciones matemáticas durante la iteración
+squares = [i * i for i in range(11)]
+print(squares)                    # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# También es posible hacer una lista de tuplas
+numbers = [(i, i * i) for i in range(11)]
+# [(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
+print(numbers)
+
+# La comprensión de listas se puede combinar con la expresión if
+# Generando numeros pares
+even_numbers = [i for i in range(21) if i % 2 == 0]  # para generar una lista de números pares en el rango de 0 a 21
+print(even_numbers)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+# Generando numeros impares
+odd_numbers = [i for i in range(21) if i % 2 != 0]  # para generar números impares en el rango de 0 a 21
+print(odd_numbers)
+
+# Filtrar números: filtremos los números pares positivos de la lista a continuación
+numbers = [-8, -7, -3, -1, 0, 1, 3, 4, 5, 7, 6, 8, 10]
+positive_even_numbers = [i for i in range(21) if i % 2 == 0 and i > 0]
+print(positive_even_numbers)  # [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+# Aplanando una matriz tridimensional
+list_of_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened_list = [number for row in list_of_list for number in row]
+print(flattened_list)   # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 users = [
     ["admin", 1],
     ["gnuxdar", 7],
@@ -212,3 +263,57 @@ does_exist = 'banana' in fruits
 print(does_exist)  # True
 does_exist = 'lime' in fruits
 print(does_exist)  # False
+
+
+# De una lista original, filtrar los elementos que no esten en la segundo lista
+user_war = ['crash', 'master pro', 'delvis', 'otto', 'el papu xd', 'lopez', 'espectrohn', 'pata de hierro',
+            'hoffman', 'gerardo', 'computer', 'antonio', 'blasete', 'arthurx', 'billied', 'k2', 'destructor',
+            'josegAguilera', 'mk', 'ramiro', 'gonazalito', 'andrezvnlza', 'recucus', 'renato cfc', 'andersond',
+            'urvina', 'gastonRamos', 'Rey t Torres', 'mary', 'veloz', 'popo', 'hugo_11n', 'samugamer100', 'lopez',
+            'alaukabar', 'zaul uwu', 'memosau', 'angel', 'idk lee', '#2']
+delete_user = ['lopez', 'espectrohn', 'gonazalito',
+               'renato cfc', 'andersond', 'urvina', 'mary', 'veloz', 'popo', 'samugamer100', 'lopez', 'zaul uwu', 'angel', '#2']
+
+user_war = [x for x in user_war if x not in delete_user]
+print(user_war)
+
+#FUNCION LAMBDA
+# La función Lambda es una pequeña función anónima sin nombre. Puede tomar cualquier número de argumentos, pero solo puede tener una expresión. 
+# La función Lambda es similar a las funciones anónimas en JavaScript. Lo necesitamos cuando queremos escribir una función anónima dentro de otra función.
+# CREANDO UNA FUNCION LAMBDA
+# Para crear una función lambda, usamos la palabra clave lambda seguida de un parámetro, seguido de una expresión. 
+# Consulte la sintaxis y el ejemplo a continuación. La función Lambda no usa return pero devuelve explícitamente la expresión.
+
+# syntax
+def x(param1, param2, param3): return param1 + param2 + param2
+print(x(arg1, arg2, arg3))
+
+# función con nombre
+def add_two_nums(a, b):
+    return a + b
+
+print(add_two_nums(2, 3))     # 5
+# Cambiemos la función anterior a una función lambda
+add_two_nums = lambda a, b: a + b
+print(add_two_nums(2,3))    # 5
+
+# Función lambda de invocación automática
+(lambda a, b: a + b)(2,3) # 5 - necesita encapsularlo en print() para ver el resultado en la consola
+
+square = lambda x : x ** 2
+print(square(3))    # 9
+cube = lambda x : x ** 3
+print(cube(3))    # 27
+
+# Multiple variables
+multiple_variable = lambda a, b, c: a ** 2 - 3 * b + 4 * c
+print(multiple_variable(5, 5, 3)) # 22
+
+# FUNCIÓN LAMBDA DENTRO DE OTRA FUNCIÓN
+def power(x):
+    return lambda n : x ** n
+
+cube = power(2)(3)   # function power now need 2 arguments to run, in separate rounded brackets
+print(cube)          # 8
+two_power_of_five = power(2)(5) 
+print(two_power_of_five)  # 32
