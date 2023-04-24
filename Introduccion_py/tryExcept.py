@@ -1,10 +1,84 @@
+# try:
+#     código en este bloque si las cosas van bien
+# except:
+#     el código en este bloque se ejecuta si las cosas van mal
+
+# ejemplo
+try:
+    print(10 + '5')
+except:
+    print('Something went wrong')  # Algo salió mal
+
+# cuando no sabemos bien cual es el error
+try:
+    name = input('Enter your name:')
+    year_born = input('Year you were born:')
+    age = 2019 - year_born
+    print(f'You are {name}. And your age is {age}.')
+except:
+    print('Something went wrong')
+# Something went wrong
+# En el ejemplo anterior, el bloque de excepción se ejecutará y no conocemos exactamente el problema. 
+# Para analizar el problema, podemos usar los diferentes tipos de error con excepción.
+
+# En el siguiente ejemplo, manejará el error y también nos dirá el tipo de error generado.
+try:
+    name = input('Enter your name:')
+    year_born = input('Year you were born:')
+    age = 2019 - year_born
+    print(f'You are {name}. And your age is {age}.')
+except TypeError:
+    print('Type error occured')
+except ValueError:
+    print('Value error occured')
+except ZeroDivisionError:
+    print('zero division error occured')
+# Enter your name:Arturo
+# Year you born: 1989
+# Type error occured
+
+# En el código anterior, la salida será TypeError. Ahora, agreguemos un bloque adicional:
+try:
+    name = input('Introduzca su nombre:')
+    year_born = input('Año que naciste:')
+    age = 2019 - int(year_born)
+    print(f'Tu nombre es {name}. Y tu edad es {age}.')
+except TypeError:
+    print('Se produce un error de tipo')
+except ValueError:
+    print('Se produce un error de valor')
+except ZeroDivisionError:
+    print('se produce un error de división por cero')
+else:
+    print('Usualmente corro con el bloque try')
+finally:
+    print('Siempre corro.')
+
+# También se acorta el código anterior de la siguiente manera:
+try:
+    name = input('Enter your name:')
+    year_born = input('Year you born:')
+    age = 2019 - int(year_born)
+    print(f'You are {name}. And your age is {age}.')
+except Exception as e:
+    print(e)
+
+# EMPAQUETAR Y DESEMPAQUETAR ARGUMENTOS EN PYTHON 
+# Usamos dos operadores:
+# * para tuples
+# ** para dictionaries
+# Permítenos tomar el siguiente ejemplo. Este toma solo argumentos, pero tenemos una lista. Podemos desempaquetar la lista y cambiarla a argumentos.
+
+# DESEMPAQUETAR
+
+
 try:
   valor = input('Escribe el número: ') #pero el usuario lo pone con letras
   valorNumerico = int(valor)
   resultado = valorNumerico + 3
   print(resultado)
 except Exception as e:
-    print('Hemos subrido un error debido a que: ',str(e))
+    print('Hemos sufrido un error debido a que: ',str(e))
 
 
 # tipos de errores
