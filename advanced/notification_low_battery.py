@@ -1,3 +1,5 @@
+# Created by @gnuxdar 
+# Modify by Root-FTW 21/04/23
 import psutil
 import time
 from os import path
