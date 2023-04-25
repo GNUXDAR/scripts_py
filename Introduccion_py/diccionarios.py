@@ -82,3 +82,18 @@ for value in users:
 
 # eliminar un diccionario
 del user
+
+# EMPAQUETAR DICCIONARIO
+def packing_person_info(**kwargs):
+    for key in kwargs:
+        print("{key} = {kwargs[key]}")
+    return kwargs
+
+print(packing_person_info(name="Arturo",
+      country="Ecuador", city="Quito", age=33))
+
+# DESEMPAQUETANDO DICCIONARIOS
+def unpacking_person_info(name, country, city, age):
+    return f'{name} lives in {country}, {city}. He is {age} year old.'
+dct = {'name':'Arturo', 'country':'Ecuador', 'city':'Quito', 'age':33}
+print(unpacking_person_info(**dct)) # Arturo lives in Ecuador, Quito. He is 33 years old.
