@@ -70,6 +70,37 @@ except Exception as e:
 # Permítenos tomar el siguiente ejemplo. Este toma solo argumentos, pero tenemos una lista. Podemos desempaquetar la lista y cambiarla a argumentos.
 
 # DESEMPAQUETAR
+# Desempaquetando listas
+def sum_of_five_nums(a, b, c, d, e):
+    return a + b + c + d + e
+
+lst = [1, 2, 3, 4, 5]
+print(sum_of_five_nums(lst)) # TypeError: sum_of_five_nums() missing 4 required positional arguments: 'b', 'c', 'd', and 'e'
+# Cuando ejecutamos este código, genera un error, porque esta función toma números (no una lista) como argumentos. 
+# Descomprimamos/desestructuramos la lista.
+
+
+def sum_of_five_nums(a, b, c, d, e):
+    return a + b + c + d + e
+
+lst = [1, 2, 3, 4, 5]
+print(sum_of_five_nums(*lst))  # 15
+# También podemos usar el desempaquetado en la función incorporada de rango que espera un comienzo y un final.
+
+numbers = range(2, 7)  # llamada normal con argumentos separados
+print(list(numbers))  # [2, 3, 4, 5, 6]
+args = [2, 7]
+numbers = range(*args)  # llamar con argumentos desempaquetados de una lista (no funciona)
+print(numbers)      # [2, 3, 4, 5,6]
+
+# Una lista o una tupla también se pueden descomprimir así:
+countries = ['Finland', 'Sweden', 'Norway', 'Denmark', 'Iceland']
+fin, sw, nor, *rest = countries
+print(fin, sw, nor, rest)   # Finland Sweden Norway ['Denmark', 'Iceland']
+numbers = [1, 2, 3, 4, 5, 6, 7]
+one, *middle, last = numbers
+print(one, middle, last)  # 1 [2, 3, 4, 5, 6] 7
+
 
 
 try:
