@@ -72,7 +72,16 @@ numeros = list(range(21))
 print(numeros[::2])     # imprime los numero pares de esa list
 print(numeros[1::2])    # imprime los numero impares de esa list (inicio::cada tantos numeros)
 
-# DESEMPAQUETAR LISTAS
+# EMPAQUETAR LISTAS
+def sum_all(*args):
+    s = 0
+    for i in args:
+        s += i
+    return s
+print(sum_all(1, 2, 3))             # 6
+print(sum_all(1, 2, 3, 4, 5, 6, 7)) # 28
+
+
 numeros = [1, 2, 3]
 
 # manera incorrecta!
@@ -127,6 +136,20 @@ print(mascotas.count("titan"))  #count() cuenta, cuantos de esos elementos en la
 
 if "titan" in mascotas:         #valida si existe en al lista
     print(mascotas.index("titan"))  
+
+# ENUMERAR LISTAS
+# Si estamos interesados ​​en el índice de una lista, usamos la función integrada de enumeración para obtener el índice de cada elemento de la lista.
+for index, item in enumerate([20, 30, 40]):
+    print(index, item)
+    # 0 20
+    # 1 30
+    # 2 40
+
+countries = ['Venezuela', 'Paris', 'Colombia', 'Finlandia']
+for index, i in enumerate(countries):
+    if i == 'Finlandia':
+        print(f'El pais {i} se ha encontrado en el indice {index}')
+# The country Finlandia has been found at index 3
 
 # agregando y eliminando elementos de una lista
 mascotas = ["zeus", "titan", "sky", "titan"]
@@ -317,3 +340,26 @@ cube = power(2)(3)   # function power now need 2 arguments to run, in separate r
 print(cube)          # 8
 two_power_of_five = power(2)(5) 
 print(two_power_of_five)  # 32
+
+# Propagacion en Python
+# Al igual que en JavaScript, la propagación es posible en Python. Comprobémoslo en un ejemplo a continuación:
+lst_one = [1, 2, 3]
+lst_two = [4, 5, 6, 7]
+lst = [0, *lst_one, *lst_two]
+print(lst)          # [0, 1, 2, 3, 4, 5, 6, 7]
+country_lst_one = ['Finland', 'Sweden', 'Norway']
+country_lst_two = ['Denmark', 'Iceland']
+nordic_countries = [*country_lst_one, *country_lst_two]
+print(nordic_countries)  # ['Finland', 'Sweden', 'Norway', 'Denmark', 'Iceland']
+
+
+# ZIP
+# A veces nos gustaría combinar listas al recorrerlas. Vea el ejemplo a continuación:
+fruits = ['banana', 'orange', 'mango', 'lemon', 'lime']                    
+vegetables = ['Tomato', 'Potato', 'Cabbage','Onion', 'Carrot']
+fruits_and_veges = []
+for f, v in zip(fruits, vegetables):
+    fruits_and_veges.append({'fruit':f, 'veg':v})
+
+print(fruits_and_veges)
+# [{'fruit': 'banana', 'veg': 'Tomato'}, {'fruit': 'orange', 'veg': 'Potato'}, {'fruit': 'mango', 'veg': 'Cabbage'}, {'fruit': 'lemon', 'veg': 'Onion'}, {'fruit': 'lime', 'veg': 'Carrot'}]
