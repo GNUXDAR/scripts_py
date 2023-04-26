@@ -26,6 +26,7 @@
 
 # Abrir archivos para leer
 # Creé y guardé un archivo llamado read_file_example.txt en el directorio de archivos. Veamos cómo se hace:
+import xml.etree.ElementTree as ET
 f = open('Introduccion_py/files/read_file_example.txt')
 print(f)    # <_io.TextIOWrapper name='Introduccion_py/files/read_file_example.txt' mode='r' encoding='UTF-8'>
 # Como puede ver en el ejemplo anterior, imprimí el archivo abierto y brindó información al respecto. 
@@ -213,6 +214,43 @@ with open('Introduccion_py/files/csv_example.csv') as f:
             line_count += 1
         else:
             print(
-                f'\t{row[0]} is a teachers. He lives in {row[1]}, {row[2]}.')
+                f'\t{row[0]} is a studen. He lives in {row[1]}, {row[2]}.')
             line_count += 1
     print(f'Number of lines:  {line_count}')
+
+# Archivo con extensión xlsx
+# Para leer archivos de Excel necesitamos instalar el paquete xlrd. Cubriremos esto después de que cubramos la instalación del paquete usando pip.
+import xlrd
+excel_book = xlrd.open_workbook('sample.xls')
+print(excel_book.nsheets)
+print(excel_book.sheet_names)
+
+# Archivo con extensión xml
+# XML es otro formato de datos estructurados que se parece a HTML. En XML, las etiquetas no están predefinidas. 
+# La primera línea es una declaración XML. La etiqueta de person es la raíz del XML. La person tiene un atributo de género. Ejemplo:XML
+<?xml version="1.0"?>
+<person gender="female">
+    <name>Arturo</name>
+    <country>Venezuela</country>
+    <city>Tunapuy</city>
+    <skills>
+        <skill>PHP</skill>
+        <skill>React</skill>
+        <skill>Python</skill>
+    </skills>
+</person>
+# para mas informacion en como leer un XML, revisa la documentacion: https://docs.python.org/2/library/xml.etree.elementtree.html
+tree = ET.parse('Introduccion_py/files/xml_example.xml')
+root = tree.getroot()
+print('Root tag:', root.tag)
+print('Attribute:', root.attrib)
+for child in root:
+    print('field: ', child.tag)
+
+# output
+# Root tag: person
+# Attribute: {'gender': 'male'}
+# field: name
+# field: country
+# field: city
+# field: skills
