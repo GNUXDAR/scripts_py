@@ -49,28 +49,4 @@ Paso 2:
 
 Creamos un director de proyecto llamado flask_project. Dentro del proyecto creamos un entorno virtual venv que podría tener cualquier nombre pero prefiero llamarlo venv. Luego activamos el entorno virtual. Usamos "pip freeze" para verificar los paquetes instalados en el directorio del proyecto. El resultado de la congelación de pip estaba vacío porque aún no se había instalado un paquete.
 
-Ahora, creemos el archivo app.py en el directorio del proyecto y escribamos el siguiente código. El archivo app.py será el archivo principal del proyecto. El siguiente código tiene un módulo flask, un módulo os.
-
-## Creando routes
-la ruta de home-
-
-    # let's import the flask
-    from flask import Flask
-    import os # importing operating system module
-
-    app = Flask(__name__)
-
-    @app.route('/') # this decorator create the home route
-    def home ():
-        return '<h1>Welcome</h1>'
-
-    @app.route('/about')
-    def about():
-        return '<h1>About us</h1>'
-
-
-    if __name__ == '__main__':
-        # for deployment we use the environ
-        # to make it work for both production and development
-        port = int(os.environ.get("PORT", 5000))
-        app.run(debug=True, host='0.0.0.0', port=port)
+Ahora, creemos el archivo app.py en el directorio del proyecto. El archivo app.py será el archivo principal del proyecto. 
