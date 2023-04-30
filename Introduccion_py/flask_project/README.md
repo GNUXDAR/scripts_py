@@ -50,3 +50,21 @@ Paso 2:
 Creamos un director de proyecto llamado flask_project. Dentro del proyecto creamos un entorno virtual venv que podría tener cualquier nombre pero prefiero llamarlo venv. Luego activamos el entorno virtual. Usamos "pip freeze" para verificar los paquetes instalados en el directorio del proyecto. El resultado de la congelación de pip estaba vacío porque aún no se había instalado un paquete.
 
 Ahora, creemos el archivo app.py en el directorio del proyecto. El archivo app.py será el archivo principal del proyecto. 
+Para ejecutar la aplicación del flask, escriba python app.py en el directorio principal de la aplicación del flask. Después de ejecutar python app.py, verifique el host local 5000. 
+
+¿Qué tal si queremos representar un archivo HTML en lugar de una cadena? Es posible renderizar un archivo HTML usando la función render_template. Vamos a crear una carpeta llamada templates y crear home.html y about.html en el directorio del proyecto. Importemos también la función render_template desde el flask.
+
+## Creando un layout
+En los archivos de plantilla, hay muchos códigos repetidos, podemos escribir un diseño y podemos eliminar la repetición. Vamos a crear "layout.html" dentro de la carpeta de "templates". Después de crear el diseño, importaremos a cada archivo.
+
+## Sirviendo archivo estático
+Cree una carpeta "static" en el directorio de su proyecto. Dentro de la carpeta "static", cree una carpeta de estilos o CSS y cree una hoja de estilo CSS. Usamos el módulo url_for para servir el archivo estático.
+
+## metodos de formularios
+Métodos de solicitud, existen diferentes métodos de solicitud (GET, POST, PUT, DELETE) son los métodos de solicitud comunes que nos permiten realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+
+En contact usaremos la alternativa de método GET y POST según el tipo de solicitud. El método de solicitud es una función para manejar los métodos de solicitud y también para acceder a los datos del formulario. app.py
+
+
+link pythonflask-project -> heroku
+pipeline -> pythonflask-project
