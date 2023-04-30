@@ -9,44 +9,65 @@
 # print(chr(43))
 # bromecina para la gripe
 
-########
+# comprension de listas
+# user_list2 = ['user00', 'user01', 'user02', 'user03', 'user04', 'user05']
+# to_delete = ['user00', 'user02']
 
-# # 10. Esta es una lista de frutas, ['plátano', 'naranja', 'mango', 'limón'] invierta el orden usando bucle.
-# fruits = ['plátano', 'naranja', 'mango', 'limón']
-# new_fruits = list()
-# for i in fruits:
-#     new_fruits.insert(0, i)
-# print(new_fruits)
+# new_list = [item for item in user_list2 if item not in to_delete]
+# print(new_list)
+class Person:
+    def __init__(self, firstname='Arturo', lastname='Cabrera', age=33, country='Venezuela', city='Chacaracual'):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.age = age
+        self.country = country
+        self.city = city
+        self.skills = []
 
-###########################
-# De una lista original, filtrar los elementos que no esten en la segundo lista
-# user_war = ['crash', 'master pro', 'delvis', 'otto', 'el papu xd', 'lopez', 'espectrohn', 'pata de hierro', 
-#             'hoffman', 'gerardo', 'computer', 'antonio', 'blasete', 'arthurx', 'billied', 'k2', 'destructor', 
-#             'josegAguilera', 'mk', 'ramiro', 'gonazalito', 'andrezvnlza', 'recucus', 'renato cfc', 'andersond', 
-#             'urvina', 'gastonRamos', 'Rey t Torres', 'mary', 'veloz', 'popo', 'hugo_11n', 'samugamer100', 'lopez', 
-#             'alaukabar', 'zaul uwu', 'memosau', 'angel', 'idk lee', '#2']
-# delete_user = ['lopez', 'espectrohn', 'gonazalito',
-#                'renato cfc', 'andersond', 'urvina', 'mary', 'veloz', 'popo', 'samugamer100', 'lopez', 'zaul uwu', 'angel', '#2']
+    def person_info(self):
+        return f'{self.firstname} {self.lastname} tiene {self.age} de edad. Vive en {self.country}, {self.city}'
 
-# user_war = [x for x in user_war if x not in delete_user]
-# print(user_war)
+    def add_skill(self, skill):
+        self.skills.append(skill)
+class Student(Person):
+    pass
 
-# Generating numbers
-# numbers = [i for i in range(11)]  # to generate numbers from 0 to 10
-# print(numbers)                    # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-try:
-    name = input('Introduzca su nombre:')
-    year_born = input('Año que naciste:')
-    age = 2019 - int(year_born)
-    print(f'Tu nombre es {name}. Y tu edad es {age}.')
-except TypeError:
-    print('Se produce un error de tipo')
-except ValueError:
-    print('Se produce un error de valor')
-except ZeroDivisionError:
-    print('se produce un error de división por cero')
-else:
-    print('Usualmente corro con el bloque try')
-finally:
-    print('Siempre corro.')
+s1 = Student('Eyob', 'Yetayeh', 30, 'Finland', 'Helsinki')
+s2 = Student('Lidiya', 'Teklemariam', 28, 'Finland', 'Espoo')
+print(s1.person_info())
+s1.add_skill('JavaScript')
+s1.add_skill('React')
+s1.add_skill('Python')
+print(s1.skills)
+
+print(s2.person_info())
+s2.add_skill('Organizing')
+s2.add_skill('Marketing')
+s2.add_skill('Digital Marketing')
+print(s2.skills)
+
+
+class Student(Person):
+    def __init__(self, firstname='Asabeneh', lastname='Yetayeh', age=250, country='Finland', city='Helsinki', gender='male'):
+        self.gender = gender
+        super().__init__(firstname, lastname, age, country, city)
+
+    def person_info(self):
+        gender = 'He' if self.gender == 'male' else 'She'
+        return f'{self.firstname} {self.lastname} is {self.age} years old. {gender} lives in {self.city}, {self.country}.'
+
+
+s1 = Student('Eyob', 'Yetayeh', 30, 'Finland', 'Helsinki', 'male')
+s2 = Student('Lidiya', 'Teklemariam', 28, 'Finland', 'Espoo', 'female')
+print(s1.person_info())
+s1.add_skill('JavaScript')
+s1.add_skill('React')
+s1.add_skill('Python')
+print(s1.skills)
+
+print(s2.person_info())
+s2.add_skill('Organizing')
+s2.add_skill('Marketing')
+s2.add_skill('Digital Marketing')
+print(s2.skills)
