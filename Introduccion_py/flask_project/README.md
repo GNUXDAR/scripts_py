@@ -47,7 +47,13 @@ Paso 2:
         Werkzeug==2.3.1
     (env)flask_project$
 
-Creamos un director de proyecto llamado flask_project. Dentro del proyecto creamos un entorno virtual venv que podría tener cualquier nombre pero prefiero llamarlo venv. Luego activamos el entorno virtual. Usamos "pip freeze" para verificar los paquetes instalados en el directorio del proyecto. El resultado de la congelación de pip estaba vacío porque aún no se había instalado un paquete.
+## levantar flask
+source venv/bin/activate
+flask run ó python3 app.py
+
+Creamos un director de proyecto llamado flask_project. Dentro del proyecto creamos un entorno virtual venv que podría tener cualquier nombre pero prefiero llamarlo venv. 
+
+Luego activamos el entorno virtual, (source venv/bin/activate). Usamos "pip freeze" para verificar los paquetes instalados en el directorio del proyecto. El resultado de la congelación de pip estaba vacío porque aún no se había instalado un paquete.
 
 Ahora, creemos el archivo app.py en el directorio del proyecto. El archivo app.py será el archivo principal del proyecto. 
 Para ejecutar la aplicación del flask, escriba python app.py en el directorio principal de la aplicación del flask. Después de ejecutar python app.py, verifique el host local 5000. 
