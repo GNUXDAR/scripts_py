@@ -36,7 +36,7 @@ def home():
     name = 'Elearning Python'
     # return '<h1>Welcome</h1>'
     # return render_template('home.html', products=get_products, techs=techs, name=name, users=users, users_to_delete=users_to_delete, size_users=size_users, size_delete=size_delete, users_success=users_success, size_us=size_us, title='home')
-    return render_template('index.html', techs=techs, name=name, users=users, users_to_delete=users_to_delete, size_users=size_users, size_delete=size_delete, users_success=users_success, size_us=size_us, title='home')
+    return render_template('home.html', techs=techs, name=name, users=users, users_to_delete=users_to_delete, size_users=size_users, size_delete=size_delete, users_success=users_success, size_us=size_us, title='home')
 
 
 

@@ -71,6 +71,11 @@ Métodos de solicitud, existen diferentes métodos de solicitud (GET, POST, PUT,
 
 En contact usaremos la alternativa de método GET y POST según el tipo de solicitud. El método de solicitud es una función para manejar los métodos de solicitud y también para acceder a los datos del formulario. app.py
 
+## Modulos necesarios para conectarse con MongoDB - una base de datos no sql
+    pip install pymongo dnspython
+    pip install certifi
+    pip install  pymongo[srv]
+    pip install Flask-PyMongo Flask-WTF
 
 link pythonflask-project -> heroku
 pipeline -> pythonflask-project
