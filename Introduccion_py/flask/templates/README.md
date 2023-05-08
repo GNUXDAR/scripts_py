@@ -1,3 +1,4 @@
+## Ejecutar el proyecto Flask
 $ source env/bin/activate
 $ flask run --debug
 
@@ -16,6 +17,8 @@ Por defecto, en Flask existen los siguientes conversores:
 Nota: antes de una isntalacion activar el entorno: "source env/bin/ activate
 pip install Flask-WTF
 pip install email-validator
+pip install WTForms
+pip install flask-login
 
 ## Para forzar la instalacion de una extension
 pip install --upgrade --force-reinstall Flask-WTF
