@@ -14,11 +14,16 @@ Por defecto, en Flask existen los siguientes conversores:
 @app.route("/p/<string:slug>/")
 
 ## Extensiones
-Nota: antes de una isntalacion activar el entorno: "source env/bin/ activate
+Nota: antes de una instalacion activar el entorno: "source env/bin/ activate
+pip freeze  (mostrar los modulos instalados)
 pip install Flask-WTF
 pip install email-validator
 pip install WTForms
 pip install flask-login
+
+pip install flask-sqlalchemy   <!--  ORM -->
+pip install psycopg2           <!--  postgresql -->
+pip install mysql-connector-python  <!-- mysql -->
 
 ## Para forzar la instalacion de una extension
 pip install --upgrade --force-reinstall Flask-WTF
