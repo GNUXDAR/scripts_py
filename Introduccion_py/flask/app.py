@@ -1,17 +1,39 @@
 # Toda aplicación Flask es una instancia WSGI de la clase Flask.
 from flask import Flask, render_template, url_for, request, redirect
 from flask_login import LoginManager, logout_user, current_user, login_user, login_required
+from flask_sqlalchemy import SQLAlchemy
 
 from forms import SignupForm, PostForm, LoginForm
 from models import users, get_user, User
+import config
+
+import mysql.connector
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '7110c8ae51a4b5af97be6534caef90e4bb9bdcb3380af008f90b23a5d1616bf319bc298105da20fe'
+# app.config['SECRET_KEY'] = config.HEX_SEC_KEY
+# app.config['MYSQL_HOST'] = config.MYSQL_HOST
+# app.config['MYSQL_USER'] = config.MYSQL_USER
+# app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
+# app.config['MYSQL_DB'] = config.MYSQL_DB
 
-# login_manager = LoginManager(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
+cnx = mysql.connector.connect(
+    user='root', password='#Pass1234', host='localhost', database='py_flask')
+cursor = cnx.cursor()
+
+login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+# objeto SQLAlchemy
+db = SQLAlchemy(app)
+
+query = ("SELECT id, name, email FROM users")
+
+cursor.execute(query)
+
+for (id, name, email) in cursor:
+  print(id, name, email)
+
+cursor.close()
+cnx.close()
 
 posts = []
 
@@ -73,7 +95,7 @@ def show_signup_form():
     return render_template('signup_form.html', form=form)
 
 # vista del login
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     """ login de la app """
     if current_user.is_authenticated:
