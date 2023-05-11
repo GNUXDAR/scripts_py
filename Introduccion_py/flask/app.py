@@ -4,7 +4,8 @@ from flask_login import LoginManager, logout_user, current_user, login_user, log
 from flask_sqlalchemy import SQLAlchemy
 
 from forms import SignupForm, PostForm, LoginForm
-from models import users, get_user, User
+from models import users, get_user
+from models import User, Post
 import config
 
 import mysql.connector
@@ -16,24 +17,18 @@ app = Flask(__name__)
 # app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
 # app.config['MYSQL_DB'] = config.MYSQL_DB
 
-cnx = mysql.connector.connect(
-    user='root', password='#Pass1234', host='localhost', database='py_flask')
-cursor = cnx.cursor()
+# cnx = mysql.connector.connect(
+#     user='root', password='#Pass1234', host='localhost', database='py_flask')
+# cursor = cnx.cursor()
+app.config['SECRET_KEY'] = '7110c8ae51a4b5af97be6534caef90e4bb9bdcb3380af008f90b23a5d1616bf319bc298105da20fe'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:#Pass1234@localhost/py_flask'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 # objeto SQLAlchemy
 db = SQLAlchemy(app)
-
-query = ("SELECT id, name, email FROM users")
-
-cursor.execute(query)
-
-for (id, name, email) in cursor:
-  print(id, name, email)
-
-cursor.close()
-cnx.close()
+from models import User
 
 posts = []
 
@@ -78,21 +73,29 @@ def show_signup_form():
         return redirect(url_for('index'))
     
     form = SignupForm()
+    error = None
 
     if form.validate_on_submit():
         name = form.name.date
         email = form.email.data
         password = form.password.data
-        # creamos el user y lo guardamos
-        user = User(len(users) + 1, name, email, password)
-        users.append(user)
+        # validamos user con el mismo email
+        user = User.get_by_email(email)
+        if user is not None:
+            error = f'El email {email} ya se encuentra utilizado'
+        else:
+            # creamos el user y lo guardamos
+            user = User(name=name, email=email)
+            user.set_password(password)
+            user.save()
 
-        next = request.args.get('next', None)
-        if next:
-            return redirect(next)
-        return redirect(url_for('index'))
-
-    return render_template('signup_form.html', form=form)
+            # dejamos al user logueado
+            login_user(user, remember=True)
+            next_page = request.args.get('next', None)
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('index')
+            return redirect(next_page)
+    return render_template('signup_form.html', form=form, error=error)
 
 # vista del login
 @app.route('/login/', methods=['GET', 'POST'])
@@ -102,7 +105,7 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = get_user(form.email.data)
+        user = User.get_by_email(form.email.data)
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -115,10 +118,7 @@ def login():
 @login_manager.user_loader
 def load_user(user_id):
     """cargar usuarios"""
-    for user in users:
-        if user.id == int(user_id):
-            return user
-    return None
+    return User.get_by_id(int(user_id))
 
 @app.route('/logout')
 def logout():
