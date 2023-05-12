@@ -24,6 +24,14 @@ pip install flask-login
 pip install flask-sqlalchemy   <!--  ORM -->
 pip install psycopg2           <!--  postgresql -->
 pip install mysql-connector-python  <!-- mysql -->
+pip install python-slugify
+
 
 ## Para forzar la instalacion de una extension
 pip install --upgrade --force-reinstall Flask-WTF
+
+## Crear la base de datos
+desde el REPL ejecutar
+
+from app import db
+db.create_all()
