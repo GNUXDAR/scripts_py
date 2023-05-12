@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from forms import SignupForm, PostForm, LoginForm
 from models import users, get_user
 from models import User, Post
-import config
+# import config
 
 import mysql.connector
 
@@ -35,32 +35,33 @@ posts = []
 @app.route('/')
 def index():
     """ ruta del home """
-    page = request.args.get('page', 1)
-    list = request.args.get('list', 20)
+    posts = Post.get_all()
 
-    return render_template('index.html', title='home', num_post=len(posts), posts=posts)
+    return render_template('index.html', title='home', posts=posts)
 
 
 @app.route('/p/<string:slug>/')
 def show_post(slug):
     """ mostrar los post con slug """
-    return render_template('post_view.html', slug_title=slug)
+    post = Post.get_by_slug(slug)
+    if post is None:
+        abort(404)
+    return render_template('post_view.html', post=post)
 
 
 # crear - editar
 @app.route('/admin/post/', methods=['GET', 'POST'], defaults={'post_id': None})
 @app.route('/admin/post/<int:post_id>/', methods=['GET', 'POST'])
 @login_required # proteger el acceso a la vista solo  a los usuarios autenticados
-def post_form(post_id=None):
+def post_form(post_id):
     """ crear y editar """
     form = PostForm()
     if form.validate_on_submit():
         title = form.title.data
-        title_slug = form.title_slug.data
         content = form.content.data
 
-        post = {'title': title, 'title_slug': title_slug, 'content': content}
-        posts.append(post)  #guardando en un dicionario post_form.html
+        post = Post(user_id=current_user.id, title=title, content=content)
+        post.save()
 
         return redirect(url_for('index'))
     return render_template('admin/post_form.html', form=form)
