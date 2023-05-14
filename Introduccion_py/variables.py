@@ -45,3 +45,7 @@ print(type(address))
 # Encuentre la longitud del texto python y convierta el valor en flotante y conviértalo en una cadena
 long_python = len('python')
 print(type(str(float(long_python))))
+
+# multiple asignacion de variables en una solo linea (mala practica)
+name, lastname, nickname, age = 'Arturo', 'Cabrera', 'gnuxdar', 33
+print('My nombre es ',name, lastname, 'me consigues en las redes como: ', nickname, 'y tengo ', age, 'años de edad')
