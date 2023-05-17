@@ -363,3 +363,11 @@ for f, v in zip(fruits, vegetables):
 
 print(fruits_and_veges)
 # [{'fruit': 'banana', 'veg': 'Tomato'}, {'fruit': 'orange', 'veg': 'Potato'}, {'fruit': 'mango', 'veg': 'Cabbage'}, {'fruit': 'lemon', 'veg': 'Onion'}, {'fruit': 'lime', 'veg': 'Carrot'}]
+
+# filtrando listas con endswith
+
+arreglo = ['banana', 'melon', 'sandia', 'pera']
+
+for fruta in arreglo:
+    if fruta.endswith('a'):
+        print('La fruta es: ' + fruta)
