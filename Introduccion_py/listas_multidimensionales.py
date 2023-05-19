@@ -25,4 +25,18 @@ indice_fecha = 2
 for i in range(len(site)):
     for j in range(len(site[i])):
         print(site[i][j])
-    print('\n for i de nuevo')
+
+
+# Como crear un array multidimensional desde cero
+array_datos = [[]]
+array_datos[0].append('Arturo')
+array_datos[0].append('Cabrera')
+
+array_datos.append([])
+array_datos[1].append('gnuxdar')
+array_datos[1].append('AC Tecnology')
+
+array_datos.append([])
+array_datos[2].append('Ecuador')
+array_datos[2].append('Venezuela')
+print(array_datos)
