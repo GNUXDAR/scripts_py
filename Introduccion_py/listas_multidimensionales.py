@@ -36,7 +36,7 @@ array_datos.append([])
 array_datos[1].append('gnuxdar')
 array_datos[1].append('AC Tecnology')
 
-array_datos.append([])
+array_datos.append([])  # esto es importanmte para crear un nuevo array y hacerlo multidimencional
 array_datos[2].append('Ecuador')
 array_datos[2].append('Venezuela')
 print(array_datos)
