@@ -97,3 +97,36 @@ def unpacking_person_info(name, country, city, age):
     return f'{name} lives in {country}, {city}. He is {age} year old.'
 dct = {'name':'Arturo', 'country':'Ecuador', 'city':'Quito', 'age':33}
 print(unpacking_person_info(**dct)) # Arturo lives in Ecuador, Quito. He is 33 years old.
+
+
+# HAACER CALCULOS CON UN DICCIONARIO
+monto_total = 244.75
+comprar = {
+    'compra1': 15,
+    'compra2': 8,
+    'compra3': 10,
+    'compra4': 50,
+    'compra5': 32.63
+}
+gasto = 0
+
+# imprimir la clave
+# for clave in comprar:
+#     print(clave)
+
+# imprimir el valor del dict
+for clave in comprar:
+    valor = comprar[clave]
+    gasto += valor
+    print(valor)
+print(monto_total - gasto)
+
+"""
+porque valor = comprar[clave] toma el valor del diccionario?
+
+Al utilizar comprar[clave], estás accediendo al valor asociado a la clave clave en el diccionario comprar. 
+En cada iteración del bucle for, la variable clave toma el valor de una clave del diccionario, y comprar[clave] devuelve el valor correspondiente a esa clave.
+
+En resumen, la línea valor = comprar[clave] asigna el valor correspondiente a la clave actual del diccionario a la variable valor, 
+lo que te permite sumar ese valor al total de gastos (gasto += valor). De esta manera, estás recorriendo cada elemento del diccionario y acumulando el gasto total en la variable gasto.
+"""
