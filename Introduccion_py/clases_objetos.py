@@ -20,6 +20,10 @@ class Person:
   pass
 print(Person)   #   <class '__main__.Person'>
 
+""" "pass" es una instrucción en Python que no hace nada. Se utiliza como marcador de posición en el código cuando se requiere una instrucción pero no se desea realizar ninguna acción.
+
+Por ejemplo, en una definición de función, se puede utilizar "pass" para indicar que la función aún no está implementada:
+"""
 
 # CREANDO UN OBJETO
 # Podemos crear un objeto llamando a la clase.
@@ -31,7 +35,7 @@ print(p)    # <__main__.Person object at 0x7f0aeb73b1c0>
 # Sin embargo, una clase sin constructor no es realmente útil en aplicaciones reales. 
 # Usemos la función constructora para que nuestra clase sea más útil. 
 # Al igual que la función constructora en Java o JavaScript, Python también tiene una función constructora init() incorporada. 
-# La función constructora init tiene un parámetro propio que es una referencia a la instancia actual de la clase. Ejemplos:
+# La función constructora __init__ tiene un parámetro propio que es una referencia a la instancia actual de la clase. Ejemplos:
 
 
 class Person:
