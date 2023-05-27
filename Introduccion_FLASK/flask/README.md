@@ -1,4 +1,4 @@
-# Sistema de Gestion de personal
+# Flask 
 
 ## creando el entorno virtual
 python3 -m venv .venv

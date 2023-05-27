@@ -1,21 +1,39 @@
-from flask import Flask, url_for, request
+from flask import Flask, url_for, request, render_template
 from markupsafe import escape
 
 
 app = Flask(__name__)
 
 
-@app.route('/login/')
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
-    return 'The login page'
+    error = None
+    if request.method == 'POST':
+        if valid_login(request.form['username'],
+                       request.form['password']):
+            return log_the_user_in(request.form['username'])
+        else:
+            return 'Invalid username/password'
+    # el siguiente código se ejecuta si el método de solicitud 
+    # # era GET o las credenciales no eran válidas
+
+""" otra manera """
+# @app.get('/login/')
+# def login_get():
+#     return show_the_login_form()
+
+# @app.post('/login/')
+# def login_post():
+#     return do_the_login()
 
 @app.route("/")
 def index():
     return "Index Page"
 
 @app.route('/hello/')
-def hello():
-    return 'Hello world!'
+@app.route('/hello/<name>')
+def hello(name=None):
+    return render_template('hello.html', name=name)
 
 @app.route('/projects/')
 def projects():
