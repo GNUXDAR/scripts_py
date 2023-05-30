@@ -52,3 +52,9 @@ install mysql-client    (pedia instalar "flask-mysqldb" pero daba error)
 ├── .venv/
 ├── pyproject.toml
 └── MANIFEST.in
+
+## Inicializar el archivo de base de datos
+Si todavía está ejecutando el servidor desde la página anterior, puede detener el servidor o ejecutar este comando en una nueva terminal. Si usa una terminal nueva, recuerde cambiar al directorio de su proyecto y activar el env como se describe en Instalación.
+
+$ flask --app flaskr init-db
+Initialized the database.
