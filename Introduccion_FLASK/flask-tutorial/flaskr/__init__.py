@@ -11,6 +11,9 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
+    from . import db
+    db.init_app(app)
+
     if test_config is None:
         # cargar la configuración de la instancia, si existe, cuando no se está realizando pruebas
         app.config.from_pyfile('config.py', silent=True)
