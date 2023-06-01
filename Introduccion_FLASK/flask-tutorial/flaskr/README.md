@@ -1,7 +1,10 @@
 # Tutorial Flask 
 [tutorial](https://flask.palletsprojects.com/)
+[Flask](https://flask.palletsprojects.com/en/2.3.x/tutorial/)
 
 ## creando el entorno virtual
+mkdir flaskr
+cd flaskr
 python3 -m venv .venv
 . .venv/bin/activate
 
