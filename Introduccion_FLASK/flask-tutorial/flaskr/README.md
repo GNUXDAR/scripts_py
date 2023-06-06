@@ -26,7 +26,7 @@ pip install flask
 install mysql-client    (pedia instalar "flask-mysqldb" pero daba error)
 
 
-## ASi debera quedar el proyecto
+## Asi debera quedar el proyecto
 /home/user/Projects/flask-tutorial
 ├── flaskr/
 │   ├── __init__.py
@@ -61,3 +61,7 @@ Si todavía está ejecutando el servidor desde la página anterior, puede detene
 
 $ flask --app flaskr init-db
 Initialized the database.
+
+## Comando para ejecutar las pruebas
+pip install pytest
+pytest
