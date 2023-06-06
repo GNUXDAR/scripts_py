@@ -62,6 +62,11 @@ Si todavía está ejecutando el servidor desde la página anterior, puede detene
 $ flask --app flaskr init-db
 Initialized the database.
 
+## Instalable
+pip install yourproject.whl
+
 ## Comando para ejecutar las pruebas
-pip install pytest
-pytest
+$ pip install pytest coverage
+$ pytest
+ó
+$ coverage run -m pytest
