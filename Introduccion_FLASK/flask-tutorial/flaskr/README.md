@@ -33,7 +33,7 @@
 └── MANIFEST.in
 
 ## creando el entorno virtual
-mkadir flaskr
+mkdir flaskr
 
 cd flaskr
 
