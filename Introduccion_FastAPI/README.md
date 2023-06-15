@@ -10,6 +10,9 @@ $ . .venv/bin/activate ó source .venv/bin/activate
 $ pip install fastapi  
 $ pip install uvicorn  
 
+# Export Requirements  
+$ pip freeze > requrements.txt  
+
 # Run
 $ uvicorn main:app --reload  
 open in browser: http://127.0.0.1:8000  
