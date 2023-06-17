@@ -9,30 +9,30 @@ curl --location --request GET 'http://127.0.0.1:8000/getAllSkuOffers/23'
 200 OK Successful response  
 
 # Successful Response Body:
-{
-    "sku": "xxx", //string
-    "offers": [
-        {
-            "id": 0, // integer
-            "price": 00.00, // decimal
-            "stock": 0, // integer - Cantidad de ofertas disponible
-            "shipping_price": 0.00, // decimal
-            "delivery_date": 2023-05-27, // date
-            "can_be_refunded": true, // boolean - Determina si un producto
-            tiene devolución.
-            "status": "new", // string (new,used,renew)
-            "guarantee": true, // boolean - Determina si un producto tiene
-            garantía.
-            "seller": {
-                "name": "xxxx", // string
-                "qualification": 0, // integer - Range: 0-5 - Promedio de
+{  
+    "sku": "xxx", //string      
+    "offers": [     
+        {   
+            "id": 0, // integer     
+            "price": 00.00, // decimal      
+            "stock": 0, // integer - Cantidad de ofertas disponible     
+            "shipping_price": 0.00, // decimal      
+            "delivery_date": 2023-05-27, // date    
+            "can_be_refunded": true, // boolean - Determina si un producto      
+            tiene devolución.   
+            "status": "new", // string (new,used,renew)     
+            "guarantee": true, // boolean - Determina si un producto tiene      
+            garantía.   
+            "seller": {     
+                "name": "xxxx", // string       
+                "qualification": 0, // integer - Range: 0-5 - Promedio de       
                 calificaciones.
-                "reviews_quantity": 0, // integer - Cantidad de calificaciones
+                "reviews_quantity": 0, // integer - Cantidad de calificaciones      
                 tiene el seller.
-            }
-        },
-    ]
-}
+            }   
+        },      
+    ]   
+}   
 
 # Error Response Body:
 
