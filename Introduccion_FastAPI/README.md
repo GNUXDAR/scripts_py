@@ -11,7 +11,8 @@ $ pip install fastapi
 $ pip install uvicorn  
 
 # Export Requirements  
-$ pip freeze > requrements.txt  
+$ pip freeze > requirements.txt  
+$ pip install -r requirements.txt  
 
 # Run
 $ uvicorn main:app --reload  
