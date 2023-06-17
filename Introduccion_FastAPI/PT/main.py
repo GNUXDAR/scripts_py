@@ -126,6 +126,20 @@ def get_all_sku_offers(sku: str):
                     "qualification": 5,  # // integer - Range: 0-5 - Promedio de calificaciones.
                     "reviews_quantity": 10  # // integer - Cantidad de calificaciones tiene el seller.
                 }
+            },{
+                "id": 2, # integer
+                "price": 20.00, # float
+                "stock": 20,  # integer - Cantidad de ofertas disponible
+                "shipping_price": 25.00, # float
+                "delivery_date": date(2023, 7, 15), # date
+                "can_be_refunded": True,  # boolean - Determina si un producto tiene devolución.
+                "status": "new",  # string (new,used,renew)
+                "guarantee": True,  # // boolean - Determina si un producto tiene garantía.
+                "seller": {
+                    "name": "Adidas", # string
+                    "qualification": 5,  # // integer - Range: 0-5 - Promedio de calificaciones.
+                    "reviews_quantity": 10  # // integer - Cantidad de calificaciones tiene el seller.
+                }
             }
         ]
     }
