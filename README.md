@@ -2,7 +2,7 @@
   <img src="https://github.com/GNUXDAR/scripts_py/blob/main/img/py_img.png">
   </a>
 
-[Blog Web](https://arturocabrera.com/blog) | [Recursos Web](Docs/links.md) | [Recursos PDF](Docs/PDF/pdfs.md)
+[Blog Web](https://arturocabrera.com/blog) | [Recursos Web](Docs/README.md) | [Recursos PDF](Docs/PDF/pdfs.md)
 
 Jupyter Notebook, una aplicación web de código abierto, 
 le permite crear y compartir un código interactivo, 
