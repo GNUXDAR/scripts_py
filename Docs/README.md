@@ -8,3 +8,6 @@
 [The Legend of Python](https://www.codedex.io/python)
 
 [CheckiO](https://py.checkio.org/)
+
+# Resources with certificated
+[Python Tutorial for Beginners](https://www.simplilearn.com/free-python-online-course-skillup)
