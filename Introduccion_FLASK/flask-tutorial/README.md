@@ -9,6 +9,9 @@ python3 -m venv .venv
 pip install flask  
 pip freeze  
 
+## Install Librery
+apt-get install python3-psutil  
+
 ## Ejecutando el fichero
 flask --app hello run       (fichero se llama hello.py)  
 flask --app hello run --debug  
