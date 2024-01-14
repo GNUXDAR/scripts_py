@@ -9,7 +9,7 @@ python3 -m venv .venv
 pip install flask  
 pip freeze  
 
-## Install Librery
+## Install Librery (^12 Debian)
 apt-get install python3-psutil  
 
 ## Ejecutando el fichero
