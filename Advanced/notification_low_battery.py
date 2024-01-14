@@ -1,5 +1,11 @@
 # Created by @gnuxdar 
 # Modify by Root-FTW 21/04/23
+
+# Install
+# sudo apt install python3-psutil
+# sudo apt install python3-
+
+#!/usr/bin/env python3
 import psutil
 import time
 from os import path
