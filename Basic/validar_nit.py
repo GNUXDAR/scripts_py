@@ -9,13 +9,16 @@ def validar_nit(nit):
 
     # Guarda el digito validador, el ultimo
     dig_validador = nit_ok[-1]
+    print("dig_validador ", dig_validador)
 
     # Guarda el resto de numeros para sumar
     dig_nit = list(nit_ok[0:-1])
+    print("dig_nit ", dig_nit)
 
     # Reverse invierte el orden de los digitos del original
     # El array inverso se refleja al original
     dig_nit_rev = dig_nit.reverse()  # None
+    print("El array inverso ", dig_nit_rev)
 
     try:
         suma = 0
